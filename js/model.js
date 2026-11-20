@@ -671,8 +671,10 @@
     const layers = {};
     U.forEach(u => { (layers[lvl[u]] = layers[lvl[u]] || []).push(u); });
     const keys = Object.keys(layers).map(Number).sort((a, b) => a - b);
-    const DX = 212, DY = 150, cx = {};
-    const width = u => units[u].length * DX;
+    const DX = 212, DXC = 280, DY = 150, cx = {};
+    /* les chaînes de procédure sont plus espacées : leurs liens portent des délais */
+    const step = u => units[u].length > 1 ? DXC : DX;
+    const width = u => units[u].length * step(u);
     const place = k => {
       const L = layers[k], tot = L.reduce((s, u) => s + width(u), 0);
       let x = -tot / 2;
@@ -694,8 +696,8 @@
       });
     }
     U.forEach(u => {
-      const L = units[u], x0 = cx[u] - (L.length - 1) * DX / 2;
-      L.forEach((id, j) => { if (!E[id].fixed) { E[id].x = Math.round(x0 + j * DX); E[id].y = lvl[u] * DY; } });
+      const L = units[u], x0 = cx[u] - (L.length - 1) * step(u) / 2;
+      L.forEach((id, j) => { if (!E[id].fixed) { E[id].x = Math.round(x0 + j * step(u)); E[id].y = lvl[u] * DY; } });
     });
   };
 })();

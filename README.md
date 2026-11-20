@@ -1,5 +1,7 @@
 # Contract Lab — atelier contrat de travail
 
+[![Contract Lab en mode cinéma : une clause de non-concurrence et ses cinq garde-fous, avec la question posée à la salle et la réponse révélée](contract-lab.png)](https://edu-fpar.github.io/contract-lab/?scenario=non-concurrence&etape=6)
+
 Outil pédagogique pour visualiser et expliquer le **contrat de travail** et le **droit du travail** :
 un contrat et ses **clauses** en icônes, les **garde-fous** qui les rendent valables, les **incompatibilités**,
 les **obligations** des parties, les **ruptures** avec leur procédure et les **indemnités** qu'elles ouvrent.
@@ -19,10 +21,15 @@ Aucune installation : ouvrez `index.html` (double-clic) ou servez le dossier ave
   de préavis et d'indemnités). Les **pastilles** sous une carte montrent ses garde-fous ; le bouton **＋** de
   l'inspecteur ajoute un garde-fou manquant. La case **🔍 Vérification** masque les verdicts pour laisser la classe juger.
   Le **📸 Studio** capture des étapes commentées et les exporte en scénario markdown.
+
+  ![Contract Lab en mode libre (nuit) : un CDI, ses clauses et la vérification du renouvellement de la période d'essai](contract-lab-libre.png)
+
 - **🎬 Cinéma** : déroule un scénario markdown, en **pas à pas** ou en **lecture continue**
   (rythme réglable), avec des **questions à la salle** et une vue adaptée au téléphone.
   Lien direct : `?scenario=non-concurrence&etape=6`, `?scenarios`, ou le bouton 🔗 Partager.
   Le bouton **📦 SCORM** exporte le scénario en paquet pour Moodle ou un autre LMS (achèvement, reprise, note).
+
+  ![Une rupture en frise de procédure : la faute grave neutralise le préavis et l'indemnité de licenciement (⊘)](contract-lab-rupture.png)
 
 ## Scénarios intégrés
 
@@ -58,6 +65,7 @@ focus NC
 - Documentation complète : `docs/index.html` (Docsify, à ouvrir via un serveur web, comme UwAmp). Les pages sont aussi lisibles directement : ce sont les fichiers `docs/*.md`.
 - Skill Claude pour générer un scénario à partir d'un support de cours : `skill/scenario-contract-lab.skill` (voir `docs/ia-et-skill.md`).
 - Après une modification du moteur, du format ou des scénarios : `node tools/build.js`, puis `python tools/package_skill.py`.
+- Captures d'écran (README et documentation) : `node tools/screenshots.js` (Edge ou Chrome sans fenêtre, aucune dépendance).
 
 ## Fichiers
 

@@ -9,6 +9,9 @@ Bouton **📚 Scénarios** :
 - ou **coller** le markdown fourni par un collègue ou une IA, puis « ▶ Lancer » ;
 - ou **ouvrir un fichier** `.md`. On peut aussi le déposer directement sur la fenêtre.
 
+![La bibliothèque des scénarios](images/bibliotheque-jour.jpg)
+<p class="caption">La bibliothèque : les scénarios intégrés, et la zone où coller un scénario écrit par un collègue ou une IA.</p>
+
 ## Partager un lien
 
 L'atelier est en ligne à l'adresse **https://edu-fpar.github.io/contract-lab/**. Le bouton **🔗 Partager** propose trois liens à copier : vers **l'étape affichée**, vers **le début du scénario**, ou vers **la bibliothèque**. Pendant la lecture, l'adresse du navigateur suit d'ailleurs l'étape en cours : on peut aussi la copier directement.
@@ -38,6 +41,8 @@ Dans le paquet, seul le lecteur reste visible : pas de mode libre, de bibliothè
 
 L'atelier s'adapte aux écrans étroits. Sur téléphone, il s'ouvre directement sur la bibliothèque des scénarios :
 
+<div class="phones"><img src="images/telephone-schema-jour.jpg" alt="Téléphone : la procédure de licenciement en haut, le commentaire en bas" width="240"> <img src="images/telephone-question-nuit.jpg" alt="Téléphone : une question révélée, choix empilés" width="240"></div>
+
 - le **schéma** occupe le haut de l'écran, les **explications** le bas ;
 - les boutons **🗺 / ◫ / 📖** de la barre du bas affichent le schéma seul, les deux, ou le texte seul ;
 - on **balaie** les explications vers la gauche ou la droite pour changer d'étape ; les boutons **◀ / Suivant** restent disponibles ;
@@ -66,6 +71,9 @@ Clavier : **→** / **←** pour avancer ou reculer, **Espace** pour avancer (pa
 ## Étapes questions
 
 Certaines étapes interrogent l'audience. Leur titre est précédé de ❓, et une fenêtre monte en bas du canevas avec la question et les choix en grandes cartes (A, B, C…).
+
+![Une question révélée en mode nuit](images/question-revelee-nuit.jpg)
+<p class="caption">Après la révélation : la bonne carte en vert, une carte retournée pour lire son explication, et la clause passée au vert sur le canevas.</p>
 
 
 1. **Laisser la salle répondre** : à main levée, à l'oral… Cliquez sur la carte choisie par la majorité, ou tapez son numéro : elle est marquée « 👥 choix de la salle ».

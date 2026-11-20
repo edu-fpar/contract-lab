@@ -8,6 +8,9 @@ Le mode libre ✏️ sert à construire un contrat ou un dossier de rupture, à 
 - **au centre**, le canevas ;
 - **à droite**, l'inspecteur : propriétés et vérification de l'élément sélectionné, ou vue d'ensemble si rien n'est sélectionné.
 
+![Mode libre : palette, contrat de Léa et vérification de la période d'essai](images/libre-verification-jour.jpg)
+<p class="caption">La palette à gauche, le contrat au centre, l'inspecteur à droite : verdict, calcul de durée et conditions de validité de la période d'essai.</p>
+
 Le bouton 🌙 / ☀️ en haut à droite bascule entre le **mode jour** et le **mode nuit**. Par défaut, l'atelier suit le réglage du système ; une fois choisi, le mode est mémorisé dans le navigateur.
 
 ## La palette

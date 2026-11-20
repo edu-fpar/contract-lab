@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /*
- * Régénère les captures d'écran de la documentation (docs/images/*.jpg).
+ * Régénère les captures d'écran de la documentation (docs/images/*.jpg)
+ * et les images de présentation à la racine (contract-lab*.png).
  * Usage (depuis le dossier du projet) : node tools/screenshots.js
  *
  * Pilote Microsoft Edge (ou Chrome) sans fenêtre via son protocole de débogage :
@@ -24,6 +25,7 @@ const BROWSER = process.env.BROWSER || [
 ].find(p => fs.existsSync(p));
 
 const DESKTOP = { width: 1366, height: 800, deviceScaleFactor: 1, mobile: false };
+const WIDE = { width: 1440, height: 860, deviceScaleFactor: 1, mobile: false };
 const PHONE = { width: 390, height: 844, deviceScaleFactor: 2, mobile: true };
 
 /* Chaque capture : page, taille, thème, et la mise en scène à exécuter dans la page avant la photo. */
@@ -39,7 +41,14 @@ const SHOTS = [
   { file: 'telephone-question-nuit', url: '?scenario=non-concurrence&etape=6', size: PHONE, theme: 'dark',
     js: `App.reveal(); await wait(700); document.querySelector('[data-card="2"]').click(); await wait(200);
          document.querySelector('.qinline').scrollIntoView({ block: 'start' });` },
-  { file: 'telephone-schema-jour', url: '?scenario=licenciement&etape=6', size: PHONE, theme: 'light' }
+  { file: 'telephone-schema-jour', url: '?scenario=licenciement&etape=6', size: PHONE, theme: 'light' },
+  /* images de présentation (README, partage sur les réseaux) : à la racine, en PNG */
+  { file: 'contract-lab', root: true, url: '?scenario=non-concurrence&etape=6', size: WIDE, theme: 'light',
+    js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
+  { file: 'contract-lab-libre', root: true, url: '', size: WIDE, theme: 'dark',
+    js: `document.querySelector('#tool-example').click(); await wait(300); App.select({ kind: 'node', id: 'REN' }); await wait(200); App.fit(false);` },
+  { file: 'contract-lab-rupture', root: true, url: '?scenario=faute-grave&etape=3', size: WIDE, theme: 'light',
+    js: `foldLegend(); App.reveal(); await wait(900); App.select({ kind: 'node', id: 'IL' });` }
 ];
 
 /* ---------- petit serveur statique */
@@ -91,8 +100,8 @@ async function main() {
       const r = await send('Runtime.evaluate', { expression: `(async () => { ${prelude} ${s.js || ''} })()`, awaitPromise: true });
       if (r.exceptionDetails) throw new Error(s.file + ' : ' + r.exceptionDetails.exception.description);
       await sleep(1600);   // fin des animations (apparition, recadrage)
-      const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 82 });
-      const file = path.join(out, s.file + '.jpg');
+      const shot = await send('Page.captureScreenshot', s.root ? { format: 'png' } : { format: 'jpeg', quality: 82 });
+      const file = s.root ? path.join(root, s.file + '.png') : path.join(out, s.file + '.jpg');
       fs.writeFileSync(file, Buffer.from(shot.data, 'base64'));
       console.log('capturé  ' + path.relative(root, file) + `  (${Math.round(fs.statSync(file).size / 1024)} ko)`);
     }

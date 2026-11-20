@@ -6,6 +6,9 @@ Chaque élément du droit du travail devient une carte : le contrat et ses claus
 
 [▶ Ouvrir l'atelier](../index.html ':ignore') — en ligne : **https://edu-fpar.github.io/contract-lab/**, utilisable aussi sur téléphone.
 
+![Mode libre : un CDI, ses clauses, et la vérification du renouvellement de la période d'essai](../contract-lab-libre.png)
+<p class="caption">Le mode libre (nuit) : le contrat de Léa et ses clauses dans leur cadre ; à droite, les conditions de validité du renouvellement de l'essai, toutes remplies.</p>
+
 ## 🤖 Préparer son cours avec une IA
 
 <div class="ai-box">
@@ -33,6 +36,9 @@ Chaque élément du droit du travail devient une carte : le contrat et ses claus
 | Rythme | libre | pas à pas, ou lecture continue à vitesse réglable |
 
 Les deux modes partagent le même moteur de vérification : conditions de validité, incompatibilités, obligations violées, calculs (période d'essai, durée du CDD, préavis, indemnité légale, rupture conventionnelle, prime de précarité).
+
+![Mode cinéma : la clause de non-concurrence, quatre garde-fous en place, la question à la salle](images/cinema-non-concurrence-jour.jpg)
+<p class="caption">Le mode cinéma (jour) : la clause de non-concurrence se construit garde-fou par garde-fou ; le commentaire est à droite.</p>
 
 ## Par où commencer ?
 
