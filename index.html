@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contract Lab — atelier contrat de travail</title>
+<meta name="description" content="Atelier pédagogique gratuit pour visualiser le contrat de travail : clauses en icônes, garde-fous qui les rendent valables, incompatibilités, obligations des parties, ruptures et leurs procédures. Scénarios animés pas à pas et quiz pour la classe.">
+<link rel="canonical" href="https://edu-fpar.github.io/contract-lab/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 6h44l20 20v68H18z' fill='%230891b2'/%3E%3Cpath d='M30 46h40M30 60h40M30 74h26' stroke='%23fff' stroke-width='7'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Contract Lab">
+<meta property="og:title" content="Contract Lab — atelier contrat de travail">
+<meta property="og:description" content="Une clause de non-concurrence sans contrepartie ? Nulle. Un atelier visuel et des scénarios animés pour enseigner le contrat de travail, ses clauses, les obligations et les ruptures.">
+<meta property="og:url" content="https://edu-fpar.github.io/contract-lab/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Contract Lab — atelier contrat de travail">
+<meta name="twitter:description" content="Clauses, garde-fous, obligations et ruptures du contrat de travail : un atelier visuel et des scénarios animés pour la classe.">
+<script>
+  /* Thème appliqué avant l'affichage pour éviter un flash : choix mémorisé, sinon réglage du système. */
+  (function () {
+    var t = null;
+    try {
+        t = localStorage.getItem('contract-lab.theme');
+    } catch (e) { /* stockage indisponible */ }
+    if (t !== 'light' && t !== 'dark') t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="libre">
+
+<header id="topbar">
+  <div class="brand"><span class="logo">📜</span><b>Contract Lab</b><small>atelier contrat de travail</small></div>
+  <nav class="modes" role="tablist">
+    <button data-mode="libre" class="active" title="Construire librement un contrat ou un dossier">✏️ Libre</button>
+    <button data-mode="cinema" title="Dérouler un scénario commenté">🎬 Cinéma</button>
+  </nav>
+  <div class="actions" id="actions-libre">
+    <button id="btn-new" title="Vider le canevas">🗋<span class="lbl"> Nouveau</span></button>
+    <button id="btn-undo" title="Annuler (Ctrl+Z)">↶</button>
+    <button id="btn-redo" title="Rétablir (Ctrl+Y)">↷</button>
+    <button id="btn-layout" title="Réorganiser automatiquement">⇅<span class="lbl"> Disposer</span></button>
+    <button id="btn-open" title="Ouvrir un schéma (.json) ou un scénario (.md)">📂<span class="lbl"> Ouvrir</span></button>
+    <button id="btn-save" title="Enregistrer le schéma (.json)">💾<span class="lbl"> Enregistrer</span></button>
+    <button id="btn-studio" title="Capturer des étapes et produire un scénario">📸<span class="lbl"> Studio</span></button>
+  </div>
+  <div class="actions" id="actions-cinema" hidden>
+    <button id="btn-library" title="Choisir un scénario">📚<span class="lbl"> Scénarios</span></button>
+    <button id="btn-share" title="Copier un lien vers ce scénario ou cette étape">🔗<span class="lbl"> Partager</span></button>
+    <button id="btn-scorm" title="Exporter ce scénario en paquet SCORM (Moodle, LMS)">📦<span class="lbl"> SCORM</span></button>
+    <button id="btn-edit-md" title="Voir et modifier le markdown du scénario">📝<span class="lbl"> Markdown</span></button>
+    <button id="btn-to-libre" title="Reprendre l'état affiché en mode libre">✏️<span class="lbl"> Explorer librement</span></button>
+  </div>
+  <div class="actions right">
+    <label class="opt" title="Affiche les verdicts (valide, à risque, nulle) et les pastilles de garde-fous. Décochez pour laisser la classe juger."><input type="checkbox" id="opt-verif" checked> 🔍 Vérification</label>
+    <button id="btn-theme" class="theme-btn" title="Mode jour / nuit">🌙</button>
+    <button id="btn-help" title="Aide">❔<span class="lbl"> Aide</span></button>
+  </div>
+</header>
+
+<main id="main">
+  <aside id="palette"></aside>
+
+  <section id="stage">
+    <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="banner" hidden></div>
+    <div id="zoom">
+      <button data-z="in" title="Zoom avant">+</button>
+      <button data-z="out" title="Zoom arrière">−</button>
+      <button data-z="fit" title="Tout afficher (F)">⤢</button>
+    </div>
+    <div id="legend"></div>
+    <div id="studio" hidden></div>
+    <div id="qsheet" hidden aria-live="polite"></div>
+    <div id="toast"></div>
+  </section>
+
+  <aside id="side">
+    <div id="inspector"></div>
+    <div id="commentary" hidden></div>
+  </aside>
+</main>
+
+<footer id="player" hidden>
+  <button id="pl-first" title="Début (Origine)">⏮</button>
+  <button id="pl-prev" title="Étape précédente (←)">◀</button>
+  <button id="pl-play" class="primary" title="Lecture / pause (Espace)">▶ Lecture</button>
+  <button id="pl-next" class="primary" title="Étape suivante (→)">Suivant ▶</button>
+  <button id="pl-reset" title="Remettre les cartes et les bulles déplacées à leur place d'origine" hidden>↺ Disposition</button>
+  <div id="pl-progress"><div id="pl-dots"></div><div id="pl-timer"><i></i></div></div>
+  <span id="pl-count">–</span>
+  <div id="pl-view" role="group" aria-label="Affichage">
+    <button data-v="schema" title="Schéma seul">🗺</button>
+    <button data-v="split" title="Schéma et explications">◫</button>
+    <button data-v="texte" title="Explications seules">📖</button>
+  </div>
+  <label class="pl-modelabel">Mode
+    <select id="pl-mode">
+      <option value="pas">Pas à pas</option>
+      <option value="continu">Lecture continue</option>
+    </select>
+  </label>
+  <label class="speed">Rythme <input type="range" id="pl-speed" min="0.25" max="3" step="0.25" value="1"> <span id="pl-speed-v">1×</span></label>
+</footer>
+
+<div id="modal" hidden><div class="dialog"><button class="close" title="Fermer (Échap)">×</button><div class="content"></div></div></div>
+<input type="file" id="file-input" accept=".md,.markdown,.txt,.json" hidden>
+
+<script src="js/model.js"></script>
+<script src="js/scenario.js"></script>
+<script src="js/docs.js"></script>
+<script src="js/library.js"></script>
+<script src="js/scorm.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

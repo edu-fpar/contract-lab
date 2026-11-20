@@ -1,0 +1,13 @@
+- [Accueil](README.md)
+- [🤖 Préparer son cours avec une IA](ia-et-skill.md)
+- **Présenter en classe**
+  - [Mode cinéma : lecture, questions, téléphone, partage](mode-cinema.md)
+  - [Scénarios disponibles](scenarios.md)
+- **Construire**
+  - [Mode libre et studio](prise-en-main.md)
+  - [Format des scénarios](format-scenario.md)
+- **Comprendre**
+  - [Règles de vérification](regles-de-calcul.md)
+- **Référence**
+  - [Page d'instructions pour IA](instructions-ia.md)
+  - [Développeurs](developpeurs.md)

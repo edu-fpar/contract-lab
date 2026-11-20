@@ -1,0 +1,14 @@
+# Contract Lab
+
+> Atelier pédagogique 100 % navigateur pour visualiser le contrat de travail et le droit du travail français (clauses et leurs garde-fous, incompatibilités, obligations des parties, ruptures et procédures, indemnités, sources du droit), avec vérification automatique des conditions de validité, et pour les présenter en classe sous forme de scénarios animés pas à pas, écrits en markdown.
+
+## Pour les IA
+
+- [Instructions : créer un scénario à partir d'un cours](https://edu-fpar.github.io/contract-lab/docs/instructions-ia.md): mission, format complet des scénarios, règles de vérification, exemple commenté.
+- [Format des scénarios](https://edu-fpar.github.io/contract-lab/docs/format-scenario.md): syntaxe des étapes, des commandes et des questions, catalogue des éléments.
+- [Règles de vérification](https://edu-fpar.github.io/contract-lab/docs/regles-de-calcul.md): ce que l'outil vérifie et calcule, et ce qu'il ne représente pas.
+
+## Pour les humains
+
+- [Atelier en ligne](https://edu-fpar.github.io/contract-lab/)
+- [Documentation](https://edu-fpar.github.io/contract-lab/docs/)

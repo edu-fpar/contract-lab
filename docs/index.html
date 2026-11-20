@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contract Lab — documentation</title>
+  <meta name="description" content="Documentation de Contract Lab : prise en main, mode cinéma, règles de vérification des clauses, des ruptures et des indemnités, format des scénarios et génération de scénarios par IA.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M22 6h42l18 18v70H22z' fill='%234f46e5'/%3E%3C/svg%3E">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="Contract Lab">
+  <meta property="og:title" content="Contract Lab — documentation">
+  <meta property="og:description" content="Prise en main, mode cinéma, règles de vérification et création de scénarios pour l'atelier Contract Lab.">
+  <meta property="og:url" content="https://edu-fpar.github.io/contract-lab/docs/">
+  <meta name="twitter:card" content="summary">
+  <script>
+    /* même réglage que l'atelier : choix mémorisé, sinon réglage du système */
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('contract-lab.theme'); } catch (e) { /* */ }
+      if (t !== 'light' && t !== 'dark') t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/themes/vue.css">
+  <style>
+    :root { --theme-color: #4f46e5; --base-font-size: 15px; }
+    .markdown-section table { display: table; width: 100%; }
+    .markdown-section pre > code { font-size: .85rem; }
+    .app-name-link { font-weight: 700; }
+    #theme-toggle {
+      position: fixed; top: 12px; right: 16px; z-index: 30; border: 1px solid #e2e8f0; background: #fff;
+      border-radius: 8px; padding: 4px 9px; font-size: 16px; cursor: pointer;
+    }
+
+    /* ---- mode nuit ---- */
+    [data-theme="dark"] { --theme-color: #818cf8; color-scheme: dark; }
+    [data-theme="dark"] body { background: #0b1120; color: #e2e8f0; }
+    [data-theme="dark"] .sidebar { background: #141c2f; border-right-color: #2a3550; color: #cbd5e1; }
+    [data-theme="dark"] .sidebar ul li a { color: #cbd5e1; }
+    [data-theme="dark"] .sidebar ul li.active > a { color: var(--theme-color); }
+    [data-theme="dark"] .sidebar-toggle { background: rgba(20, 28, 47, .9); }
+    [data-theme="dark"] .sidebar-toggle span { background-color: #cbd5e1; }
+    [data-theme="dark"] .app-name-link, [data-theme="dark"] .sidebar strong { color: #e2e8f0; }
+    [data-theme="dark"] .markdown-section, [data-theme="dark"] .markdown-section p,
+    [data-theme="dark"] .markdown-section li { color: #cbd5e1; }
+    [data-theme="dark"] .markdown-section h1, [data-theme="dark"] .markdown-section h2,
+    [data-theme="dark"] .markdown-section h3, [data-theme="dark"] .markdown-section h4,
+    [data-theme="dark"] .markdown-section strong { color: #f1f5f9; }
+    [data-theme="dark"] .markdown-section h1 a, [data-theme="dark"] .markdown-section h2 a,
+    [data-theme="dark"] .markdown-section h3 a, [data-theme="dark"] .markdown-section .anchor span { color: #f1f5f9; }
+    [data-theme="dark"] .markdown-section code { background: #1a2338; color: #fca5a5; }
+    [data-theme="dark"] .markdown-section pre { background: #060b16; }
+    [data-theme="dark"] .markdown-section pre > code { background: transparent; color: #e2e8f0; }
+    [data-theme="dark"] .markdown-section table tr { background: #141c2f; border-top-color: #2a3550; }
+    [data-theme="dark"] .markdown-section table tr:nth-child(2n) { background: #1a2338; }
+    [data-theme="dark"] .markdown-section td, [data-theme="dark"] .markdown-section th { border-color: #2a3550; }
+    [data-theme="dark"] .markdown-section blockquote { color: #94a3b8; border-left-color: var(--theme-color); }
+    [data-theme="dark"] .markdown-section hr { border-bottom-color: #2a3550; }
+    [data-theme="dark"] .search { border-bottom-color: #2a3550; }
+    [data-theme="dark"] .search input { background: #1a2338; color: #e2e8f0; }
+    [data-theme="dark"] .search .matching-post { border-bottom-color: #2a3550; }
+    [data-theme="dark"] .search p, [data-theme="dark"] .search h2 { color: #cbd5e1; }
+    [data-theme="dark"] .token.punctuation, [data-theme="dark"] .token.operator { color: #94a3b8; }
+    [data-theme="dark"] #theme-toggle { background: #141c2f; border-color: #2a3550; }
+
+    /* ---- captures d'écran ---- */
+    .markdown-section img { border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 6px 22px rgba(15, 23, 42, .12); }
+    [data-theme="dark"] .markdown-section img { border-color: #2a3550; box-shadow: 0 6px 22px rgba(0, 0, 0, .45); }
+    .markdown-section p.caption, .markdown-section figcaption { text-align: center; font-size: .85em; color: #64748b; margin: .4rem 0 1.6rem; }
+    [data-theme="dark"] .markdown-section p.caption, [data-theme="dark"] .markdown-section figcaption { color: #94a3b8; }
+    .markdown-section .shots-phone { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 1rem 0 1.6rem; }
+    .markdown-section .shots-phone figure { margin: 0; width: 260px; max-width: 45%; }
+    .markdown-section .shots-phone img { width: 100%; }
+
+    /* ---- encart « Préparer son cours avec une IA » (identique en jour et en nuit) ---- */
+    .markdown-section .ai-box {
+      background: linear-gradient(135deg, #2a2752, #4b2fb8); color: #fff; border-radius: 20px;
+      padding: 1.4rem 1.6rem; margin: 1rem 0 2rem; box-shadow: 0 10px 30px rgba(43, 32, 120, .25);
+    }
+    [data-theme] .markdown-section .ai-box p, [data-theme] .markdown-section .ai-box strong { color: #fff; }
+    [data-theme] .markdown-section .ai-box code { background: rgba(0, 0, 0, .25); color: #ffd166; word-break: break-all; padding: 2px 6px; }
+    [data-theme] .markdown-section .ai-box a:not(.ai-btn) { color: #fff; text-decoration: underline; font-weight: 600; }
+    .markdown-section .ai-box .ai-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    [data-theme] .markdown-section .ai-box .ai-sub { margin: 1rem 0 .4rem; }
+    .markdown-section .ai-prompt { background: rgba(255, 255, 255, .12); border-radius: 12px; padding: .85rem 1rem; line-height: 1.6; }
+    [data-theme] .markdown-section .ai-box .ai-note { font-size: .88em; opacity: .85; margin: .8rem 0 .2rem; }
+    .markdown-section .ai-btn {
+      display: inline-flex; align-items: center; gap: 4px; margin-top: .5rem; padding: 5px 12px; border-radius: 8px;
+      border: 1px solid #fff; background: #fff; color: #2a2752; font: 600 13px/1.4 inherit; cursor: pointer; text-decoration: none;
+    }
+    .markdown-section .ai-btn.ghost { background: transparent; color: #fff; }
+    .markdown-section .ai-btn.warn { background: #ffc107; border-color: #ffc107; color: #2a2752; }
+    .markdown-section .ai-btn:hover { filter: brightness(1.08); }
+    .markdown-section .ai-line .ai-btn { margin-top: 0; }
+    .markdown-section .ai-steps { counter-reset: ai; list-style: none; padding: 0; margin: 0; }
+    .markdown-section .ai-steps > li { counter-increment: ai; position: relative; padding: 0 0 0 46px; margin: 0 0 1.1rem; color: #fff; line-height: 1.6; }
+    .markdown-section .ai-steps > li::before {
+      content: counter(ai); position: absolute; left: 0; top: -2px; width: 32px; height: 32px; border-radius: 50%;
+      background: #ffd166; color: #2a2752; font-weight: 800; display: grid; place-items: center;
+    }
+    [data-theme] .markdown-section .ai-steps strong { color: #fff; }
+    .markdown-section .ai-prompt[contenteditable] { margin: .6rem 0 .2rem; outline: 2px dashed rgba(255, 255, 255, .25); outline-offset: -2px; cursor: text; }
+    .markdown-section .ai-prompt[contenteditable]:focus { outline-color: #ffd166; background: rgba(255, 255, 255, .18); }
+    .markdown-section .ai-btn.big { font-size: 15px; padding: 8px 18px; }
+    .markdown-section .ai-more { margin: .2rem 0 .6rem; padding: .6rem .9rem; border-radius: 12px; background: rgba(0, 0, 0, .18); }
+    .markdown-section .ai-more summary { cursor: pointer; font-weight: 600; }
+    [data-theme] .markdown-section .ai-more p { margin: .5rem 0; }
+    [data-theme] .markdown-section .ai-box a.ai-link { margin-left: 8px; font-weight: 400; }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" type="button"></button>
+  <script>
+    (function () {
+      var b = document.getElementById('theme-toggle'), root = document.documentElement;
+      function show() {
+        var dark = root.getAttribute('data-theme') === 'dark';
+        b.textContent = dark ? '☀️' : '🌙';
+        b.title = dark ? 'Passer en mode jour' : 'Passer en mode nuit';
+      }
+      b.onclick = function () {
+        var t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', t);
+        try { localStorage.setItem('contract-lab.theme', t); } catch (e) { /* */ }
+        show();
+      };
+      show();
+    })();
+  </script>
+  <div id="app">Chargement de la documentation…</div>
+  <noscript>
+    La documentation s'affiche avec JavaScript. Les pages sont aussi lisibles directement : ouvrez les fichiers .md de ce dossier.
+  </noscript>
+  <script>
+    window.$docsify = {
+      name: '📜 Contract Lab',
+      nameLink: '../index.html',
+      loadSidebar: true,
+      subMaxLevel: 2,
+      auto2top: true,
+      relativePath: true,
+      search: { placeholder: 'Rechercher…', noData: 'Aucun résultat', depth: 3 },
+      plugins: [function (hook) { hook.doneEach(fillAiBox); }]
+    };
+
+    /* Encart IA : adresse de la page d'instructions (publique si la doc est consultée en local) et boutons Copier */
+    var PUBLIC_DOCS = 'https://edu-fpar.github.io/contract-lab/docs/';
+    function isLocal() { return location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname); }
+    function docsBase() { return isLocal() ? PUBLIC_DOCS : location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, ''); }
+    function fillAiBox() {
+      var url = docsBase() + 'instructions-ia.md';
+      document.querySelectorAll('.js-ia-url').forEach(function (e) { e.textContent = url; });
+      document.querySelectorAll('.js-ia-local').forEach(function (e) { e.hidden = !isLocal(); });
+    }
+    function copyText(text, btn) {
+      var done = function () { var old = btn.innerHTML; btn.innerHTML = '✅ Copié !'; setTimeout(function () { btn.innerHTML = old; }, 1600); };
+      var fallback = function () {
+        var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { alert('Copie impossible : sélectionnez le texte manuellement.'); }
+        ta.remove();
+      };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+    }
+    document.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-copy-sel], [data-copy-full]');
+      if (!b) return;
+      var box = b.closest('.ai-box') || document;
+      var consigne = (box.querySelector('.js-ia-prompt') || {}).innerText || '';
+      if (b.hasAttribute('data-copy-sel')) { copyText(box.querySelector(b.getAttribute('data-copy-sel')).innerText.trim(), b); return; }
+      // Version complète, pour une IA qui n'ouvre pas les liens : instructions + consigne (sans le lien)
+      var f = b.getAttribute('data-copy-full');
+      var suite = consigne.trim().replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare');
+      // fichier local d'abord ; sinon (ouverture en file://) la version publiée
+      fetch(f).then(function (r) { if (!r.ok) throw 0; return r.text(); })
+        .catch(function () { return fetch(PUBLIC_DOCS + f).then(function (r) { if (!r.ok) throw 0; return r.text(); }); })
+        .then(function (t) { copyText(t.trim() + '\n\n---\n\n# Ma demande\n\n' + suite + '\n\n', b); })
+        .catch(function () { alert('Lecture impossible : ouvrez la page des instructions (lien « voir les instructions ») et copiez son contenu.'); });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/plugins/search.min.js"></script>
+</body>
+</html>
