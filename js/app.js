@@ -701,7 +701,7 @@
       else h += `<div class="prow"><label>${esc(PARAM_LABELS[k] || k)}</label><input type="text" data-act="param" data-k="${esc(k)}" value="${esc(p[k] == null ? '' : p[k])}"></div>`;
     });
     h += `<input type="text" class="addparam" data-act="addparam" placeholder="${t('＋ autre donnée : cle=valeur (ex. icone=🧸)')}">`;
-    if (!keys.length) h += '<p class="small muted">' + t("Ancienneté, salaire et catégorie se renseignent sur le salarié : les indemnités, le préavis et la période d'essai les utilisent.") + '</p>';
+    if (!keys.length && P.jurisId === 'fr') h += '<p class="small muted">' + t("Ancienneté, salaire et catégorie se renseignent sur le salarié : les indemnités, le préavis et la période d'essai les utilisent.") + '</p>';
     return h;
   }
   function relSelect(cur) {
@@ -910,6 +910,9 @@
   App.libFind = (id, lang) => P.LIBRARY.find(s => s.id === id && libLang(s) === (lang || P.lang)) || P.LIBRARY.find(s => s.id === id);
   function openLibrary(all) {
     const list = P.LIBRARY.filter(s => all || libLang(s) === P.lang);
+    // d'abord les scénarios du droit « natif » de la langue (droit anglais en anglais, droit français en français)
+    const native = s => { const J = P.JURIS[P.jurisOf(P.parseScenario(s.md).meta.droit || 'fr') || 'fr']; return J && J.lang === P.lang ? 0 : 1; };
+    list.sort((a, b) => native(a) - native(b));
     const cards = (list.length ? list : P.LIBRARY).map(s => {
       const sc = P.parseScenario(s.md);
       const J = P.JURIS[P.jurisOf(sc.meta.droit || sc.meta.law || 'fr') || 'fr'];

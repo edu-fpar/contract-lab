@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /*
  * Régénère les captures d'écran de la documentation (docs/images/*.jpg)
+ * (docs/images/en/*.jpg pour la documentation anglaise)
  * et les images de présentation à la racine (contract-lab*.png).
  * Usage (depuis le dossier du projet) : node tools/screenshots.js
  *
@@ -42,6 +43,21 @@ const SHOTS = [
     js: `App.reveal(); await wait(700); document.querySelector('[data-card="2"]').click(); await wait(200);
          document.querySelector('.qinline').scrollIntoView({ block: 'start' });` },
   { file: 'telephone-schema-jour', url: '?scenario=licenciement&etape=6', size: PHONE, theme: 'light' },
+  /* documentation anglaise (docs/images/en/) : interface anglaise, droit anglais */
+  { file: 'en/cinema-covenants-day', url: '?lang=en&scenario=uk-covenants&etape=4', size: DESKTOP, theme: 'light' },
+  { file: 'en/question-revealed-night', url: '?lang=en&scenario=uk-covenants&etape=5', size: DESKTOP, theme: 'dark',
+    js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2'); key('1');` },
+  { file: 'en/free-check-day', url: '?lang=en', size: DESKTOP, theme: 'light',
+    js: `const s = document.querySelector('#opt-droit'); s.value = 'uk'; s.dispatchEvent(new Event('change')); await wait(300);
+         document.querySelector('#tool-example').click(); await wait(400);
+         const st = App.state, an = App.an, ids = Object.keys(st.entities);
+         const id = ids.slice().sort((a, b) => an.info[b].reqs.length - an.info[a].reqs.length)[0];
+         App.select({ kind: 'node', id }); await wait(200); App.fit(false); document.querySelector('#toast').classList.remove('show');` },
+  { file: 'en/library-day', url: '?lang=en&scenarios', size: DESKTOP, theme: 'light' },
+  { file: 'en/phone-question-night', url: '?lang=en&scenario=uk-misconduct&etape=5', size: PHONE, theme: 'dark',
+    js: `App.reveal(); await wait(700); const c = document.querySelector('.qcard.correct') || document.querySelector('[data-card="0"]'); c.click(); await wait(200);
+         document.querySelector('.qinline').scrollIntoView({ block: 'start' });` },
+  { file: 'en/phone-diagram-day', url: '?lang=en&scenario=uk-redundancy&etape=5', size: PHONE, theme: 'light' },
   /* images de présentation (README, partage sur les réseaux) : à la racine, en PNG */
   { file: 'contract-lab', root: true, url: '?scenario=non-concurrence&etape=6', size: WIDE, theme: 'light',
     js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
@@ -91,7 +107,8 @@ async function main() {
     });
     await send('Page.enable'); await send('Runtime.enable');
 
-    for (const s of SHOTS) {
+    // ONLY=en/ node tools/screenshots.js : ne refait que les captures dont le nom commence ainsi
+    for (const s of SHOTS.filter(x => !process.env.ONLY || x.file.startsWith(process.env.ONLY))) {
       await send('Emulation.setDeviceMetricsOverride', s.size);
       await send('Emulation.setTouchEmulationEnabled', { enabled: !!s.size.mobile });
       await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: s.theme }] });
@@ -107,6 +124,7 @@ async function main() {
       await sleep(1600);   // fin des animations (apparition, recadrage)
       const shot = await send('Page.captureScreenshot', s.root ? { format: 'png' } : { format: 'jpeg', quality: 82 });
       const file = s.root ? path.join(root, s.file + '.png') : path.join(out, s.file + '.jpg');
+      fs.mkdirSync(path.dirname(file), { recursive: true });
       fs.writeFileSync(file, Buffer.from(shot.data, 'base64'));
       console.log('capturé  ' + path.relative(root, file) + `  (${Math.round(fs.statSync(file).size / 1024)} ko)`);
     }

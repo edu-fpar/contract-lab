@@ -60,7 +60,7 @@ The English catalogue's annual figures are in `DEF` at the top of `js/catalog-uk
 
 ## Screenshots
 
-`tools/screenshots.js` produces `docs/images/*.jpg` (French interface), driving Microsoft Edge or Chrome headless:
+`tools/screenshots.js` produces `docs/images/*.jpg` (French interface), `docs/images/en/*.jpg` (English interface, English law) and the `contract-lab*.png` images at the root (`ONLY=en/ node tools/screenshots.js` redoes only the English ones), driving Microsoft Edge or Chrome headless:
 
 ```bash
 node tools/screenshots.js

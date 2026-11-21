@@ -12,7 +12,7 @@ Each element of employment law becomes a card: the contract and its clauses, the
 <p class="caption">Cinema mode, English law: the non-compete turns green when its last safeguard (a reasonable duration) is added; the classroom question has just been revealed.</p>
 
 ![Redundancy under English law, with statutory redundancy pay calculated by the tool](../../contract-lab-en-redundancy.png)
-<p class="caption">Redundancy (night theme): the procedure chain and statutory redundancy pay, 12 weeks × £751 = £9,012. Other screenshots in this documentation show the French interface.</p>
+<p class="caption">Redundancy (night theme): the procedure chain and statutory redundancy pay, 12 weeks × £751 = £9,012.</p>
 
 ## 🤖 Prepare your course with an AI
 
@@ -52,8 +52,8 @@ The English catalogue states the law in force on 20 November 2026 and flags the 
 
 Both modes share the same checking engine: validity conditions, incompatibilities, breached obligations, calculations.
 
-![Cinema mode: the non-compete clause, its safeguards, the question for the class](../images/cinema-non-concurrence-jour.jpg)
-<p class="caption">Cinema mode (day theme), French interface: the clause is built safeguard by safeguard; the commentary is on the right.</p>
+![Cinema mode: a non-compete under English law, built safeguard by safeguard](../images/en/cinema-covenants-day.jpg)
+<p class="caption">Cinema mode (day theme), English law: the non-compete is built safeguard by safeguard; the missing one (a reasonable duration) shows as a dotted badge, and the commentary is on the right.</p>
 
 ## Getting started
 

@@ -8,8 +8,8 @@ Free mode ✏️ is for building a contract or a termination file, adding or rem
 - **in the centre**, the canvas;
 - **on the right**, the inspector: properties and checks of the selected item, or an overview if nothing is selected.
 
-![Free mode: palette, contract and check of the probationary period](../images/libre-verification-jour.jpg)
-<p class="caption">The palette on the left, the contract in the centre, the inspector on the right (French interface, French law): verdict, calculation and validity conditions of the probationary period.</p>
+![Free mode: palette, a contract under English law and the check of a 48-hour opt-out](../images/en/free-check-day.jpg)
+<p class="caption">The palette on the left, the contract in the centre, the inspector on the right (English law): verdict, validity conditions and description of the 48-hour opt-out.</p>
 
 The **law selector** in the toolbar chooses the catalogue: English law (England & Wales) or French law. The language selector switches the interface between English and French. The 🌙 / ☀️ button switches between **day** and **night** themes; by default the workshop follows the system setting, and the choice is remembered in the browser.
 

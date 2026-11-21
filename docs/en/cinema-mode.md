@@ -9,8 +9,8 @@ Cinema mode 🎬 plays a **scenario**: at each step the canvas comes alive (card
 - or **paste** the markdown supplied by a colleague or an AI, then "▶ Start";
 - or **open a file** `.md`. It can also be dropped directly onto the window.
 
-![The scenario library](../images/bibliotheque-jour.jpg)
-<p class="caption">The library (French interface): the built-in scenarios, and the area where a scenario written by a colleague or an AI can be pasted.</p>
+![The scenario library](../images/en/library-day.jpg)
+<p class="caption">The library in English: English-law scenarios first, then French law in English; below, the area where a scenario written by a colleague or an AI can be pasted.</p>
 
 ## Sharing a link
 
@@ -41,7 +41,7 @@ In the package only the player remains visible: no free mode, library or sharing
 
 The workshop adapts to narrow screens. On a phone, it opens directly on the scenario library:
 
-<div class="phones"><img src="images/telephone-schema-jour.jpg" alt="Phone: the diagram at the top, the commentary at the bottom" width="240"> <img src="images/telephone-question-nuit.jpg" alt="Phone: a revealed question, stacked choices" width="240"></div>
+<div class="phones"><img src="images/en/phone-diagram-day.jpg" alt="Phone: a redundancy procedure at the top, the commentary at the bottom" width="240"> <img src="images/en/phone-question-night.jpg" alt="Phone: a revealed question, stacked choices" width="240"></div>
 
 - the **diagram** takes the top of the screen, the **explanations** the bottom;
 - the **🗺 / ◫ / 📖** buttons of the bottom bar show the diagram only, both, or the text only;
@@ -72,8 +72,8 @@ Keyboard: **→** / **←** to move forward or back, **Space** to move forward (
 
 Some steps question the audience. Their title is preceded by ❓, and a window rises at the bottom of the canvas with the question and the choices as large cards (A, B, C…).
 
-![A revealed question, night theme](../images/question-revelee-nuit.jpg)
-<p class="caption">After the reveal (French interface): the right card in green, a card flipped to read its explanation, and the clause turned green on the canvas.</p>
+![A revealed question, night theme](../images/en/question-revealed-night.jpg)
+<p class="caption">After the reveal: the right card in green, a wrong card flipped to read its explanation, and the non-compete turned green on the canvas.</p>
 
 1. **Let the class answer**: show of hands, orally… Click the card chosen by the majority, or type its number: it is marked "👥 class's choice".
 2. **Reveal the answer**: "💡 Reveal the answer" button, **→** key, or the "💡 Answer ▶" button of the bottom bar. A presentation remote therefore works: a first press reveals, the next one moves to the following step.
