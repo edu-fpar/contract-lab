@@ -1,6 +1,6 @@
 ---
 name: scenario-contract-lab
-description: Génère, à partir d'un support de cours (PDF, diapositives, polycopié, notes, cas pratique), un scénario markdown jouable en mode « cinéma » dans l'atelier Contract Lab, l'outil de visualisation du contrat de travail et du droit du travail (clauses et garde-fous, incompatibilités, obligations, ruptures et procédures, indemnités). Le scénario est ensuite vérifié par le moteur de l'outil. Utiliser cette skill dès qu'un enseignant veut transformer un cours, un chapitre ou un exercice de droit du travail, de gestion des ressources humaines (RH) ou de droit social en animation pas à pas — contrat de travail, CDI, CDD, intérim, période d'essai, clauses (non-concurrence, mobilité, exclusivité, dédit-formation, forfait jours), obligations de l'employeur et du salarié, faute grave, licenciement, rupture conventionnelle, démission, prise d'acte, indemnités, préavis, sources du droit du travail —, ou demande « un scénario pour l'outil Contract Lab », « une animation pour ma classe sur le licenciement », « le markdown cinéma de ce chapitre », même sans nommer l'outil.
+description: Génère et vérifie un scénario markdown « cinéma » pour l'atelier Contract Lab (contrat de travail et droit du travail, droit français ou droit anglais) à partir d'un support de cours. À utiliser dès qu'un enseignant veut transformer un cours de droit du travail ou RH en animation pas à pas : CDI, CDD, période d'essai, non-concurrence, mobilité, faute grave, licenciement, rupture conventionnelle, démission, indemnités, préavis. Also use it in English: turning an employment law or HR course, slides or case study into a step-by-step class animation or a Contract Lab scenario, English law (England & Wales) or French law: contract of employment, written statement, restrictive covenants, notice, gross misconduct, unfair dismissal, wrongful or constructive dismissal, redundancy, settlement agreement, ACAS Code. Even if the tool is not named.
 ---
 
 # Générer un scénario « Contract Lab » à partir d'un support de cours
@@ -14,7 +14,23 @@ Ton travail : lire le support de l'enseignant, en tirer un scénario **juste**, 
 - `references/format.md` — la syntaxe exacte du scénario, toutes les commandes et le **catalogue des types** avec leurs conditions. **À lire avant d'écrire.**
 - `references/regles-de-calcul.md` — les règles de vérification : contexte d'une condition, dossier et incompatibilités, obligations violées, calculs et formules, verdicts imposés, et ce que l'outil ne représente pas. À lire pour que le commentaire et l'affichage concordent.
 - `references/exemple.md` — un scénario complet qui fonctionne (la clause de non-concurrence), comme modèle de ton et de rythme.
-- `scripts/verifier.js` — rejoue le scénario avec le vrai moteur de l'outil et affiche, étape par étape, les verdicts, les garde-fous remplis ou manquants, les incompatibilités et les calculs (`node scripts/verifier.js scenario.md`).
+- English versions / versions anglaises : `references/format-en.md` (format, English commands, **catalogues of English law and of French law**), `references/checking-rules-en.md` (checking rules for both laws: qualifying period, notice, redundancy pay, awards, annual figures, Employment Rights Act 2025), `references/example-en.md` (restrictive covenants, English law).
+- `scripts/verifier.js` — rejoue le scénario avec le vrai moteur de l'outil et affiche, étape par étape, les verdicts, les garde-fous remplis ou manquants, les incompatibilités et les calculs (`node scripts/verifier.js scenario.md`, option `--lang en|fr` ; par défaut, anglais si le scénario est détecté comme anglais).
+
+## Choisir le droit et la langue / Choosing the law and the language
+
+L'atelier connaît deux droits, et l'interface existe en français et en anglais. Décide **avant d'écrire** :
+
+| Le support porte sur… / The course is about… | Droit / Law | En-tête du fichier / File header | Références / References |
+|---|---|---|---|
+| le droit français du travail (Code du travail, CDI, CDD, rupture conventionnelle…) | droit français (par défaut) | aucun / none | `format.md`, `regles-de-calcul.md`, `exemple.md` — ou `format-en.md` (catalogue « French law ») si le scénario doit être en anglais |
+| English employment law (ERA 1996, unfair dismissal, redundancy, restrictive covenants, settlement agreements, ACAS Code…) | English law (England & Wales) | `---` / `droit: uk` / `---` on the first three lines | `format-en.md` (English-law catalogue), `checking-rules-en.md`, `example-en.md` |
+
+- **Langue du scénario / language of the scenario**: celle du support et de la demande de l'enseignant (the language of the course and of the teacher's request). Un cours de droit anglais s'écrit en anglais ; un cours de droit français en français, sauf demande contraire (droit comparé, étudiants internationaux : French law in English).
+- **Un scénario, un droit / one scenario, one law.** En droit anglais, utilise les clés anglaises (`employee`, `permanent`, `non_compete`, `conduct_dismissal`…) ; en droit français, les clés françaises (les alias anglais sont acceptés). Pour une comparaison, évoque l'autre droit dans le commentaire (ex. « > 💡 France: a non-compete without payment is void »).
+- **English law figures**: the week's pay cap (£751), the compensatory award cap (£123,543) and the minimum wage rates are those from April 2026 and change **every April**; the catalogue flags the **Employment Rights Act 2025** reforms (6-month qualifying period, no compensatory award cap, announced for 1 January 2027) without applying them. Say which figures you use, and flag the reforms in a `> ⚠️` quote when they matter (`qualifying_years=0.5` shows the reformed rule).
+- **Commandes / commands**: every command has an English and a French name (`remove`/`retirer`, `status`/`statut`, `select`/`selection`, `check off` = `verification off`…); quiz answers use `### Answer` (English) or `### Réponse` (French).
+- **In English**, follow the same method below, reading `format-en.md`, `checking-rules-en.md` and `example-en.md` instead of the French references, and write your delivery message in English.
 
 ## Démarche
 
@@ -47,7 +63,7 @@ Respecte `references/format.md`. Points qui comptent pour que le rendu soit bon 
 - Le commentaire est lu à l'écran pendant que le canevas s'anime : phrases courtes, notions clés en **gras**, une citation `> 💡` pour l'idée à retenir.
 - **Déclare tous les éléments** avant de les relier ; un élément non déclaré est créé automatiquement, avec un avertissement.
 - Relie chaque garde-fou **à la clause** qu'il conditionne. Seules les formalités générales (l'`ecrit`) se relient au contrat : elles valent alors pour toutes ses clauses.
-- Porte `categorie`, `anciennete` et `salaire` sur le **salarié** : les calculs les retrouvent. Donne les calculs dans le texte (« 2 400 € × 3 × 1/4 = 1 800 € ») : l'outil affiche les mêmes valeurs.
+- Porte `categorie`, `anciennete` et `salaire` sur le **salarié** (droit anglais : `service`, `weekly_pay`, `age` sur l'`employee`) : les calculs les retrouvent. Donne les calculs dans le texte (« 2 400 € × 3 × 1/4 = 1 800 € ») : l'outil affiche les mêmes valeurs.
 - Pense au **dossier** : tout ce qui est relié de proche en proche (hors parties et normes) est dans le même dossier, et les incompatibilités s'y appliquent. Ne relie pas deux situations qui doivent rester distinctes.
 - `focus` et `note` guident le regard ; ils ne valent que pour leur étape. Une bulle doit rester courte (environ 60 caractères). `vue ID` zoome sur le dossier d'un élément.
 - Un verdict imposé par `statut` reste visible même avec `verification off` : ne l'impose pas avant une question dont il donnerait la réponse.
@@ -61,7 +77,8 @@ Respecte `references/format.md`. Points qui comptent pour que le rendu soit bon 
 Enregistre le scénario dans un fichier, puis lance le script en donnant son chemin complet (il se trouve dans le dossier de cette skill) :
 
 ```bash
-node <dossier-skill>/scripts/verifier.js scenario.md
+node <dossier-skill>/scripts/verifier.js scenario.md            # messages dans la langue détectée
+node <dossier-skill>/scripts/verifier.js scenario.md --lang en  # English messages
 ```
 
 Le script liste les commandes non comprises (erreurs) puis, pour chaque étape, chaque élément avec son verdict (✅ ⚠️ ⛔ ⚡), ses conditions (✔ remplie, avec l'élément qui la remplit ; ✘ manquante, avec l'effet), ses incompatibilités (⊘) et ses calculs (🧮), ainsi que les relations. Il montre toujours les verdicts, même dans une étape en `verification off`, et l'état d'une question après révélation. Il avertit aussi : question sans `verification off` alors qu'un élément mis en évidence affiche un verdict, question sans bonne réponse ou sans explication, étape sans commentaire, bulle trop longue.

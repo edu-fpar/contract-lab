@@ -6,7 +6,8 @@
   'use strict';
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
-  const esc = P.esc, CAT = P.CATALOG;
+  const esc = P.esc, t = P.t;
+  let CAT = P.CATALOG;   // catalogue du droit en vigueur (change avec st.options.droit)
   const NW = 184, NH = 74;
   const LS_KEY = 'contract-lab.libre.v1';
   /* paquet SCORM exporté : scénario embarqué (js/scenario-data.js) et plateforme (js/scorm-runtime.js) */
@@ -22,7 +23,7 @@
     disp: {}, ldisp: {},
     cam: { x: 0, y: 150, k: 1 }, camT: null,
     scenario: null, scenarioSrc: '', step: 0, playing: false, speed: 1, playMode: 'pas', timer: null,
-    studio: { open: false, title: 'Mon scénario', steps: [] },
+    studio: { open: false, title: t('Mon scénario'), steps: [] },
     hoverRef: null, libreState: null, planOpen: false, drag: null,
     cinePos: {},   // positions d'éléments déplacés à la main pendant la lecture d'un scénario
     noteOff: {},   // décalages des bulles déplacées à la main
@@ -53,11 +54,11 @@
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
   }
   function copyText(text) {
-    const done = () => toast('📋 Copié dans le presse-papiers');
+    const done = () => toast(t('📋 Copié dans le presse-papiers'));
     const fallback = () => {
       const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
       document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) { toast('Copie impossible'); }
+      try { document.execCommand('copy'); done(); } catch (e) { toast(t('Copie impossible')); }
       ta.remove();
     };
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
@@ -124,7 +125,7 @@
   }
 
   /* étiquettes affichées sur les liens : libellé libre, sinon un mot pour les relations qui portent du sens */
-  const PILL = { viole: '⚡ viole', exclut: '⊘ exclut', limite: '🔒', ouvre: 'ouvre droit à', justifie: 'justifie', met_fin: 'met fin à', prevaut: 'prévaut sur', requiert: 'requiert', initie: "à l'initiative de", encadre: 'encadre', doit: 'doit' };
+  const PILL = { viole: '⚡ ' + t('viole'), exclut: '⊘ ' + t('exclut'), limite: '🔒', ouvre: t('ouvre droit à'), justifie: t('justifie'), met_fin: t('met fin à'), prevaut: t('prévaut sur'), requiert: t('requiert'), initie: t("à l'initiative de"), encadre: t('encadre'), doit: t('doit') };
 
   function linkSVG(l, now, dim) {
     const k = P.linkKey(l), ld = App.ldisp[k] || { born: -1e9 };
@@ -137,7 +138,7 @@
     let dash = R.dash ? `stroke-dasharray:${R.dash};` : '';
     if (!R.dash && a < 1) dash = `stroke-dasharray:1;stroke-dashoffset:${(1 - ease(a)).toFixed(3)};`;
     const arrow = l.rel !== 'contient' && a > 0.9 ? ` marker-end="url(#m-${P.RELS[l.rel] ? l.rel : 'lien'})"` : '';
-    let s = `<g class="link${sel ? ' sel' : ''}${R.faint ? ' faint' : ''}" data-link="${esc(k)}" style="opacity:${faded ? 0.18 : 1}"><title>${esc(nameOf(l.from) + ' — ' + R.label + ' → ' + nameOf(l.to) + (l.label ? ' : ' + l.label : ''))}</title>`;
+    let s = `<g class="link${sel ? ' sel' : ''}${R.faint ? ' faint' : ''}" data-link="${esc(k)}" style="opacity:${faded ? 0.18 : 1}"><title>${esc(nameOf(l.from) + ' — ' + R.label + ' → ' + nameOf(l.to) + (l.label ? t(' : ') + l.label : ''))}</title>`;
     s += `<path class="hit" d="${g.d}"/>`;
     if (sel) s += `<path class="halo" d="${g.d}" style="stroke-width:${w + 9}px"/>`;
     s += `<path class="stroke" d="${g.d}"${R.dash ? '' : ' pathLength="1"'} style="stroke:${R.color};stroke-width:${w}px;${dash}"${arrow}/>`;
@@ -154,7 +155,7 @@
     const g = linkGeom(x.from, x.to, 28);
     const faded = dim.has(x.from) || dim.has(x.to);
     const col = x.level === 'grave' ? '#dc2626' : '#d97706';
-    const s = `<g class="autolink" style="opacity:${faded ? 0.15 : 0.9}"><title>${esc(nameOf(x.from) + ' ⊘ ' + nameOf(x.to) + ' : ' + x.effet)}</title><path d="${g.d}" style="stroke:${col}"/></g>`;
+    const s = `<g class="autolink" style="opacity:${faded ? 0.15 : 0.9}"><title>${esc(nameOf(x.from) + ' ⊘ ' + nameOf(x.to) + t(' : ') + x.effet)}</title><path d="${g.d}" style="stroke:${col}"/></g>`;
     const label = `<g class="llabel auto" transform="translate(${g.lx.toFixed(1)},${g.ly.toFixed(1)})" style="opacity:${faded ? 0.2 : 1}"><title>${esc(x.effet)}</title><circle r="11" style="stroke:${col}"/><text y="4.5" text-anchor="middle" style="fill:${col}">⊘</text></g>`;
     return { path: s, label };
   }
@@ -199,7 +200,7 @@
     else if (I.calc.length) { l3 = I.calc[0]; l3c = 'var(--ink)'; }
     else if (D.fam === 'partie') {
       const n = st.links.filter(l => l.from === id && l.rel === 'doit').length;
-      if (n) l3 = `${n} obligation${n > 1 ? 's' : ''}`;
+      if (n) l3 = t(n > 1 ? '{n} obligations' : '{n} obligation', { n });
     }
     if (l3) s += `<text class="st" x="${x0 + 12}" y="${y0 + 62}" style="fill:${l3c}">${esc(trunc(l3, 30))}</text>`;
     // pastilles des garde-fous : vertes si présents, pointillées s'ils manquent
@@ -209,11 +210,11 @@
         const ic = r.custom ? (r.ok ? '☑️' : '✖️') : CAT[r.any[0]].icon;
         const lab = r.custom ? r.label : CAT[r.any[0]].label;
         const col = r.ok ? '#16a34a' : (r.level === 'grave' ? '#dc2626' : '#d97706');
-        s += `<g class="badge${r.ok ? ' ok' : ' miss'}" transform="translate(${bx0 + i * gap},${by})"><title>${r.ok ? '✔ ' : '✘ manque : '}${esc(lab)}${r.why ? ' — ' + esc(r.why) : ''}</title><circle r="11" style="stroke:${col}"/><text y="4.3" text-anchor="middle">${ic}</text></g>`;
+        s += `<g class="badge${r.ok ? ' ok' : ' miss'}" transform="translate(${bx0 + i * gap},${by})"><title>${r.ok ? '✔ ' : t('✘ manque : ')}${esc(lab)}${r.why ? ' — ' + esc(r.why) : ''}</title><circle r="11" style="stroke:${col}"/><text y="4.3" text-anchor="middle">${ic}</text></g>`;
       });
     }
     if (App.mode === 'libre') s += `<g class="port" data-port="${esc(id)}"><circle cx="${NW / 2}" cy="0" r="9"/><text x="${NW / 2}" y="4.5" text-anchor="middle">+</text></g>`;
-    s += `<title>${esc(e.name)} — ${esc(D.label)}${I.verdict ? ' : ' + esc(I.verdict) : ''}</title></g>`;
+    s += `<title>${esc(e.name)} — ${esc(D.label)}${I.verdict ? t(' : ') + esc(I.verdict) : ''}</title></g>`;
     return s;
   }
 
@@ -237,7 +238,7 @@
     const tail = (o.dx || o.dy)
       ? (ay > y + lh ? `M${cx - 8},${y + lh - 0.5} L${ax},${ay} L${cx + 8},${y + lh - 0.5}` : `M${cx - 8},${y + 0.5} L${ax},${d.y + NH / 2 - 2} L${cx + 8},${y + 0.5}`)
       : `M${x + 14},${y + lh - 0.5} L${x + 12},${y + lh + 12} L${x + 28},${y + lh - 0.5}`;
-    let s = `<g class="note" data-note="${esc(id)}"><title>Glisser pour déplacer la bulle</title><path d="${tail}"/><rect x="${x}" y="${y}" width="${lw}" height="${lh}" rx="9"/>`;
+    let s = `<g class="note" data-note="${esc(id)}"><title>${t('Glisser pour déplacer la bulle')}</title><path d="${tail}"/><rect x="${x}" y="${y}" width="${lw}" height="${lh}" rx="9"/>`;
     lines.forEach((l, i) => { s += `<text x="${(x + lw / 2).toFixed(1)}" y="${(y + 20 + i * 16).toFixed(1)}" text-anchor="middle">${esc(l)}</text>`; });
     return s + '</g>';
   }
@@ -298,6 +299,8 @@
       for (const id in App.cinePos) if (st.entities[id]) Object.assign(st.entities[id], App.cinePos[id]);
     }
     App.an = P.analyze(st);
+    if (CAT !== P.CATALOG) { CAT = P.CATALOG; buildPalette(); }
+    syncJurisSelect();
     syncDisp(o.animate !== false);
     if (App.sel && !selExists(App.sel)) App.sel = null;
     requestRender();
@@ -337,7 +340,7 @@
   function updateBanner() {
     const st = App.state, el = $('#banner'), pv = st.view.perspective;
     if (!pv || !st.entities[pv] || !App.an) { el.hidden = true; return; }
-    el.innerHTML = `🔎 Zoom sur : <b>${iconOf(pv)} ${esc(nameOf(pv))}</b> et son dossier <button data-act="pvoff" title="Tout afficher">×</button>`;
+    el.innerHTML = `🔎 ${t('Zoom sur :')} <b>${iconOf(pv)} ${esc(nameOf(pv))}</b> ${t('et son dossier')} <button data-act="pvoff" title="${t('Tout afficher')}">×</button>`;
     el.hidden = false;
   }
   $('#banner').addEventListener('click', ev => {
@@ -545,7 +548,7 @@
   /* ---- palette : construite depuis le catalogue */
   function buildPalette() {
     const el = $('#palette');
-    let h = '<input type="search" id="pal-search" placeholder="🔍 Chercher une clause, une rupture…" spellcheck="false">';
+    let h = '<input type="search" id="pal-search" placeholder="' + t('🔍 Chercher une clause, une rupture…') + '" spellcheck="false">';
     P.FAM_ORDER.forEach((f, i) => {
       const F = P.FAMS[f], items = Object.keys(CAT).filter(k => CAT[k].fam === f);
       const grps = [];
@@ -554,21 +557,29 @@
       grps.forEach(g => {
         if (g && grps.length > 1) h += `<div class="pal-grp">${esc(g)}</div>`;
         items.filter(k => (CAT[k].grp || '') === g).forEach(k => {
-          h += `<div class="tool" draggable="true" data-kind="${k}" title="${esc(CAT[k].desc || '')}" style="--fc:${F.color}"><span class="ic">${CAT[k].icon}</span><b>${esc(CAT[k].label)}</b>${CAT[k].req ? `<i class="nreq" title="${CAT[k].req.length} condition(s) de validité">${CAT[k].req.length}</i>` : ''}${CAT[k].illicite ? '<i class="nreq bad" title="Illicite">!</i>' : ''}</div>`;
+          h += `<div class="tool" draggable="true" data-kind="${k}" title="${esc(CAT[k].desc || '')}" style="--fc:${F.color}"><span class="ic">${CAT[k].icon}</span><b>${esc(CAT[k].label)}</b>${CAT[k].req ? `<i class="nreq" title="${t('{n} condition(s) de validité', { n: CAT[k].req.length })}">${CAT[k].req.length}</i>` : ''}${CAT[k].illicite ? '<i class="nreq bad" title="' + t('Illicite') + '">!</i>' : ''}</div>`;
         });
       });
       h += '</details>';
     });
-    h += `<h3>Outils</h3><button class="tool-btn" id="tool-example">✨ Charger un exemple</button>
-      <p class="hint">Cliquez ou glissez un élément sur le canevas.<br>Tirez la poignée <b>+</b> (à droite d'une carte) vers une autre carte pour les relier : la relation est choisie automatiquement.<br>Les <b>pastilles</b> sous une clause sont ses garde-fous : pointillées, ils manquent.</p>`;
+    h += `<h3>${t('Outils')}</h3><button class="tool-btn" id="tool-example">${t('✨ Charger un exemple')}</button>
+      <p class="hint">${t("Cliquez ou glissez un élément sur le canevas.<br>Tirez la poignée <b>+</b> (à droite d'une carte) vers une autre carte pour les relier : la relation est choisie automatiquement.<br>Les <b>pastilles</b> sous une clause sont ses garde-fous : pointillées, ils manquent.")}</p>`;
     el.innerHTML = h;
     const search = $('#pal-search', el);
+    if (el.dataset.bound) { bindSearch(search, el); return; }
+    el.dataset.bound = '1';
+    bindSearch(search, el);
+  }
+  function bindSearch(search, el) {
     search.addEventListener('input', () => {
       const q = P.norm(search.value);
       $$('.tool', el).forEach(t => { const k = t.dataset.kind; t.hidden = !!q && !P.norm(CAT[k].label + ' ' + k + ' ' + (CAT[k].desc || '')).includes(q); });
       $$('.pal-fam', el).forEach(d => { const any = $$('.tool', d).some(t => !t.hidden); d.hidden = !any; if (q) d.open = any; });
       $$('.pal-grp', el).forEach(gp => { let n = gp.nextElementSibling, any = false; while (n && n.classList.contains('tool')) { if (!n.hidden) any = true; n = n.nextElementSibling; } gp.hidden = !any; });
     });
+  }
+  function bindPalette() {
+    const el = $('#palette');
     el.addEventListener('dragstart', ev => {
       const t = ev.target.closest && ev.target.closest('.tool[data-kind]'); if (!t) return;
       ev.dataTransfer.setData('text/x-kind', t.dataset.kind); ev.dataTransfer.effectAllowed = 'copy';
@@ -582,7 +593,7 @@
         const from = sel ? App.sel.id : null;
         pushUndo();
         const id = addEntityAt(t.dataset.kind, p.x, p.y, true);
-        if (from && autoRelate(from, id)) toast(`Relié à « ${esc(nameOf(from))} » (Ctrl+Z pour annuler)`);
+        if (from && autoRelate(from, id)) toast(P.t('Relié à « {n} » (Ctrl+Z pour annuler)', { n: esc(nameOf(from)) }));
         App.sel = { kind: 'node', id }; App.commit();
         return;
       }
@@ -634,35 +645,35 @@
   /* ============================================================ analyse (texte) */
   function verdictHTML(id) {
     const I = App.an.info[id], S = P.STATUS[I.status] || P.STATUS.neutral;
-    if (I.hidden) return '<div class="verdict none">🔍 Vérification automatique masquée : à vous de juger !</div>';
+    if (I.hidden) return '<div class="verdict none">' + t('🔍 Vérification automatique masquée : à vous de juger !') + '</div>';
     if (I.status === 'neutral') return '';
-    let h = `<div class="verdict" style="--c:${S.color}">${S.icon} <b>${esc(I.verdict ? I.verdict.charAt(0).toUpperCase() + I.verdict.slice(1) : S.label)}</b>${I.override ? ' <span class="muted small">(verdict fixé par le scénario)</span>' : ''}</div>`;
-    if (I.violee) h += `<div class="warnbox">⚡ Violée par : ${I.violee.map(v => `<a data-act="sel" data-id="${esc(v)}">${iconOf(v)} ${esc(nameOf(v))}</a>`).join(', ')}</div>`;
+    let h = `<div class="verdict" style="--c:${S.color}">${S.icon} <b>${esc(I.verdict ? I.verdict.charAt(0).toUpperCase() + I.verdict.slice(1) : S.label)}</b>${I.override ? ' <span class="muted small">' + t('(verdict fixé par le scénario)') + '</span>' : ''}</div>`;
+    if (I.violee) h += `<div class="warnbox">⚡ ${t('Violée par :')} ${I.violee.map(v => `<a data-act="sel" data-id="${esc(v)}">${iconOf(v)} ${esc(nameOf(v))}</a>`).join(', ')}</div>`;
     const ex = I.issues.filter(x => x.other);
-    if (ex.length) h += ex.map(x => `<div class="warnbox">⊘ <a data-act="sel" data-id="${esc(x.other)}">${iconOf(x.other)} ${esc(nameOf(x.other))}</a> : ${esc(x.effet)}</div>`).join('');
-    const other = I.issues.filter(x => !x.other && !/^Manque/.test(x.text));
-    if (other.length) h += other.map(x => `<div class="warnbox">${x.level === 'grave' ? '⛔' : '⚠️'} ${esc(x.text)} : ${esc(x.effet)}</div>`).join('');
+    if (ex.length) h += ex.map(x => `<div class="warnbox">⊘ <a data-act="sel" data-id="${esc(x.other)}">${iconOf(x.other)} ${esc(nameOf(x.other))}</a>${t(' : ')}${esc(x.effet)}</div>`).join('');
+    const other = I.issues.filter(x => !x.other && !/^Manque/.test(x.text) && x.text.indexOf(t('Manque : ')) !== 0);
+    if (other.length) h += other.map(x => `<div class="warnbox">${x.level === 'grave' ? '⛔' : '⚠️'} ${esc(x.text)}${t(' : ')}${esc(x.effet)}</div>`).join('');
     return h;
   }
   function checklistHTML(id, editable) {
     const I = App.an.info[id]; if (!I.reqs.length) return '';
-    let h = '<h4>Conditions de validité</h4><ul class="checklist">';
+    let h = '<h4>' + t('Conditions de validité') + '</h4><ul class="checklist">';
     I.reqs.forEach(r => {
       const k = r.custom ? null : r.any[0], lab = r.custom ? r.label : CAT[k].label;
       const hid = I.hidden;
-      h += `<li class="${hid ? 'hid' : r.ok ? 'ok' : (r.level === 'grave' ? 'miss' : 'warn')}"><span class="ck">${hid ? '❔' : r.ok ? '✔' : '✘'}</span><span class="ci">${r.custom ? '☑️' : CAT[k].icon}</span><div><b>${esc(lab)}</b>${r.any && r.any.length > 1 ? `<span class="muted small"> (ou : ${r.any.slice(1).map(x => esc(CAT[x].label)).join(', ')})</span>` : ''}${r.why ? `<br><span class="small muted">${esc(r.why)}</span>` : ''}${!r.ok && !hid ? `<br><span class="small eff">Sinon : ${esc(r.effet)}</span>` : ''}${r.ok && r.via ? `<br><span class="small muted">via <a data-act="sel" data-id="${esc(r.via)}">${esc(nameOf(r.via))}</a></span>` : ''}</div>${editable && !r.ok && !r.custom ? `<button class="small add-req" data-act="addreq" data-k="${k}" title="Ajouter et relier « ${esc(lab)} »">＋</button>` : ''}</li>`;
+      h += `<li class="${hid ? 'hid' : r.ok ? 'ok' : (r.level === 'grave' ? 'miss' : 'warn')}"><span class="ck">${hid ? '❔' : r.ok ? '✔' : '✘'}</span><span class="ci">${r.custom ? '☑️' : CAT[k].icon}</span><div><b>${esc(lab)}</b>${r.any && r.any.length > 1 ? `<span class="muted small"> (${t('ou :')} ${r.any.slice(1).map(x => esc(CAT[x].label)).join(', ')})</span>` : ''}${r.why ? `<br><span class="small muted">${esc(r.why)}</span>` : ''}${!r.ok && !hid ? `<br><span class="small eff">${t('Sinon :')} ${esc(r.effet)}</span>` : ''}${r.ok && r.via ? `<br><span class="small muted">${t('via')} <a data-act="sel" data-id="${esc(r.via)}">${esc(nameOf(r.via))}</a></span>` : ''}</div>${editable && !r.ok && !r.custom ? `<button class="small add-req" data-act="addreq" data-k="${k}" title="${t('Ajouter et relier « {n} »', { n: esc(lab) })}">＋</button>` : ''}</li>`;
     });
     return h + '</ul>';
   }
   function rulesHTML(id, editable) {
     const e = App.state.entities[id], D = P.def(e); let h = '';
     if (D.excl && D.excl.length) {
-      h += '<h4>Incompatibilités</h4><ul class="rules">' + D.excl.map(x => `<li>⊘ ${x.any.map(k => `${CAT[k].icon} ${esc(CAT[k].label)}`).join(', ')} <span class="small muted">→ ${esc(x.effet)}</span></li>`).join('') + '</ul>';
+      h += '<h4>' + t('Incompatibilités') + '</h4><ul class="rules">' + D.excl.map(x => `<li>⊘ ${x.any.map(k => `${CAT[k].icon} ${esc(CAT[k].label)}`).join(', ')} <span class="small muted">→ ${esc(x.effet)}</span></li>`).join('') + '</ul>';
     }
     const by = Object.keys(CAT).filter(k => (CAT[k].excl || []).some(x => x.any.includes(e.kind)));
-    if (by.length) h += `<p class="small muted">Sa présence neutralise : ${by.map(k => `${CAT[k].icon} ${esc(CAT[k].label)}`).join(', ')}.</p>`;
+    if (by.length) h += `<p class="small muted">${t('Sa présence neutralise :')} ${by.map(k => `${CAT[k].icon} ${esc(CAT[k].label)}`).join(', ')}.</p>`;
     if (D.ouvre && D.ouvre.length) {
-      h += '<h4>Conséquences habituelles</h4><div class="chips">' + D.ouvre.map(k => editable ? `<button class="small chip" data-act="addcons" data-k="${k}" title="Ajouter et relier">${CAT[k].icon} ${esc(CAT[k].label)}</button>` : `<span class="chip">${CAT[k].icon} ${esc(CAT[k].label)}</span>`).join('') + '</div>';
+      h += '<h4>' + t('Conséquences habituelles') + '</h4><div class="chips">' + D.ouvre.map(k => editable ? `<button class="small chip" data-act="addcons" data-k="${k}" title="${t('Ajouter et relier')}">${CAT[k].icon} ${esc(CAT[k].label)}</button>` : `<span class="chip">${CAT[k].icon} ${esc(CAT[k].label)}</span>`).join('') + '</div>';
     }
     return h;
   }
@@ -680,17 +691,17 @@
   function kindSelect(cur) {
     return `<select data-act="kind">${P.FAM_ORDER.map(f => `<optgroup label="${esc(P.FAMS[f].label)}">${Object.keys(CAT).filter(k => CAT[k].fam === f).map(k => `<option value="${k}"${k === cur ? ' selected' : ''}>${CAT[k].icon} ${esc(CAT[k].label)}</option>`).join('')}</optgroup>`).join('')}</select>`;
   }
-  const PARAM_LABELS = { categorie: 'Catégorie', anciennete: 'Ancienneté (années)', salaire: 'Salaire mensuel brut (€)', duree: 'Durée (mois)', montant: 'Montant (€)', remuneration_totale: 'Rémunération totale brute (€)', icone: 'Icône' };
+  const PARAM_LABELS = { categorie: t('Catégorie'), anciennete: t('Ancienneté (années)'), salaire: t('Salaire mensuel brut (€)'), duree: t('Durée (mois)'), montant: t('Montant (€)'), remuneration_totale: t('Rémunération totale brute (€)'), icone: t('Icône') };
   function paramsHTML(id) {
     const e = App.state.entities[id], D = P.def(e), p = e.params || {};
     const keys = Array.from(new Set((D.params || []).concat(Object.keys(p)).concat(e.kind === 'indemnite_rc' ? ['montant'] : []).concat(e.kind === 'indemnite_precarite' ? ['remuneration_totale'] : [])));
-    let h = '<h4>Données chiffrées</h4>';
+    let h = '<h4>' + t('Données chiffrées') + '</h4>';
     keys.forEach(k => {
       if (k === 'categorie') h += `<div class="prow"><label>${PARAM_LABELS[k]}</label><select data-act="param" data-k="categorie"><option value="">—</option>${Object.keys(P.CATEGORIES).map(c => `<option value="${c}"${p.categorie === c ? ' selected' : ''}>${P.CATEGORIES[c].label}</option>`).join('')}</select></div>`;
       else h += `<div class="prow"><label>${esc(PARAM_LABELS[k] || k)}</label><input type="text" data-act="param" data-k="${esc(k)}" value="${esc(p[k] == null ? '' : p[k])}"></div>`;
     });
-    h += `<input type="text" class="addparam" data-act="addparam" placeholder="＋ autre donnée : cle=valeur (ex. icone=🧸)">`;
-    if (!keys.length) h += '<p class="small muted">Ancienneté, salaire et catégorie se renseignent sur le salarié : les indemnités, le préavis et la période d\'essai les utilisent.</p>';
+    h += `<input type="text" class="addparam" data-act="addparam" placeholder="${t('＋ autre donnée : cle=valeur (ex. icone=🧸)')}">`;
+    if (!keys.length) h += '<p class="small muted">' + t("Ancienneté, salaire et catégorie se renseignent sur le salarié : les indemnités, le préavis et la période d'essai les utilisent.") + '</p>';
     return h;
   }
   function relSelect(cur) {
@@ -698,78 +709,78 @@
   }
   function linksHTML(id) {
     const st = App.state, ls = st.links.filter(l => l.from === id || l.to === id);
-    let h = '<h4>Relations</h4>';
-    if (!ls.length) h += '<p class="muted small">Aucune. Tirez la poignée <b>+</b> vers une autre carte.</p>';
+    let h = '<h4>' + t('Relations') + '</h4>';
+    if (!ls.length) h += '<p class="muted small">' + t('Aucune. Tirez la poignée <b>+</b> vers une autre carte.') + '</p>';
     ls.forEach(l => {
       const out = l.from === id, o = out ? l.to : l.from;
-      h += `<div class="le" data-link="${esc(P.linkKey(l))}"><div class="le-head"><span>${out ? '' : `<a data-act="sel" data-id="${esc(o)}">${iconOf(o)} ${esc(nameOf(o))}</a> `}${relSelect(l.rel)}${out ? ` <a data-act="sel" data-id="${esc(o)}">${iconOf(o)} ${esc(nameOf(o))}</a>` : ' <i class="muted">cette carte</i>'}</span><button class="x" data-act="dellink" title="Supprimer ce lien">×</button></div>
-        <input type="text" class="lab" data-act="label" placeholder="libellé (facultatif : délai, montant…)" value="${esc(l.label || '')}"></div>`;
+      h += `<div class="le" data-link="${esc(P.linkKey(l))}"><div class="le-head"><span>${out ? '' : `<a data-act="sel" data-id="${esc(o)}">${iconOf(o)} ${esc(nameOf(o))}</a> `}${relSelect(l.rel)}${out ? ` <a data-act="sel" data-id="${esc(o)}">${iconOf(o)} ${esc(nameOf(o))}</a>` : ' <i class="muted">' + t('cette carte') + '</i>'}</span><button class="x" data-act="dellink" title="${t('Supprimer ce lien')}">×</button></div>
+        <input type="text" class="lab" data-act="label" placeholder="${t('libellé (facultatif : délai, montant…)')}" value="${esc(l.label || '')}"></div>`;
     });
     const cand = Object.keys(st.entities).filter(o => o !== id && !P.findAnyLink(st, id, o));
-    if (cand.length) h += `<select data-act="addlink" class="add"><option value="">＋ Relier à…</option>${P.FAM_ORDER.map(f => { const xs = cand.filter(o => famOf(o) === f); return xs.length ? `<optgroup label="${esc(P.FAMS[f].label)}">${xs.map(o => `<option value="${esc(o)}">${iconOf(o)} ${esc(nameOf(o))}</option>`).join('')}</optgroup>` : ''; }).join('')}</select>`;
+    if (cand.length) h += `<select data-act="addlink" class="add"><option value="">${t('＋ Relier à…')}</option>${P.FAM_ORDER.map(f => { const xs = cand.filter(o => famOf(o) === f); return xs.length ? `<optgroup label="${esc(P.FAMS[f].label)}">${xs.map(o => `<option value="${esc(o)}">${iconOf(o)} ${esc(nameOf(o))}</option>`).join('')}</optgroup>` : ''; }).join('')}</select>`;
     return h;
   }
-  const STATUT_OPTS = [['auto', 'automatique'], ['ok', '✅ valide'], ['risk', '⚠️ à risque'], ['ko', '⛔ nulle / irrégulière'], ['violee', '⚡ violée'], ['neutral', '— sans verdict']];
+  const STATUT_OPTS = [['auto', t('automatique')], ['ok', '✅ ' + t('valide')], ['risk', '⚠️ ' + t('à risque')], ['ko', '⛔ ' + t('nulle / irrégulière')], ['violee', '⚡ ' + t('violée')], ['neutral', '— ' + t('sans verdict')]];
 
   function overviewHTML() {
     const st = App.state, an = App.an, ids = Object.keys(st.entities);
     if (!ids.length) {
-      return `<div class="welcome"><h3>Bienvenue 👋</h3>
-        <p>Cet atelier transforme un cours de <b>droit du travail</b> en schéma : un contrat et ses <b>clauses</b> en icônes, les <b>garde-fous</b> qui les rendent valables, les <b>incompatibilités</b>, les <b>obligations</b> des parties et les <b>ruptures</b> avec leur procédure.</p>
-        <ol><li>Cliquez ou glissez des éléments depuis la palette.</li><li>Tirez la poignée <b>+</b> d'une carte vers une autre pour les relier.</li><li>Lisez le verdict : ✅ valide, ⚠️ à risque, ⛔ nulle — et les pastilles de garde-fous manquants.</li></ol>
-        <div class="btns"><button class="primary" data-act="example">✨ Charger un exemple</button><button data-act="cinema">🎬 Voir les scénarios</button></div></div>`;
+      return `<div class="welcome"><h3>${t('Bienvenue 👋')}</h3>
+        <p>${t('Cet atelier transforme un cours de <b>droit du travail</b> en schéma : un contrat et ses <b>clauses</b> en icônes, les <b>garde-fous</b> qui les rendent valables, les <b>incompatibilités</b>, les <b>obligations</b> des parties et les <b>ruptures</b> avec leur procédure.')}</p>
+        <ol><li>${t('Cliquez ou glissez des éléments depuis la palette.')}</li><li>${t("Tirez la poignée <b>+</b> d'une carte vers une autre pour les relier.")}</li><li>${t('Lisez le verdict : ✅ valide, ⚠️ à risque, ⛔ nulle — et les pastilles de garde-fous manquants.')}</li></ol>
+        <div class="btns"><button class="primary" data-act="example">${t('✨ Charger un exemple')}</button><button data-act="cinema">${t('🎬 Voir les scénarios')}</button></div></div>`;
     }
     const c = an.counts();
-    let h = `<h3>Vue d'ensemble</h3><p class="muted small">${ids.length} élément${ids.length > 1 ? 's' : ''} · ${st.links.length} relation${st.links.length > 1 ? 's' : ''}</p>`;
-    if (!an.verif) h += '<div class="verdict none">🔍 Vérification automatique désactivée : les verdicts et les pastilles sont masqués.</div>';
-    else h += `<div class="counts"><span style="--c:#16a34a">✅ ${c.ok}<small>valide(s)</small></span><span style="--c:#d97706">⚠️ ${c.risk}<small>à risque</small></span><span style="--c:#dc2626">⛔ ${c.ko}<small>nulle(s)</small></span><span style="--c:#dc2626">⚡ ${c.violee}<small>violée(s)</small></span></div>`;
+    let h = `<h3>${t("Vue d'ensemble")}</h3><p class="muted small">${t(ids.length > 1 ? '{n} éléments' : '{n} élément', { n: ids.length })} · ${t(st.links.length > 1 ? '{n} relations' : '{n} relation', { n: st.links.length })}</p>`;
+    if (!an.verif) h += '<div class="verdict none">' + t('🔍 Vérification automatique désactivée : les verdicts et les pastilles sont masqués.') + '</div>';
+    else h += `<div class="counts"><span style="--c:#16a34a">✅ ${c.ok}<small>${t('valide(s)')}</small></span><span style="--c:#d97706">⚠️ ${c.risk}<small>${t('à risque')}</small></span><span style="--c:#dc2626">⛔ ${c.ko}<small>${t('nulle(s)')}</small></span><span style="--c:#dc2626">⚡ ${c.violee}<small>${t('violée(s)')}</small></span></div>`;
     const pb = ids.filter(i => ['ko', 'risk', 'violee'].includes(an.info[i].status));
-    if (pb.length) h += '<h4>Points à corriger</h4><ul class="ctrl-list">' + pb.map(i => `<li><span class="dot" style="background:${P.STATUS[an.info[i].status].color}"></span><a data-act="sel" data-id="${esc(i)}"><b>${iconOf(i)} ${esc(nameOf(i))}</b></a><br><span class="small">${esc(an.info[i].verdict)}</span></li>`).join('') + '</ul>';
-    if (an.frames.length) h += '<h4>Contrats</h4><ul class="ctrl-list">' + an.frames.map(f => `<li><a data-act="sel" data-id="${esc(f.id)}"><b>${iconOf(f.id)} ${esc(nameOf(f.id))}</b></a><br><span class="small">${f.members.filter(m => m !== f.id && famOf(m) === 'clause').map(m => `${iconOf(m)} ${esc(nameOf(m))}`).join(' · ') || '—'}</span></li>`).join('') + '</ul>';
-    h += `<h4>Zoom sur un dossier</h4><select data-act="pvsel" class="add"><option value="">— tout afficher —</option>${ids.map(i => `<option value="${esc(i)}"${st.view.perspective === i ? ' selected' : ''}>${iconOf(i)} ${esc(nameOf(i))}</option>`).join('')}</select>`;
-    h += '<p class="hint">Cliquez sur une carte ou un lien pour le modifier. Avec une carte sélectionnée, un clic dans la palette ajoute l\'élément <b>et le relie</b>. Glisser le fond déplace la vue, la molette zoome.</p>';
+    if (pb.length) h += '<h4>' + t('Points à corriger') + '</h4><ul class="ctrl-list">' + pb.map(i => `<li><span class="dot" style="background:${P.STATUS[an.info[i].status].color}"></span><a data-act="sel" data-id="${esc(i)}"><b>${iconOf(i)} ${esc(nameOf(i))}</b></a><br><span class="small">${esc(an.info[i].verdict)}</span></li>`).join('') + '</ul>';
+    if (an.frames.length) h += '<h4>' + t('Contrats') + '</h4><ul class="ctrl-list">' + an.frames.map(f => `<li><a data-act="sel" data-id="${esc(f.id)}"><b>${iconOf(f.id)} ${esc(nameOf(f.id))}</b></a><br><span class="small">${f.members.filter(m => m !== f.id && famOf(m) === 'clause').map(m => `${iconOf(m)} ${esc(nameOf(m))}`).join(' · ') || '—'}</span></li>`).join('') + '</ul>';
+    h += `<h4>${t('Zoom sur un dossier')}</h4><select data-act="pvsel" class="add"><option value="">${t('— tout afficher —')}</option>${ids.map(i => `<option value="${esc(i)}"${st.view.perspective === i ? ' selected' : ''}>${iconOf(i)} ${esc(nameOf(i))}</option>`).join('')}</select>`;
+    h += '<p class="hint">' + t("Cliquez sur une carte ou un lien pour le modifier. Avec une carte sélectionnée, un clic dans la palette ajoute l'élément <b>et le relie</b>. Glisser le fond déplace la vue, la molette zoome.") + '</p>';
     return h;
   }
 
   function entityInspector(id) {
     const st = App.state, e = st.entities[id], D = P.def(e), F = P.FAMS[D.fam];
     const pv = st.view.perspective === id, ov = e.status ? e.status.v : 'auto';
-    let h = `<div class="insp-head"><span class="big">${P.iconOf(e)}</span><input class="name" data-act="rename" value="${esc(e.name)}" spellcheck="false" title="Renommer"></div>`;
+    let h = `<div class="insp-head"><span class="big">${P.iconOf(e)}</span><input class="name" data-act="rename" value="${esc(e.name)}" spellcheck="false" title="${t('Renommer')}"></div>`;
     h += `<div class="famtag" style="--c:${F.color}">${F.icon} ${esc(F.label)}${D.grp ? ' · ' + esc(D.grp) : ''}</div>`;
-    h += `<div class="row"><label>Type</label>${kindSelect(e.kind)}</div>`;
+    h += `<div class="row"><label>${t('Type')}</label>${kindSelect(e.kind)}</div>`;
     h += `<div id="insp-analysis">${App.analysisHTML(id, true)}</div>`;
     if (D.fam !== 'limite' && D.fam !== 'norme') h += paramsHTML(id);
     h += linksHTML(id);
-    h += `<details class="adv"${ov !== 'auto' || (e.conds || []).length ? ' open' : ''}><summary>Verdict et conditions personnalisés</summary>
-      <div class="row"><label>Verdict</label><select data-act="statut">${STATUT_OPTS.map(([v, l]) => `<option value="${v}"${v === ov ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
-      ${ov !== 'auto' ? `<input type="text" class="lab" data-act="statut-text" placeholder="texte du verdict" value="${esc(e.status.text || '')}">` : ''}
-      <div class="conds">${(e.conds || []).map((c, i) => `<label class="chk"><input type="checkbox" data-act="cond" data-i="${i}"${c.ok ? ' checked' : ''}> ${esc(c.label)} <button class="x" data-act="delcond" data-i="${i}" title="Retirer">×</button></label>`).join('')}</div>
-      <input type="text" class="lab" data-act="addcond" placeholder="＋ condition libre (Entrée), ex. « Limitée à 1 an »">
+    h += `<details class="adv"${ov !== 'auto' || (e.conds || []).length ? ' open' : ''}><summary>${t('Verdict et conditions personnalisés')}</summary>
+      <div class="row"><label>${t('Verdict')}</label><select data-act="statut">${STATUT_OPTS.map(([v, l]) => `<option value="${v}"${v === ov ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
+      ${ov !== 'auto' ? `<input type="text" class="lab" data-act="statut-text" placeholder="${t('texte du verdict')}" value="${esc(e.status.text || '')}">` : ''}
+      <div class="conds">${(e.conds || []).map((c, i) => `<label class="chk"><input type="checkbox" data-act="cond" data-i="${i}"${c.ok ? ' checked' : ''}> ${esc(c.label)} <button class="x" data-act="delcond" data-i="${i}" title="${t('Retirer')}">×</button></label>`).join('')}</div>
+      <input type="text" class="lab" data-act="addcond" placeholder="${t('＋ condition libre (Entrée), ex. « Limitée à 1 an »')}">
     </details>`;
-    h += `<div class="btns"><button data-act="pv" class="${pv ? 'on' : ''}">🔎 ${pv ? 'Tout afficher' : 'Zoom sur son dossier'}</button><button data-act="del" class="danger">🗑 Supprimer</button></div>`;
+    h += `<div class="btns"><button data-act="pv" class="${pv ? 'on' : ''}">🔎 ${pv ? t('Tout afficher') : t('Zoom sur son dossier')}</button><button data-act="del" class="danger">🗑 ${t('Supprimer')}</button></div>`;
     return h;
   }
 
   function linkInspector(k) {
     const l = findLinkByKey(k); if (!l) return overviewHTML();
     const R = P.RELS[l.rel] || P.RELS.lien;
-    let h = `<h3>🔗 Relation</h3><p><a data-act="sel" data-id="${esc(l.from)}">${iconOf(l.from)} ${esc(nameOf(l.from))}</a> <b style="color:${R.color}">${esc(R.label)}</b> <a data-act="sel" data-id="${esc(l.to)}">${iconOf(l.to)} ${esc(nameOf(l.to))}</a></p>`;
-    h += `<div class="le" data-link="${esc(k)}"><div class="row"><label>Relation</label>${relSelect(l.rel)}</div><input type="text" class="lab" data-act="label" placeholder="libellé (facultatif : délai, montant…)" value="${esc(l.label || '')}"></div>`;
+    let h = `<h3>🔗 ${t('Relation')}</h3><p><a data-act="sel" data-id="${esc(l.from)}">${iconOf(l.from)} ${esc(nameOf(l.from))}</a> <b style="color:${R.color}">${esc(R.label)}</b> <a data-act="sel" data-id="${esc(l.to)}">${iconOf(l.to)} ${esc(nameOf(l.to))}</a></p>`;
+    h += `<div class="le" data-link="${esc(k)}"><div class="row"><label>${t('Relation')}</label>${relSelect(l.rel)}</div><input type="text" class="lab" data-act="label" placeholder="${t('libellé (facultatif : délai, montant…)')}" value="${esc(l.label || '')}"></div>`;
     h += `<p class="small muted">${esc(REL_HELP[l.rel] || '')}</p>`;
-    h += '<div class="btns"><button data-act="swap">⇄ Inverser le sens</button><button data-act="dellink" class="danger">🗑 Supprimer</button></div>';
+    h += '<div class="btns"><button data-act="swap">⇄ ' + t('Inverser le sens') + '</button><button data-act="dellink" class="danger">🗑 ' + t('Supprimer') + '</button></div>';
     h += `<h4>${iconOf(l.to)} ${esc(nameOf(l.to))}</h4><div id="insp-analysis">${App.analysisHTML(l.to, false)}</div>`;
     return h;
   }
   const REL_HELP = {
-    contient: 'Le contrat comporte cette clause : elle apparaît dans le cadre du contrat.',
-    limite: "Garde-fou : cet élément limite ou conditionne la validité de l'autre (contrepartie, limite dans le temps, écrit…).",
-    requiert: "L'origine suppose la présence de la cible.",
-    exclut: "Incompatibilité : quand les deux éléments sont dans le même dossier, la cible est neutralisée (verdict rouge).",
-    signe: 'Partie au contrat.', doit: 'La partie est débitrice de cette obligation.', viole: "Le manquement viole l'obligation : elle passe en ⚡ violée.",
-    justifie: 'La faute ou le motif justifie la rupture (et compte comme sa cause).', initie: 'La partie est à l\'initiative de la rupture.',
-    met_fin: 'La rupture met fin au contrat.', puis: 'Étape suivante de la procédure (libellé : délai à respecter).',
-    ouvre: 'La rupture ou l\'étape ouvre droit à cette indemnité ou ce droit.', encadre: 'La norme encadre cet élément.',
-    prevaut: 'Hiérarchie des normes : la source prévaut (ou est plus favorable).', lien: 'Lien libre : précisez-le avec un libellé.'
+    contient: t('Le contrat comporte cette clause : elle apparaît dans le cadre du contrat.'),
+    limite: t("Garde-fou : cet élément limite ou conditionne la validité de l'autre (contrepartie, limite dans le temps, écrit…)."),
+    requiert: t("L'origine suppose la présence de la cible."),
+    exclut: t("Incompatibilité : quand les deux éléments sont dans le même dossier, la cible est neutralisée (verdict rouge)."),
+    signe: t('Partie au contrat.'), doit: t('La partie est débitrice de cette obligation.'), viole: t("Le manquement viole l'obligation : elle passe en ⚡ violée."),
+    justifie: t('La faute ou le motif justifie la rupture (et compte comme sa cause).'), initie: t("La partie est à l'initiative de la rupture."),
+    met_fin: t('La rupture met fin au contrat.'), puis: t('Étape suivante de la procédure (libellé : délai à respecter).'),
+    ouvre: t("La rupture ou l'étape ouvre droit à cette indemnité ou ce droit."), encadre: t('La norme encadre cet élément.'),
+    prevaut: t('Hiérarchie des normes : la source prévaut (ou est plus favorable).'), lien: t('Lien libre : précisez-le avec un libellé.')
   };
 
   App.renderInspector = function () {
@@ -799,7 +810,7 @@
     else if (P.famOf(st.entities[nid]) === 'etape' && P.famOf(e) === 'rupture') chainAppend(id, nid);
     else { const d = P.defaultRel(e.kind, k); if (d[0] === 'lien' && P.famOf(st.entities[nid]) !== 'limite') P.setLink(st, nid, id, 'lien', ''); else createLink(id, nid, null, true); }
     App.commit();
-    toast(`${CAT[k].icon} ${esc(CAT[k].label)} ajouté(e) et relié(e)`);
+    toast(`${CAT[k].icon} ${t('{n} ajouté(e) et relié(e)', { n: esc(CAT[k].label) })}`);
   }
 
   const insp = $('#inspector');
@@ -831,7 +842,7 @@
     }
     if (act === 'addparam' && e) {
       const m = t.value.trim().match(/^([A-Za-zÀ-ÿ_]+)\s*[=:]\s*(.+)$/);
-      if (!m) { toast('Format attendu : cle=valeur'); return; }
+      if (!m) { toast(P.t('Format attendu : cle=valeur')); return; }
       pushUndo(); e.params = e.params || {};
       const k = P.key(m[1]), n = P.num(m[2]); e.params[k === 'icon' ? 'icone' : k] = n == null ? m[2].trim() : n;
       App.commit(); return;
@@ -868,13 +879,13 @@
   /* ============================================================ légende */
   function buildLegend() {
     const el = $('#legend');
-    let h = '<div class="lg-h">Légende <span>▾</span></div><div class="lg-body"><div class="lg-sec">Verdicts</div>';
+    let h = '<div class="lg-h">' + t('Légende') + ' <span>▾</span></div><div class="lg-body"><div class="lg-sec">' + t('Verdicts') + '</div>';
     ['ok', 'risk', 'ko', 'violee'].forEach(k => { const S = P.STATUS[k]; h += `<div class="lg-row"><span class="box" style="border-color:${S.color};background:${tint(S.color, 0.1)}"></span>${S.icon} ${esc(S.label)}</div>`; });
-    h += '<div class="lg-row"><span class="bdg ok">💰</span><span class="bdg miss">⌛</span>garde-fou présent / manquant</div>';
-    h += '<div class="lg-sec">Relations</div>';
+    h += '<div class="lg-row"><span class="bdg ok">💰</span><span class="bdg miss">⌛</span>' + t('garde-fou présent / manquant') + '</div>';
+    h += '<div class="lg-sec">' + t('Relations') + '</div>';
     ['limite', 'exclut', 'doit', 'viole', 'puis', 'ouvre', 'justifie', 'prevaut'].forEach(r => { const R = P.RELS[r]; h += `<div class="lg-row"><span class="sw${R.dash ? ' dash' : ''}" style="border-color:${R.color}"></span>${esc(R.label)}</div>`; });
-    h += '<div class="lg-row"><span class="sw dash" style="border-color:#dc2626;opacity:.7"></span>⊘ incompatibilité (automatique)</div>';
-    h += '<div class="lg-row"><span class="box" style="border-color:#4f46e5;border-style:dashed"></span>📄 cadre du contrat</div></div>';
+    h += '<div class="lg-row"><span class="sw dash" style="border-color:#dc2626;opacity:.7"></span>⊘ ' + t('incompatibilité (automatique)') + '</div>';
+    h += '<div class="lg-row"><span class="box" style="border-color:#4f46e5;border-style:dashed"></span>📄 ' + t('cadre du contrat') + '</div></div>';
     el.innerHTML = h;
     let pref = null;
     try { pref = localStorage.getItem('contract-lab.legend'); } catch (e) { /* */ }
@@ -894,21 +905,28 @@
   App.closeModal = () => { $('#modal').hidden = true; };
   $('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal' || ev.target.closest('.close')) App.closeModal(); });
 
-  function openLibrary() {
-    const cards = P.LIBRARY.map(s => {
+  /** scénarios de la bibliothèque dans la langue de l'interface (ceux sans langue sont en français) */
+  const libLang = s => s.lang || 'fr';
+  App.libFind = (id, lang) => P.LIBRARY.find(s => s.id === id && libLang(s) === (lang || P.lang)) || P.LIBRARY.find(s => s.id === id);
+  function openLibrary(all) {
+    const list = P.LIBRARY.filter(s => all || libLang(s) === P.lang);
+    const cards = (list.length ? list : P.LIBRARY).map(s => {
       const sc = P.parseScenario(s.md);
-      return `<div class="lib-card"><h4>${esc(sc.title)}</h4><p>${esc(sc.description)}</p><span class="small muted">${sc.steps.length} étapes</span>
-        <div class="btns"><button class="primary" data-run="${s.id}">▶ Lancer</button><button data-see="${s.id}">📝 Markdown</button><button data-dl="${s.id}" title="Télécharger le fichier .md">⬇</button></div></div>`;
+      const J = P.JURIS[P.jurisOf(sc.meta.droit || sc.meta.law || 'fr') || 'fr'];
+      return `<div class="lib-card"><h4>${esc(sc.title)}</h4><p>${esc(sc.description)}</p><span class="small muted">⚖️ ${esc(P.jurisLabel(J))} · ${t('{n} étapes', { n: sc.steps.length })}${all ? ' · ' + libLang(s).toUpperCase() : ''}</span>
+        <div class="btns"><button class="primary" data-run="${s.id}" data-lang="${libLang(s)}">▶ ${t('Lancer')}</button><button data-see="${s.id}" data-lang="${libLang(s)}">📝 Markdown</button><button data-dl="${s.id}" data-lang="${libLang(s)}" title="${t('Télécharger le fichier .md')}">⬇</button></div></div>`;
     }).join('');
-    const c = App.modal(`<h2>📚 Scénarios</h2><div class="lib-grid">${cards}</div>
-      <h3>Votre propre scénario</h3>
-      <p class="muted small">Collez le markdown fourni par un enseignant ou généré par une IA, ou ouvrez / déposez un fichier .md.</p>
-      <textarea id="md-input" placeholder="# Mon scénario&#10;&#10;## 1. Première étape&#10;Commentaire…&#10;&#10;\`\`\`scene&#10;cdi C &quot;Contrat de Léa&quot;&#10;non_concurrence NC&#10;C -> NC&#10;\`\`\`"></textarea>
-      <div class="btns"><button class="primary" id="md-run">▶ Lancer ce scénario</button><button id="md-file">📂 Ouvrir un fichier .md</button><button id="md-prompt" title="Consigne à donner à une IA avec votre cours">🤖 Consigne pour une IA</button><button id="md-spec">📄 Format des scénarios</button></div>`);
+    const others = P.LIBRARY.some(s => libLang(s) !== P.lang);
+    const c = App.modal(`<h2>📚 ${t('Scénarios')}</h2>${others ? `<p class="small"><label class="chk"><input type="checkbox" id="lib-all"${all ? ' checked' : ''}> ${t('Afficher aussi les scénarios dans les autres langues')}</label></p>` : ''}<div class="lib-grid">${cards}</div>
+      <h3>${t('Votre propre scénario')}</h3>
+      <p class="muted small">${t('Collez le markdown fourni par un enseignant ou généré par une IA, ou ouvrez / déposez un fichier .md.')}</p>
+      <textarea id="md-input" placeholder="${t('# Mon scénario&#10;&#10;## 1. Première étape&#10;Commentaire…&#10;&#10;```scene&#10;cdi C &quot;Contrat de Léa&quot;&#10;non_concurrence NC&#10;C -> NC&#10;```')}"></textarea>
+      <div class="btns"><button class="primary" id="md-run">▶ ${t('Lancer ce scénario')}</button><button id="md-file">📂 ${t('Ouvrir un fichier .md')}</button><button id="md-prompt" title="${t('Consigne à donner à une IA avec votre cours')}">🤖 ${t('Consigne pour une IA')}</button><button id="md-spec">📄 ${t('Format des scénarios')}</button></div>`);
+    const la = $('#lib-all', c); if (la) la.onchange = () => openLibrary(la.checked);
     c.addEventListener('click', ev => {
       const b = ev.target.closest('button'); if (!b) return;
-      const get = id => P.LIBRARY.find(s => s.id === id);
-      if (b.dataset.run) { App.closeModal(); App.loadScenario(get(b.dataset.run).md, { id: b.dataset.run }); }
+      const get = id => App.libFind(id, b.dataset.lang);
+      if (b.dataset.run) { App.closeModal(); App.loadScenario(get(b.dataset.run).md, { id: b.dataset.run, lang: b.dataset.lang }); }
       else if (b.dataset.see) openEditor(get(b.dataset.see).md, false);
       else if (b.dataset.dl) download(b.dataset.dl + '.md', get(b.dataset.dl).md.replace(/~~~scene/g, '```scene').replace(/^~~~$/gm, '```'));
       else if (b.id === 'md-run') { const v = $('#md-input', c).value; if (v.trim()) { App.closeModal(); App.loadScenario(v); } }
@@ -919,10 +937,10 @@
   }
 
   function openEditor(md, isCurrent) {
-    const c = App.modal(`<h2>📝 Markdown du scénario</h2>
-      <p class="muted small">Modifiez le texte puis relancez. Les blocs <code>scene</code> contiennent les commandes (voir « Format des scénarios »).</p>
+    const c = App.modal(`<h2>📝 ${t('Markdown du scénario')}</h2>
+      <p class="muted small">${t('Modifiez le texte puis relancez. Les blocs <code>scene</code> contiennent les commandes (voir « Format des scénarios »).')}</p>
       <textarea id="ed-md" class="big" spellcheck="false"></textarea>
-      <div class="btns"><button class="primary" id="ed-run">▶ ${isCurrent ? 'Appliquer (rester à cette étape)' : 'Lancer'}</button><button id="ed-copy">📋 Copier</button><button id="ed-dl">⬇ Télécharger .md</button><button id="ed-spec">📄 Format</button></div>`);
+      <div class="btns"><button class="primary" id="ed-run">▶ ${isCurrent ? t('Appliquer (rester à cette étape)') : t('Lancer')}</button><button id="ed-copy">📋 ${t('Copier')}</button><button id="ed-dl">⬇ ${t('Télécharger .md')}</button><button id="ed-spec">📄 ${t('Format')}</button></div>`);
     $('#ed-md', c).value = md;
     $('#ed-run', c).onclick = () => {
       const keep = App.step; App.closeModal();
@@ -938,47 +956,52 @@
 
   /* Instructions complètes pour une IA : la page publiée (à jour), sinon la version embarquée (hors ligne). */
   function copyAllInstructions(consigne) {
-    const demande = '\n\n---\n\n# Ma demande\n\n' + P.iaConsigneSansLien(consigne) + '\n\n';
-    fetch('docs/instructions-ia.md').then(r => { if (!r.ok) throw 0; return r.text(); })
-      .catch(() => fetch(P.IA_INSTRUCTIONS_URL).then(r => { if (!r.ok) throw 0; return r.text(); }))
-      .then(t => copyText(t.trim() + demande), () => copyText(P.AI_PROMPT.trim() + demande));
+    const demande = '\n\n---\n\n# ' + t('Ma demande') + '\n\n' + P.iaConsigneSansLien(consigne) + '\n\n';
+    const en = P.lang === 'en';
+    fetch(en ? 'docs/en/instructions-ia.md' : 'docs/instructions-ia.md').then(r => { if (!r.ok) throw 0; return r.text(); })
+      .catch(() => fetch(en ? P.IA_INSTRUCTIONS_URL.replace('/docs/', '/docs/en/') : P.IA_INSTRUCTIONS_URL).then(r => { if (!r.ok) throw 0; return r.text(); }))
+      .then(t => copyText(t.trim() + demande), () => copyText(((en && P.AI_PROMPT_EN) || P.AI_PROMPT).trim() + demande));
   }
 
+  /** page de documentation dans la langue de l'interface */
+  const DOC_EN = { 'prise-en-main': 'getting-started', 'mode-cinema': 'cinema-mode', scenarios: 'scenarios', 'regles-de-calcul': 'checking-rules', 'format-scenario': 'format-scenario', 'ia-et-skill': 'ai-and-skill', '': '' };
+  const docPage = p => (P.lang === 'en' && DOC_EN[p] != null ? 'en/' + DOC_EN[p] : p);
   function openHelp(which) {
+    const fmtDoc = (P.lang === 'en' && P.FORMAT_DOC_EN) || P.FORMAT_DOC;
     if (which === 'format') {
-      const c = App.modal(`<div class="help-doc md">${P.md(P.FORMAT_DOC)}</div>
-        <div class="btns"><button class="primary" id="hp-dl">⬇ Télécharger la spécification (.md)</button><a class="btnlink" href="docs/index.html#/format-scenario" target="_blank" rel="noopener">📖 Dans la documentation</a></div>`);
-      $('#hp-dl', c).onclick = () => download('format-scenario.md', P.FORMAT_DOC);
+      const c = App.modal(`<div class="help-doc md">${P.md(fmtDoc)}</div>
+        <div class="btns"><button class="primary" id="hp-dl">⬇ ${t('Télécharger la spécification (.md)')}</button><a class="btnlink" href="docs/index.html#/${docPage('format-scenario')}" target="_blank" rel="noopener">📖 ${t('Dans la documentation')}</a></div>`);
+      $('#hp-dl', c).onclick = () => download('format-scenario.md', fmtDoc);
       return;
     }
-    const doc = (page, label) => `<a class="doc-link" href="docs/index.html#/${page}" target="_blank" rel="noopener">${label}</a>`;
-    const c = App.modal(`<h2>❔ Aide</h2>
+    const doc = (page, label) => `<a class="doc-link" href="docs/index.html#/${docPage(page)}" target="_blank" rel="noopener">${label}</a>`;
+    const c = App.modal(`<h2>❔ ${t('Aide')}</h2>
       <div class="help-cols">
-        <div class="help-card"><h3>✏️ Mode libre</h3>${P.md(P.HELP_LIBRE)}</div>
-        <div class="help-card"><h3>🎬 Mode cinéma</h3>${P.md(P.HELP_CINEMA)}</div>
+        <div class="help-card"><h3>✏️ ${t('Mode libre')}</h3>${P.md(P.HELP_LIBRE)}</div>
+        <div class="help-card"><h3>🎬 ${t('Mode cinéma')}</h3>${P.md(P.HELP_CINEMA)}</div>
       </div>
       <div class="help-ai">
-        <h3>🤖 Préparer son cours avec une IA</h3>
+        <h3>🤖 ${t('Préparer son cours avec une IA')}</h3>
         <ol class="help-steps">
-          <li><b>Copiez la consigne</b> (elle contient le lien vers les instructions ; le texte est modifiable) :
+          <li>${t('<b>Copiez la consigne</b> (elle contient le lien vers les instructions ; le texte est modifiable) :')}
             <div class="help-prompt" id="hp-text" contenteditable="true" spellcheck="false">${esc(P.IA_CONSIGNE)}</div>
-            <button id="hp-consigne" class="big">📋 Copier la consigne</button></li>
-          <li><b>Collez-la dans votre IA</b> (ChatGPT, Claude, Gemini, Mistral…), puis ajoutez votre cours.</li>
-          <li><b>Collez la réponse</b> dans 📚 Scénarios, puis Lancer.</li>
+            <button id="hp-consigne" class="big">📋 ${t('Copier la consigne')}</button></li>
+          <li>${t('<b>Collez-la dans votre IA</b> (ChatGPT, Claude, Gemini, Mistral…), puis ajoutez votre cours.')}</li>
+          <li>${t('<b>Collez la réponse</b> dans 📚 Scénarios, puis Lancer.')}</li>
         </ol>
-        <details class="help-more"><summary>Votre IA ne peut pas ouvrir de lien ?</summary>
-          <p>Copiez la version complète (instructions et consigne en un seul texte), puis ajoutez votre cours.</p>
-          <div class="btns"><button id="hp-all" class="warn">📄 Copier la version complète</button>${doc('ia-et-skill', 'En savoir plus →')}</div>
+        <details class="help-more"><summary>${t('Votre IA ne peut pas ouvrir de lien ?')}</summary>
+          <p>${t('Copiez la version complète (instructions et consigne en un seul texte), puis ajoutez votre cours.')}</p>
+          <div class="btns"><button id="hp-all" class="warn">📄 ${t('Copier la version complète')}</button>${doc('ia-et-skill', t('En savoir plus →'))}</div>
         </details>
       </div>
-      <h3>📖 Documentation complète</h3>
+      <h3>📖 ${t('Documentation complète')}</h3>
       <div class="doc-links">
-        ${doc('mode-cinema', '🎬 Mode cinéma<small>lecture, questions, téléphone, partage</small>')}
-        ${doc('prise-en-main', '✏️ Mode libre<small>construire un contrat, studio</small>')}
-        ${doc('scenarios', '📚 Scénarios<small>les ' + P.LIBRARY.length + ' scénarios intégrés</small>')}
-        ${doc('regles-de-calcul', '🧮 Règles de vérification<small>garde-fous, incompatibilités, calculs</small>')}
-        ${doc('format-scenario', '📄 Format des scénarios<small>écrire ou corriger un scénario</small>')}
-        ${doc('', '🏠 Accueil de la documentation<small>tout le reste</small>')}
+        ${doc('mode-cinema', t('🎬 Mode cinéma<small>lecture, questions, téléphone, partage</small>'))}
+        ${doc('prise-en-main', t('✏️ Mode libre<small>construire un contrat, studio</small>'))}
+        ${doc('scenarios', t('📚 Scénarios<small>les {n} scénarios intégrés</small>', { n: P.LIBRARY.length }))}
+        ${doc('regles-de-calcul', t('🧮 Règles de vérification<small>garde-fous, incompatibilités, calculs</small>'))}
+        ${doc('format-scenario', t('📄 Format des scénarios<small>écrire ou corriger un scénario</small>'))}
+        ${doc('', t('🏠 Accueil de la documentation<small>tout le reste</small>'))}
       </div>
       <p class="help-thanks">${P.md(P.HELP_THANKS).replace(/^<p>|<\/p>$/g, '')}</p>`);
     $('#hp-consigne', c).onclick = () => copyText($('#hp-text', c).innerText.trim());
@@ -996,8 +1019,8 @@
           const st = sanitize(o.state || o);
           if (App.mode !== 'libre') setMode('libre');
           pushUndo(); App.state = st; App.sel = null; App.disp = {}; App.commit({ animate: true }); App.fit(true);
-          toast('📂 Schéma chargé : ' + esc(f.name));
-        } catch (e) { toast('⚠ Fichier JSON invalide'); }
+          toast(t('📂 Schéma chargé : ') + esc(f.name));
+        } catch (e) { toast(t('⚠ Fichier JSON invalide')); }
       } else { App.closeModal(); App.loadScenario(txt); }
     };
     r.readAsText(f, 'utf-8');
@@ -1005,7 +1028,7 @@
   $('#file-input').addEventListener('change', ev => { const f = ev.target.files[0]; if (f) openFile(f); ev.target.value = ''; });
 
   function loadExample() {
-    const sc = P.parseScenario(P.LIBRARY[0].md);
+    const sc = P.parseScenario((P.LIBRARY.find(s => (s.lang || 'fr') === P.lang && P.jurisOf(P.parseScenario(s.md).meta.droit || 'fr') === ((App.state.options && App.state.options.droit) || 'fr')) || App.libFind(P.LIBRARY[0].id)).md);
     const st = P.buildState(sc, sc.steps.length - 1);
     P.layout(st);
     Object.values(st.entities).forEach(e => { e.fixed = true; });
@@ -1018,7 +1041,7 @@
    *  { id } (bibliothèque), { url } (fichier servi), { packed } (texte encodé dans le lien) ou rien. */
   App.loadScenario = function (md, origin, startStep) {
     const sc = P.parseScenario(md);
-    if (!sc.steps.length) { toast('⚠ Ce scénario ne contient aucune étape.'); return false; }
+    if (!sc.steps.length) { toast(t('⚠ Ce scénario ne contient aucune étape.')); return false; }
     const errs = []; P.buildState(sc, sc.steps.length - 1, errs);
     sc.errors = sc.errors.concat(errs);
     App.pause();
@@ -1027,7 +1050,7 @@
     App.cinePos = {}; App.noteOff = {};
     if (App.mode !== 'cinema') setMode('cinema', true);
     App.goStep(startStep || 0);
-    if (errs.length) toast(`⚠ ${errs.length} avertissement(s) dans le scénario (voir sous le commentaire).`, 4000);
+    if (errs.length) toast(t('⚠ {n} avertissement(s) dans le scénario (voir sous le commentaire).', { n: errs.length }), 4000);
     return true;
   };
 
@@ -1071,6 +1094,7 @@
     const o = App.origin; if (!o) return null;
     const u = new URL(base);
     if (o.id) u.searchParams.set('scenario', o.id);
+    if (o.id && (P.lang !== 'fr' || (o.lang || 'fr') !== 'fr')) u.searchParams.set('lang', P.lang !== 'fr' ? P.lang : o.lang);
     else if (o.url) u.searchParams.set('md', o.url);
     if (step > 0) u.searchParams.set('etape', step + 1);
     if (o.packed) u.hash = 'md=' + o.packed;
@@ -1101,19 +1125,19 @@
   async function openShare() {
     if (!App.scenario) { openLibrary(); return; }
     const base = baseUrl(), isLocal = base !== location.origin + location.pathname;
-    if (!App.origin) { try { App.origin = { packed: await packMd(App.scenarioSrc) }; } catch (e) { toast('Encodage du scénario impossible dans ce navigateur.'); return; } }
+    if (!App.origin) { try { App.origin = { packed: await packMd(App.scenarioSrc) }; } catch (e) { toast(t('Encodage du scénario impossible dans ce navigateur.')); return; } }
     const lib = new URL(base); lib.searchParams.set('scenarios', '');
     const links = [
-      ['Cette étape', `Ouvre « ${esc(App.scenario.title)} » directement à l'étape ${App.step + 1}.`, scenarioUrl(base, App.step)],
-      ['Début du scénario', 'Ouvre le scénario à sa première étape.', scenarioUrl(base, 0)],
-      ['Bibliothèque', 'Ouvre le choix des scénarios.', lib.toString().replace('scenarios=', 'scenarios')]
+      [t('Cette étape'), t("Ouvre « {s} » directement à l'étape {n}.", { s: esc(App.scenario.title), n: App.step + 1 }), scenarioUrl(base, App.step)],
+      [t('Début du scénario'), t('Ouvre le scénario à sa première étape.'), scenarioUrl(base, 0)],
+      [t('Bibliothèque'), t('Ouvre le choix des scénarios.'), lib.toString().replace('scenarios=', 'scenarios')]
     ];
     const long = App.origin.packed && links[0][2].length > 6000;
-    const c = App.modal(`<h2>🔗 Partager</h2>
-      ${App.origin.packed ? '<p class="small muted">Ce scénario ne fait pas partie de la bibliothèque : son texte est encodé dans le lien lui-même (après le #). Aucun serveur ne le reçoit.</p>' : ''}
-      ${long ? '<p class="small" style="color:var(--warn)">⚠ Lien très long : certaines messageries peuvent le couper. Pour un long scénario, publiez plutôt le fichier .md et utilisez ?md=adresse-du-fichier.</p>' : ''}
-      ${isLocal ? `<p class="small muted">Liens construits sur l'adresse publique <b>${esc(PUBLIC_BASE)}</b>${App.origin.id ? ' : le scénario doit y avoir été publié' : ''}.</p>` : ''}
-      ${links.map(([t, d, u], i) => `<div class="share-row"><div><b>${t}</b><span class="small muted"> — ${d}</span></div><div class="share-line"><input type="text" readonly value="${esc(u)}" id="sh-${i}"><button data-copy="${i}">📋 Copier</button><a class="btnlink" href="${esc(u)}" target="_blank" rel="noopener">↗</a></div></div>`).join('')}`, 'narrow');
+    const c = App.modal(`<h2>🔗 ${t('Partager')}</h2>
+      ${App.origin.packed ? '<p class="small muted">' + t('Ce scénario ne fait pas partie de la bibliothèque : son texte est encodé dans le lien lui-même (après le #). Aucun serveur ne le reçoit.') + '</p>' : ''}
+      ${long ? '<p class="small" style="color:var(--warn)">' + t('⚠ Lien très long : certaines messageries peuvent le couper. Pour un long scénario, publiez plutôt le fichier .md et utilisez ?md=adresse-du-fichier.') + '</p>' : ''}
+      ${isLocal ? `<p class="small muted">${t("Liens construits sur l'adresse publique")} <b>${esc(PUBLIC_BASE)}</b>${App.origin.id ? t(' : le scénario doit y avoir été publié') : ''}.</p>` : ''}
+      ${links.map(([t, d, u], i) => `<div class="share-row"><div><b>${t}</b><span class="small muted"> — ${d}</span></div><div class="share-line"><input type="text" readonly value="${esc(u)}" id="sh-${i}"><button data-copy="${i}">📋 ${P.t('Copier')}</button><a class="btnlink" href="${esc(u)}" target="_blank" rel="noopener">↗</a></div></div>`).join('')}`, 'narrow');
     c.addEventListener('click', ev => { const b = ev.target.closest('[data-copy]'); if (b) copyText($('#sh-' + b.dataset.copy, c).value); });
     $$('input[readonly]', c).forEach(i => i.addEventListener('focus', () => i.select()));
   }
@@ -1123,29 +1147,29 @@
   function openScorm() {
     if (!App.scenario) { openLibrary(); return; }
     const sc = App.scenario, nq = sc.steps.filter(s => s.question && s.question.choices.some(c => c.correct)).length;
-    const c = App.modal(`<h2>📦 Exporter en SCORM</h2>
-      <p class="small muted">Un fichier .zip à déposer dans Moodle (activité « Paquetage SCORM ») ou dans une autre plateforme d'apprentissage. Il contient l'atelier et ce scénario : les élèves le suivent seuls, en pas à pas, sans connexion à ce site.</p>
-      <label class="field"><span>Titre dans la plateforme</span><input type="text" id="sc-title" value="${esc(sc.title)}"></label>
-      <label class="field"><span>Version</span><select id="sc-ver"><option value="1.2">SCORM 1.2 (recommandé, Moodle)</option><option value="2004">SCORM 2004 4ᵉ édition</option></select></label>
-      ${nq ? `<label class="chk"><input type="checkbox" id="sc-score" checked> Transmettre une note sur 100 : ${nq > 1 ? `part des ${nq} questions où l'élève choisit` : "100 si l'élève choisit"} une bonne carte avant de révéler la réponse</label>` : ''}
+    const c = App.modal(`<h2>📦 ${t('Exporter en SCORM')}</h2>
+      <p class="small muted">${t("Un fichier .zip à déposer dans Moodle (activité « Paquetage SCORM ») ou dans une autre plateforme d'apprentissage. Il contient l'atelier et ce scénario : les élèves le suivent seuls, en pas à pas, sans connexion à ce site.")}</p>
+      <label class="field"><span>${t('Titre dans la plateforme')}</span><input type="text" id="sc-title" value="${esc(sc.title)}"></label>
+      <label class="field"><span>${t('Version')}</span><select id="sc-ver"><option value="1.2">${t('SCORM 1.2 (recommandé, Moodle)')}</option><option value="2004">${t('SCORM 2004 4ᵉ édition')}</option></select></label>
+      ${nq ? `<label class="chk"><input type="checkbox" id="sc-score" checked> ${t(nq > 1 ? "Transmettre une note sur 100 : part des {n} questions où l'élève choisit une bonne carte avant de révéler la réponse" : "Transmettre une note sur 100 : 100 si l'élève choisit une bonne carte avant de révéler la réponse", { n: nq })}</label>` : ''}
       <ul class="small muted">
-        <li>Activité <b>terminée</b> quand l'élève atteint la dernière étape (${sc.steps.length}).</li>
-        <li>En revenant, l'élève reprend à l'étape où il s'était arrêté.</li>
+        <li>${t("Activité <b>terminée</b> quand l'élève atteint la dernière étape ({n}).", { n: sc.steps.length })}</li>
+        <li>${t("En revenant, l'élève reprend à l'étape où il s'était arrêté.")}</li>
       </ul>
-      <div class="btns"><button class="primary" id="sc-ok">⬇ Télécharger le paquet SCORM</button></div>`, 'narrow');
+      <div class="btns"><button class="primary" id="sc-ok">⬇ ${t('Télécharger le paquet SCORM')}</button></div>`, 'narrow');
     $('#sc-ok', c).onclick = async () => {
       const b = $('#sc-ok', c), title = $('#sc-title', c).value.trim() || sc.title, version = $('#sc-ver', c).value;
-      b.disabled = true; b.textContent = '⏳ Préparation…';
+      b.disabled = true; b.textContent = '⏳ ' + t('Préparation…');
       try {
         const blob = await P.scormPackage({ md: App.scenarioSrc, title, version, score: !!($('#sc-score', c) || {}).checked, publicBase: PUBLIC_BASE });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
         a.download = 'scorm-' + (P.slug(title).toLowerCase().replace(/_/g, '-') || 'scenario') + '.zip';
         document.body.appendChild(a); a.click();
         setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
-        App.closeModal(); toast('📦 Paquet SCORM téléchargé');
+        App.closeModal(); toast(t('📦 Paquet SCORM téléchargé'));
       } catch (e) {
-        b.disabled = false; b.textContent = '⬇ Télécharger le paquet SCORM';
-        toast('⚠ Paquet impossible à construire : fichiers de l’atelier inaccessibles (ouvrez l’atelier depuis un serveur web ou en ligne).', 6000);
+        b.disabled = false; b.textContent = '⬇ ' + t('Télécharger le paquet SCORM');
+        toast(t('⚠ Paquet impossible à construire : fichiers de l’atelier inaccessibles (ouvrez l’atelier depuis un serveur web ou en ligne).'), 6000);
       }
     };
   }
@@ -1172,21 +1196,21 @@
   /** Contenu de la question : en feuille sur le canevas (écran large) ou dans le texte (téléphone). */
   function qsheetHTML(q, inline) {
     const Q = App.q, inl = t => P.md(t, { nameOf });
-    let h = `<div class="qs-head" data-qs="toggle" title="Réduire / agrandir"><span class="qs-badge">❓ Question</span><div class="qs-text">${inl(q.text)}</div><div class="qs-actions">`;
-    h += Q.revealed ? '<span class="qs-done">✔ Réponse révélée</span>' : '<button class="primary" data-qs="reveal" title="Révéler la réponse (→)">💡 Révéler la réponse</button>';
-    h += `<button class="qs-min" data-qs="toggle" title="${Q.collapsed ? 'Agrandir' : 'Réduire'}">${Q.collapsed ? '▴' : '▾'}</button></div></div><div class="qs-body">`;
+    let h = `<div class="qs-head" data-qs="toggle" title="${t('Réduire / agrandir')}"><span class="qs-badge">❓ ${t('Question')}</span><div class="qs-text">${inl(q.text)}</div><div class="qs-actions">`;
+    h += Q.revealed ? '<span class="qs-done">✔ ' + t('Réponse révélée') + '</span>' : '<button class="primary" data-qs="reveal" title="' + t('Révéler la réponse (→)') + '">💡 ' + t('Révéler la réponse') + '</button>';
+    h += `<button class="qs-min" data-qs="toggle" title="${Q.collapsed ? t('Agrandir') : t('Réduire')}">${Q.collapsed ? '▴' : '▾'}</button></div></div><div class="qs-body">`;
     if (q.choices.length) {
       h += '<div class="qs-grid">' + q.choices.map((c, i) => {
         const cls = ['qcard', Q.picked === i ? 'picked' : '', Q.revealed ? (c.correct ? 'correct' : 'wrong') : '', Q.revealed && Q.flipped[i] ? 'flipped' : ''].join(' ');
-        const pickTag = Q.picked === i ? '<span class="qc-pick">👥 choix de la salle</span>' : '';
+        const pickTag = Q.picked === i ? '<span class="qc-pick">👥 ' + t('choix de la salle') + '</span>' : '';
         return `<div class="${cls}" data-card="${i}" role="button" tabindex="0"><div class="qc-inner">
           <div class="qc-face qc-front"><span class="qc-letter">${'ABCDEFGHIJ'[i] || i + 1}</span><div class="qc-txt">${inl(c.text)}${pickTag}</div>${Q.revealed ? `<span class="qc-mark">${c.correct ? '✓' : '✗'}</span>` : ''}</div>
-          <div class="qc-face qc-back"><div class="qc-verdict">${c.correct ? '✓ Bonne réponse' : '✗ Mauvaise réponse'}</div><div class="qc-txt">${c.explain ? inl(c.explain) : ''}</div></div>
+          <div class="qc-face qc-back"><div class="qc-verdict">${c.correct ? '✓ ' + t('Bonne réponse') : '✗ ' + t('Mauvaise réponse')}</div><div class="qc-txt">${c.explain ? inl(c.explain) : ''}</div></div>
         </div></div>`;
       }).join('') + '</div>';
-      h += `<p class="qs-hint">${Q.revealed ? (q.choices.some(c => c.explain) ? 'Cliquez sur une carte (ou tapez son numéro) pour la retourner et lire son explication.' : 'Cliquez sur une carte pour la retourner.') : 'Cliquez sur la réponse choisie par la salle (ou tapez son numéro), puis révélez la réponse (→).'}${inline ? '' : ' Le canevas reste déplaçable au-dessus.'}</p>`;
+      h += `<p class="qs-hint">${Q.revealed ? (q.choices.some(c => c.explain) ? t('Cliquez sur une carte (ou tapez son numéro) pour la retourner et lire son explication.') : t('Cliquez sur une carte pour la retourner.')) : t('Cliquez sur la réponse choisie par la salle (ou tapez son numéro), puis révélez la réponse (→).')}${inline ? '' : ' ' + t('Le canevas reste déplaçable au-dessus.')}</p>`;
     } else {
-      h += `<p class="qs-open">${Q.revealed ? (inline ? 'La réponse est affichée ci-dessous.' : 'La réponse est affichée dans le panneau de droite.') : 'Question ouverte : échangez avec la salle, puis révélez la réponse (→).'}</p>`;
+      h += `<p class="qs-open">${Q.revealed ? (inline ? t('La réponse est affichée ci-dessous.') : t('La réponse est affichée dans le panneau de droite.')) : t('Question ouverte : échangez avec la salle, puis révélez la réponse (→).')}</p>`;
     }
     return h + '</div>';
   }
@@ -1250,7 +1274,7 @@
   function updatePlayer() {
     const sc = App.scenario, cont = App.playMode === 'continu';
     $('#pl-play').hidden = !cont;
-    $('#pl-play').textContent = App.playing ? '⏸ Pause' : '▶ Lecture';
+    $('#pl-play').textContent = App.playing ? '⏸ ' + t('Pause') : '▶ ' + t('Lecture');
     $('#pl-next').className = cont ? '' : 'primary';
     $('#pl-timer').style.visibility = cont ? 'visible' : 'hidden';
     $('.speed').style.display = cont ? '' : 'none';
@@ -1260,8 +1284,8 @@
     $('#pl-reset').hidden = !Object.keys(App.cinePos).length && !Object.keys(App.noteOff).length;
     $('#pl-prev').disabled = App.step <= 0;
     const pending = !!curQuestion() && !App.q.revealed;
-    $('#pl-next').textContent = pending ? (isMobile() ? '💡 Réponse' : '💡 Réponse ▶') : (isMobile() ? 'Suivant' : 'Suivant ▶');
-    $('#pl-next').title = pending ? 'Révéler la réponse (→)' : 'Étape suivante (→)';
+    $('#pl-next').textContent = pending ? (isMobile() ? '💡 ' + t('Réponse') : '💡 ' + t('Réponse') + ' ▶') : (isMobile() ? t('Suivant') : t('Suivant') + ' ▶');
+    $('#pl-next').title = pending ? t('Révéler la réponse (→)') : t('Étape suivante (→)');
     $('#pl-next').disabled = !pending && App.step >= sc.steps.length - 1;
   }
   $('#pl-first').onclick = () => App.goStep(0);
@@ -1277,39 +1301,39 @@
   };
   $('#pl-speed').oninput = ev => {
     App.speed = parseFloat(ev.target.value);
-    $('#pl-speed-v').textContent = App.speed.toLocaleString('fr-FR') + '×';
+    $('#pl-speed-v').textContent = App.speed.toLocaleString(P.locale ? P.locale() : 'fr-FR') + '×';
   };
   $('#pl-speed').onchange = () => { if (App.playing) App.schedule(); };
 
   function dossierSummary(pv) {
     const an = App.an, rel = Array.from(an.related(pv)).filter(c => c !== pv && an.info[c].status !== 'neutral');
     if (!rel.length) return '';
-    return `<div class="auto"><div class="auto-h">🔎 Dossier : ${iconOf(pv)} ${esc(nameOf(pv))}</div><table class="mini"><tr><th>Élément</th><th>Verdict</th></tr>${rel.map(c => `<tr><td><span class="ref" data-ref="${esc(c)}">${iconOf(c)} ${esc(nameOf(c))}</span></td><td style="color:${P.STATUS[an.info[c].status].color}">${P.STATUS[an.info[c].status].icon} ${esc(an.info[c].verdict)}</td></tr>`).join('')}</table></div>`;
+    return `<div class="auto"><div class="auto-h">🔎 ${t('Dossier :')} ${iconOf(pv)} ${esc(nameOf(pv))}</div><table class="mini"><tr><th>${t('Élément')}</th><th>${t('Verdict')}</th></tr>${rel.map(c => `<tr><td><span class="ref" data-ref="${esc(c)}">${iconOf(c)} ${esc(nameOf(c))}</span></td><td style="color:${P.STATUS[an.info[c].status].color}">${P.STATUS[an.info[c].status].icon} ${esc(an.info[c].verdict)}</td></tr>`).join('')}</table></div>`;
   }
 
   App.renderCommentary = function () {
     const el = $('#commentary'), sc = App.scenario;
     if (!sc) {
-      el.innerHTML = '<div class="empty"><h2>🎬 Mode cinéma</h2><p>Un scénario déroule, étape par étape, la construction d\'un contrat, d\'une rupture ou d\'un litige, avec ses commentaires et ses questions.</p><button class="primary" data-act="lib">📚 Choisir un scénario</button></div>';
+      el.innerHTML = '<div class="empty"><h2>🎬 ' + t('Mode cinéma') + '</h2><p>' + t("Un scénario déroule, étape par étape, la construction d'un contrat, d'une rupture ou d'un litige, avec ses commentaires et ses questions.") + '</p><button class="primary" data-act="lib">📚 ' + t('Choisir un scénario') + '</button></div>';
       return;
     }
     const s = sc.steps[App.step], st = App.state;
-    let h = `<div class="sc-head"><div class="sc-title">${esc(sc.title)}</div><div class="sc-no">Étape ${App.step + 1} / ${sc.steps.length}</div></div>`;
+    let h = `<div class="sc-head"><div class="sc-title">${esc(sc.title)}</div><div class="sc-no">${t('Étape {n} / {t}', { n: App.step + 1, t: sc.steps.length })}</div></div>`;
     h += `<h2 class="step-title">${s.question ? '❓ ' : ''}${esc(s.title)}</h2><div class="md">${P.md(s.md, { nameOf })}</div>`;
     if (s.question) {
       const q = s.question, good = q.choices.map((c, i) => c.correct ? `<b>${'ABCDEFGHIJ'[i] || i + 1}</b> — ${P.md(c.text, { nameOf }).replace(/^<p>|<\/p>$/g, '')}` : null).filter(Boolean);
       if (isMobile()) h += `<div class="qinline">${qsheetHTML(q, true)}</div>`;
-      if (!App.q.revealed) { if (!isMobile()) h += '<div class="answer-wait">La réponse s\'affichera ici. <button class="small" data-act="reveal">💡 Révéler la réponse</button></div>'; }
+      if (!App.q.revealed) { if (!isMobile()) h += '<div class="answer-wait">' + t("La réponse s'affichera ici.") + ' <button class="small" data-act="reveal">💡 ' + t('Révéler la réponse') + '</button></div>'; }
       else if (good.length || q.answerMd) {
-        h += `<details class="answer" open><summary>💡 Réponse</summary>${good.length ? `<p class="good">${good.length > 1 ? 'Bonnes réponses' : 'Bonne réponse'} : ${good.join(' ; ')}</p>` : ''}<div class="md">${P.md(q.answerMd, { nameOf })}</div></details>`;
+        h += `<details class="answer" open><summary>💡 ${t('Réponse')}</summary>${good.length ? `<p class="good">${good.length > 1 ? t('Bonnes réponses') : t('Bonne réponse')}${t(' : ')}${good.join(t(' ; '))}</p>` : ''}<div class="md">${P.md(q.answerMd, { nameOf })}</div></details>`;
       }
     }
     const target = App.sel && App.sel.kind === 'node' ? App.sel.id : null;
-    if (target && st.entities[target]) h += `<div class="auto"><div class="auto-h">🔍 ${iconOf(target)} ${esc(nameOf(target))}<button data-act="unsel" title="Fermer">×</button></div>${App.analysisHTML(target, false)}</div>`;
+    if (target && st.entities[target]) h += `<div class="auto"><div class="auto-h">🔍 ${iconOf(target)} ${esc(nameOf(target))}<button data-act="unsel" title="${t('Fermer')}">×</button></div>${App.analysisHTML(target, false)}</div>`;
     else if (st.view.perspective && st.entities[st.view.perspective]) h += dossierSummary(st.view.perspective);
-    h += `<details class="plan"${App.planOpen ? ' open' : ''}><summary>Plan du scénario</summary><ol>${sc.steps.map((x, i) => `<li class="${i === App.step ? 'cur' : ''}${i < App.step ? ' done' : ''}"><a data-go="${i}">${esc(x.title)}</a></li>`).join('')}</ol></details>`;
-    if (sc.errors.length) h += `<details class="errs"><summary>⚠ ${sc.errors.length} avertissement(s) dans le scénario</summary><ul>${sc.errors.map(e => `<li>Étape ${(e.step || 0) + 1}, ligne ${e.line} : <code>${esc(e.text)}</code> — ${esc(e.msg)}</li>`).join('')}</ul></details>`;
-    h += '<p class="hint">Cliquez sur une carte du canevas pour afficher ses conditions de validité. Glissez une carte ou une bulle pour la déplacer.</p>';
+    h += `<details class="plan"${App.planOpen ? ' open' : ''}><summary>${t('Plan du scénario')}</summary><ol>${sc.steps.map((x, i) => `<li class="${i === App.step ? 'cur' : ''}${i < App.step ? ' done' : ''}"><a data-go="${i}">${esc(x.title)}</a></li>`).join('')}</ol></details>`;
+    if (sc.errors.length) h += `<details class="errs"><summary>${t('⚠ {n} avertissement(s) dans le scénario', { n: sc.errors.length })}</summary><ul>${sc.errors.map(e => `<li>${t('Étape {n}, ligne {l} :', { n: (e.step || 0) + 1, l: e.line })} <code>${esc(e.text)}</code> — ${esc(e.msg)}</li>`).join('')}</ul></details>`;
+    h += '<p class="hint">' + t('Cliquez sur une carte du canevas pour afficher ses conditions de validité. Glissez une carte ou une bulle pour la déplacer.') + '</p>';
     el.innerHTML = h;
     const d = $('details.plan', el); if (d) d.addEventListener('toggle', () => { App.planOpen = d.open; });
   };
@@ -1338,16 +1362,16 @@
     $('#btn-studio').classList.toggle('on', App.studio.open);
     if (el.hidden) return;
     const n = App.studio.steps.length;
-    el.innerHTML = `<b>🎞 Studio</b><span>${n} étape${n > 1 ? 's' : ''} capturée${n > 1 ? 's' : ''}</span>
-      <button class="primary" data-st="cap">📸 Capturer l'étape</button>
-      <button data-st="prev"${n ? '' : ' disabled'}>▶ Prévisualiser</button>
-      <button data-st="exp">⬇ Exporter .md</button>
-      <button data-st="pop"${n ? '' : ' disabled'} title="Retirer la dernière étape">↶</button>
-      <button data-st="clr"${n ? '' : ' disabled'}>Vider</button>
-      <button data-st="close" title="Fermer le studio">×</button>`;
+    el.innerHTML = `<b>🎞 ${t('Studio')}</b><span>${t(n > 1 ? '{n} étapes capturées' : '{n} étape capturée', { n })}</span>
+      <button class="primary" data-st="cap">📸 ${t("Capturer l'étape")}</button>
+      <button data-st="prev"${n ? '' : ' disabled'}>▶ ${t('Prévisualiser')}</button>
+      <button data-st="exp">⬇ ${t('Exporter .md')}</button>
+      <button data-st="pop"${n ? '' : ' disabled'} title="${t('Retirer la dernière étape')}">↶</button>
+      <button data-st="clr"${n ? '' : ' disabled'}>${t('Vider')}</button>
+      <button data-st="close" title="${t('Fermer le studio')}">×</button>`;
   }
   function studioMd() {
-    const steps = App.studio.steps.length ? App.studio.steps : [{ title: 'Structure', comment: '', snap: P.clone(App.state) }];
+    const steps = App.studio.steps.length ? App.studio.steps : [{ title: t('Structure'), comment: '', snap: P.clone(App.state) }];
     return P.studioMarkdown(App.studio.title, steps);
   }
   $('#studio').addEventListener('click', ev => {
@@ -1356,12 +1380,12 @@
     switch (b.dataset.st) {
       case 'cap': {
         const selNode = App.sel && App.sel.kind === 'node' ? App.sel.id : null;
-        const c = App.modal(`<h2>📸 Capturer l'étape ${S.steps.length + 1}</h2>
-          ${S.steps.length ? '' : `<label class="field"><span>Titre du scénario</span><input type="text" id="sd-title" value="${esc(S.title)}"></label>`}
-          <label class="field"><span>Titre de l'étape</span><input type="text" id="sd-step" value="${S.steps.length + 1}. "></label>
-          <label class="field"><span>Commentaire (markdown : **gras**, listes « - », citations « > »…)</span><textarea id="sd-com" placeholder="Expliquez ce que montre cette étape…"></textarea></label>
-          ${selNode ? `<label class="chk"><input type="checkbox" id="sd-focus" checked> mettre en évidence « ${esc(nameOf(selNode))} »</label>` : ''}
-          <div class="btns"><button class="primary" id="sd-ok">Capturer</button></div>`, 'narrow');
+        const c = App.modal(`<h2>📸 ${t("Capturer l'étape {n}", { n: S.steps.length + 1 })}</h2>
+          ${S.steps.length ? '' : `<label class="field"><span>${t('Titre du scénario')}</span><input type="text" id="sd-title" value="${esc(S.title)}"></label>`}
+          <label class="field"><span>${t("Titre de l'étape")}</span><input type="text" id="sd-step" value="${S.steps.length + 1}. "></label>
+          <label class="field"><span>${t('Commentaire (markdown : **gras**, listes « - », citations « > »…)')}</span><textarea id="sd-com" placeholder="${t('Expliquez ce que montre cette étape…')}"></textarea></label>
+          ${selNode ? `<label class="chk"><input type="checkbox" id="sd-focus" checked> ${t('mettre en évidence « {n} »', { n: esc(nameOf(selNode)) })}</label>` : ''}
+          <div class="btns"><button class="primary" id="sd-ok">${t('Capturer')}</button></div>`, 'narrow');
         $('#sd-step', c).focus();
         $('#sd-ok', c).onclick = () => {
           const snap = P.clone(App.state);
@@ -1369,15 +1393,15 @@
           snap.view.notes = {}; snap.view.select = null;
           if ($('#sd-title', c)) S.title = $('#sd-title', c).value.trim() || S.title;
           S.steps.push({ title: $('#sd-step', c).value.trim(), comment: $('#sd-com', c).value, snap });
-          App.closeModal(); updateStudio(); toast(`📸 Étape ${S.steps.length} capturée`);
+          App.closeModal(); updateStudio(); toast(t('📸 Étape {n} capturée', { n: S.steps.length }));
         };
         break;
       }
       case 'prev': App.loadScenario(studioMd()); break;
       case 'exp': {
         const md = studioMd();
-        const c = App.modal(`<h2>⬇ Scénario généré</h2><textarea class="big" id="sd-md" spellcheck="false"></textarea>
-          <div class="btns"><button class="primary" id="sd-dl">⬇ Télécharger .md</button><button id="sd-cp">📋 Copier</button><button id="sd-play">▶ Lire en mode cinéma</button></div>`);
+        const c = App.modal(`<h2>⬇ ${t('Scénario généré')}</h2><textarea class="big" id="sd-md" spellcheck="false"></textarea>
+          <div class="btns"><button class="primary" id="sd-dl">⬇ ${t('Télécharger .md')}</button><button id="sd-cp">📋 ${t('Copier')}</button><button id="sd-play">▶ ${t('Lire en mode cinéma')}</button></div>`);
         $('#sd-md', c).value = md;
         $('#sd-dl', c).onclick = () => download(P.slug(S.title).toLowerCase() + '.md', $('#sd-md').value);
         $('#sd-cp', c).onclick = () => copyText($('#sd-md').value);
@@ -1385,7 +1409,7 @@
         break;
       }
       case 'pop': S.steps.pop(); updateStudio(); break;
-      case 'clr': if (confirm('Vider toutes les étapes capturées ?')) { S.steps = []; updateStudio(); } break;
+      case 'clr': if (confirm(t('Vider toutes les étapes capturées ?'))) { S.steps = []; updateStudio(); } break;
       case 'close': S.open = false; updateStudio(); break;
     }
   });
@@ -1422,7 +1446,7 @@
 
   /* ============================================================ barre d'actions */
   $('#btn-new').onclick = () => {
-    if (Object.keys(App.state.entities).length && !confirm('Vider le canevas ? (Ctrl+Z pour annuler)')) return;
+    if (Object.keys(App.state.entities).length && !confirm(t('Vider le canevas ? (Ctrl+Z pour annuler)'))) return;
     pushUndo(); App.state = P.newState(); App.sel = null; App.commit(); App.fit(true);
   };
   $('#btn-undo').onclick = undo;
@@ -1442,7 +1466,7 @@
   $('#btn-edit-md').onclick = () => { if (App.scenario) openEditor(App.scenarioSrc, true); else openLibrary(); };
   $('#btn-to-libre').onclick = () => {
     const lib = App.libreState;
-    if (lib && Object.keys(lib.entities).length && !confirm('Remplacer le canevas du mode libre par l\'état affiché ? (Ctrl+Z pour annuler en mode libre)')) return;
+    if (lib && Object.keys(lib.entities).length && !confirm(t("Remplacer le canevas du mode libre par l'état affiché ? (Ctrl+Z pour annuler en mode libre)"))) return;
     const st = P.clone(App.state);
     Object.values(st.entities).forEach(e => { e.fixed = true; });
     st.view.focus = []; st.view.notes = {}; st.view.select = null;
@@ -1450,7 +1474,7 @@
     setMode('libre');
     if (prevLibre) App.undoStack.push(JSON.stringify(prevLibre));
     App.state = st; App.commit({ animate: false }); App.fit(false);
-    toast('✏️ Vous pouvez maintenant modifier librement ce schéma.');
+    toast(t('✏️ Vous pouvez maintenant modifier librement ce schéma.'));
   };
   $('#btn-help').onclick = () => openHelp('all');
 
@@ -1459,7 +1483,7 @@
     document.documentElement.setAttribute('data-theme', t);
     const b = $('#btn-theme');
     b.textContent = t === 'dark' ? '☀️' : '🌙';
-    b.title = t === 'dark' ? 'Passer en mode jour' : 'Passer en mode nuit';
+    b.title = t === 'dark' ? P.t('Passer en mode jour') : P.t('Passer en mode nuit');
     if (remember) { try { localStorage.setItem('contract-lab.theme', t); } catch (e) { /* */ } }
     requestRender();
   }
@@ -1527,7 +1551,32 @@
   });
 
   /* ============================================================ démarrage */
+  /* ---- langue de l'interface et droit applicable */
+  function syncJurisSelect() {
+    const sel = $('#opt-droit'); if (!sel) return;
+    const cur = (App.state.options && App.state.options.droit) || 'fr';
+    if (!sel.options.length || sel.options.length !== Object.keys(P.JURIS).length)
+      sel.innerHTML = Object.keys(P.JURIS).map(id => `<option value="${id}">⚖️ ${esc(P.jurisLabel(P.JURIS[id]))}</option>`).join('');
+    sel.value = cur;
+    sel.disabled = App.mode !== 'libre';
+    sel.title = App.mode === 'libre' ? t('Droit applicable : catalogue des clauses, garde-fous et calculs') : t('Droit applicable (fixé par le scénario)');
+  }
+  function initLangJuris() {
+    const ls = $('#opt-lang');
+    ls.innerHTML = Object.keys(P.LANGS).map(l => `<option value="${l}"${l === P.lang ? ' selected' : ''}>${l.toUpperCase()}</option>`).join('');
+    ls.onchange = () => P.setLang(ls.value);
+    $('#opt-droit').onchange = ev => {
+      if (App.mode !== 'libre') return;
+      pushUndo(); App.state.options.droit = ev.target.value; App.sel = null; App.commit(); App.fit(true);
+      toast(t('Droit applicable : {d}', { d: P.jurisLabel(P.JURIS[ev.target.value]) }));
+    };
+  }
+
   function init() {
+    P.translateDom(document.body);
+    document.title = t(document.title);
+    initLangJuris();
+    bindPalette();
     buildPalette();
     buildLegend();
     try {
@@ -1548,15 +1597,15 @@
     const step = Math.max(0, (parseInt(q.get('etape') || q.get('step'), 10) || 1) - 1);
     const hash = (location.hash.match(/(?:^#|&)md=([A-Za-z0-9_-]+)/) || [])[1];
     if (sid) {
-      const s = P.LIBRARY.find(x => x.id === sid);
-      if (s) App.loadScenario(s.md, { id: sid }, step); else { toast('Scénario introuvable : ' + esc(sid)); setMode('cinema'); }
+      const s = App.libFind(sid, q.get('lang') || P.lang);
+      if (s) App.loadScenario(s.md, { id: sid, lang: s.lang || 'fr' }, step); else { toast(t('Scénario introuvable : ') + esc(sid)); setMode('cinema'); }
     } else if (hash) {
       unpackMd(hash).then(t => App.loadScenario(t, { packed: hash }, step))
-        .catch(() => { toast('⚠ Lien de scénario illisible (incomplet ?)'); setMode('cinema'); });
+        .catch(() => { toast(t('⚠ Lien de scénario illisible (incomplet ?)')); setMode('cinema'); });
     } else if (url) {
       fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
         .then(t => App.loadScenario(t, { url }, step))
-        .catch(() => toast('⚠ Impossible de charger ' + esc(url)));
+        .catch(() => toast(t('⚠ Impossible de charger ') + esc(url)));
     } else if (q.has('scenarios') || q.has('bibliotheque') || isMobile()) {
       setMode('cinema');   // ouvre la bibliothèque ; sur téléphone, le mode cinéma est le point d'entrée
     }

@@ -19,22 +19,23 @@
     note: ['note', 'bulle'],
     effacer: ['effacer', 'vider', 'reset', 'clear'],
     duree: ['duree', 'duration'],
-    regle: ['regle', 'option', 'rule', 'verification'],
+    regle: ['regle', 'option', 'rule', 'verification', 'check', 'checking'],
+    droit: ['droit', 'law', 'jurisdiction', 'juridiction'],
     disposition: ['disposition', 'layout'],
     deplacer: ['deplacer', 'placer', 'move'],
     selection: ['selection', 'selectionner', 'select', 'analyse', 'analyser']
   };
   const KWMAP = {};
   Object.keys(KW).forEach(k => KW[k].forEach(w => { KWMAP[w] = k; }));
-  const NONE = ['aucun', 'aucune', 'aucuns', 'aucunes', 'rien', 'none', 'off', '-'];
+  const NONE = ['aucun', 'aucune', 'aucuns', 'aucunes', 'rien', 'none', 'off', '-', 'nothing'];
   const isNone = tok => tok && NONE.includes(P.norm(tok.v));
   const STATUTS = {
-    ok: ['ok', 'valide', 'valable', 'licite', 'reguliere', 'regulier', 'respectee', 'vert'],
-    ko: ['ko', 'nulle', 'nul', 'illicite', 'irreguliere', 'irregulier', 'abusive', 'invalide', 'rouge'],
-    risk: ['risk', 'risque', 'a_risque', 'douteuse', 'orange'],
-    violee: ['violee', 'viole', 'manquement'],
+    ok: ['ok', 'valide', 'valable', 'licite', 'reguliere', 'regulier', 'respectee', 'vert', 'valid', 'lawful', 'fair', 'green'],
+    ko: ['ko', 'nulle', 'nul', 'illicite', 'irreguliere', 'irregulier', 'abusive', 'invalide', 'rouge', 'void', 'invalid', 'unlawful', 'unfair', 'unenforceable', 'red'],
+    risk: ['risk', 'risque', 'a_risque', 'douteuse', 'orange', 'risky', 'at_risk', 'amber'],
+    violee: ['violee', 'viole', 'manquement', 'breached', 'breach'],
     neutral: ['neutre', 'neutral', 'gris', 'sans'],
-    auto: ['auto', 'automatique', 'aucun', 'aucune']
+    auto: ['auto', 'automatique', 'aucun', 'aucune', 'automatic']
   };
   const statutOf = w => Object.keys(STATUTS).find(k => STATUTS[k].includes(P.key(w))) || null;
 
@@ -70,7 +71,8 @@
     if (tok.q) return null;
     const m = tok.v.match(/^([A-Za-zÀ-ÿ_]+)=(.*)$/);
     if (!m) return null;
-    const k = P.key(m[1]); let v = m[2];
+    let k = P.key(m[1]); const v = m[2];
+    const al = (P.juris && P.juris.paramAliases) || {}; if (al[k]) k = al[k];
     if (k === 'icone' || k === 'icon') return { k: 'icone', v };
     if (k === 'categorie') return { k, v: P.catKey(v) || v };
     const n = P.num(v);
@@ -84,7 +86,9 @@
     const err = msg => { if (errs) errs.push({ line, text, msg }); };
     const arrow = t.findIndex(x => !x.q && x.v === '->');
     const kw0 = P.norm(t[0].v);
-    const cmd = KWMAP[kw0];
+    let cmd = KWMAP[kw0];
+    // « droit » est aussi un type (élément libre) : commande seulement si l'argument désigne un droit
+    if (cmd === 'droit' && t[1] && !P.jurisOf(t[1].v) && P.kindOf(t[0].v)) cmd = null;
     if (!cmd && arrow > 0) return linkCmd(t, arrow);
     if (!cmd && P.relOf(t[0].v) && t.length >= 3 && !P.kindOf(t[0].v)) {
       // forme « limite A B C » : A (relation) B, A (relation) C
@@ -134,11 +138,11 @@
         a.slice(2).forEach(tok => {
           const w = P.key(tok.v);
           if (tok.q) { effet = tok.v; return; }
-          if (['ok', 'oui', 'remplie', 'satisfaite', 'presente', 'vrai'].includes(w)) ok = true;
-          else if (['manque', 'non', 'absente', 'manquante', 'ko', 'faux'].includes(w)) ok = false;
-          else if (['risque', 'leger', 'legere'].includes(w)) level = 'risque';
-          else if (['grave', 'nullite'].includes(w)) level = 'grave';
-          else if (['retirer', 'supprimer'].includes(w)) ok = 'del';
+          if (['ok', 'oui', 'remplie', 'satisfaite', 'presente', 'vrai', 'yes', 'met', 'present', 'true'].includes(w)) ok = true;
+          else if (['manque', 'non', 'absente', 'manquante', 'ko', 'faux', 'missing', 'no', 'unmet', 'false'].includes(w)) ok = false;
+          else if (['risque', 'leger', 'legere', 'risk', 'minor'].includes(w)) level = 'risque';
+          else if (['grave', 'nullite', 'serious', 'major'].includes(w)) level = 'grave';
+          else if (['retirer', 'supprimer', 'remove', 'delete'].includes(w)) ok = 'del';
           else err('Mot non compris : « ' + tok.v + ' »');
         });
         e.conds = (e.conds || []).filter(c => P.norm(c.label) !== P.norm(label));
@@ -178,9 +182,14 @@
       case 'regle': {
         const w = a.map(x => P.key(x.v));
         const on = w.some(x => ['on', 'oui', 'actif', 'active', 'activee', 'vrai', 'true'].includes(x));
-        const off = w.some(x => ['off', 'non', 'inactif', 'inactive', 'desactivee', 'faux', 'false', 'masquee', 'cachee'].includes(x));
+        const off = w.some(x => ['off', 'non', 'inactif', 'inactive', 'desactivee', 'faux', 'false', 'masquee', 'cachee', 'no', 'hidden', 'hide'].includes(x));
         if (!on && !off) return err('Syntaxe : verification on|off');
         st.options.verif = on; return;
+      }
+      case 'droit': {
+        const j = a[0] && P.jurisOf(a[0].v);
+        if (!j) return err('Droit inconnu : ' + (a[0] ? a[0].v : '?') + ' (' + Object.keys(P.JURIS).join(', ') + ')');
+        st.options.droit = j; P.setJuris(j); return;
       }
       case 'disposition': Object.values(st.entities).forEach(e => { e.fixed = false; }); return;
       case 'deplacer': {
@@ -255,7 +264,7 @@
    *    ou d'une section « ### Réponse » ;
    *  - lignes indentées (ou citations « > ») sous un choix = explication de ce choix ;
    *  - tout ce qui suit « ### Réponse » (texte et blocs scene) n'apparaît qu'à la révélation. */
-  const ANSWER_RE = /^###\s+(?:💡\s*)?(?:réponse|reponse|correction|explication|solution)s?\b/i;
+  const ANSWER_RE = /^###\s+(?:💡\s*)?(?:réponse|reponse|correction|explication|solution|answer|explanation)s?\b/i;
   const CHOICE_RE = /^\s*[-*+]\s+\[( |x|X)\]\s+(.*)$/;
   const QTITLE_RE = /^(?:❓\s*)?(?:question|quiz)\b/i;
   const QPREFIX_RE = /^(?:❓\s*)?(?:(?:question|quiz)\s*(?:n°\s*)?\d*\s*[:.\-–—]\s*)?/i;
@@ -350,6 +359,8 @@
    *  celles de l'étape n seulement si revealLast est vrai. */
   P.buildState = function (sc, n, errs, revealLast) {
     const st = P.newState();
+    const j = P.jurisOf(sc.meta.droit || sc.meta.law || sc.meta.jurisdiction || 'fr') || 'fr';
+    st.options.droit = j; P.setJuris(j);
     for (let i = 0; i <= n && i < sc.steps.length; i++) {
       st.view.focus = []; st.view.notes = {}; st.view.select = null;
       const sink = errs ? { push: e => errs.push(Object.assign(e, { step: i })) } : null;
@@ -390,6 +401,7 @@
       const p = P.findLink(prev, l.from, l.to);
       if (!p || p.rel !== l.rel || (p.label || '') !== (l.label || '')) out.push(`${l.from} -> ${l.to} ${l.rel}${l.label ? ' ' + q(l.label) : ''}`);
     });
+    if ((prev.options.droit || 'fr') !== (cur.options.droit || 'fr')) out.unshift('droit ' + (cur.options.droit || 'fr'));
     if ((prev.options.verif !== false) !== (cur.options.verif !== false)) out.push('verification ' + (cur.options.verif === false ? 'off' : 'on'));
     if (prev.view.perspective !== cur.view.perspective) out.push('vue ' + (cur.view.perspective || 'aucune'));
     if (cur.view.focus && cur.view.focus.length) out.push('focus ' + cur.view.focus.join(' '));
@@ -400,7 +412,8 @@
   P.paramValue = pv;
 
   P.studioMarkdown = function (title, steps) {
-    let md = `# ${title}\n\n> Scénario créé avec le studio de l'atelier Contract Lab.\n\n`;
+    const dr = steps.length && steps[steps.length - 1].snap.options.droit;
+    let md = (dr && dr !== 'fr' ? `---\ndroit: ${dr}\n---\n\n` : '') + `# ${title}\n\n> ${P.t ? P.t("Scénario créé avec le studio de l'atelier Contract Lab.") : "Scénario créé avec le studio de l'atelier Contract Lab."}\n\n`;
     let prev = P.newState();
     steps.forEach((s, i) => {
       const cmds = P.toCommands(prev, s.snap);

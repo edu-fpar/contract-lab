@@ -8,6 +8,7 @@
 (function () {
   'use strict';
   const P = window.P = window.P || {};
+  const t = (x, v) => (P.t ? P.t(x, v) : (v ? String(x).replace(/\{(\w+)\}/g, (m, k) => (v[k] != null ? v[k] : m)) : x));
 
   P.norm = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
   P.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -15,26 +16,28 @@
   P.key = s => P.norm(s).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   P.num = function (v) {
     if (v == null) return null;
-    const s = String(v).trim().replace(/\s/g, '').replace(',', '.').replace(/(%|€|mois|ans?|annees?)$/i, '');
+    let s = String(v).trim().replace(/\s/g, '').replace(/^[£$€]/, '').replace(/(%|€|£|mois|months?|ans?|annees?|years?|weeks?|semaines?)$/i, '');
+    // 1,200 ou 1,200,000 : séparateur de milliers (anglais) ; sinon la virgule est décimale (français)
+    s = /^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
     const m = s.match(/^-?\d+(?:\.\d+)?$/);
     return m ? parseFloat(s) : null;
   };
   P.round2 = v => Math.round(v * 100) / 100;
-  P.eur = v => Math.round(v).toLocaleString('fr-FR') + ' €';
-  P.mois = v => P.round2(v).toLocaleString('fr-FR') + ' mois';
+  P.eur = v => { const cur = (P.juris && P.juris.currency) || 'EUR', n = Math.round(v).toLocaleString(P.locale ? P.locale() : 'fr-FR'); return cur === 'GBP' ? '£' + n : (cur === 'USD' ? '$' + n : n + ' €'); };
+  P.mois = v => P.round2(v).toLocaleString(P.locale ? P.locale() : 'fr-FR') + ' ' + (P.lang === 'en' ? (P.round2(v) > 1 ? 'months' : 'month') : 'mois');
 
   /* ------------------------------------------------------------ familles */
   P.FAMS = {
-    partie: { label: 'Parties & acteurs', short: 'Partie', color: '#2563eb', icon: '👥' },
-    contrat: { label: 'Contrats', short: 'Contrat', color: '#4f46e5', icon: '📃' },
-    clause: { label: 'Clauses', short: 'Clause', color: '#0891b2', icon: '🧩' },
-    limite: { label: 'Garde-fous & conditions', short: 'Condition', color: '#059669', icon: '🔒' },
-    obligation: { label: 'Obligations', short: 'Obligation', color: '#7c3aed', icon: '📌' },
-    manquement: { label: 'Fautes & manquements', short: 'Manquement', color: '#dc2626', icon: '⚡' },
-    rupture: { label: 'Ruptures du contrat', short: 'Rupture', color: '#ea580c', icon: '💔' },
-    etape: { label: 'Procédure', short: 'Étape', color: '#64748b', icon: '🔹' },
-    droit: { label: 'Indemnités & droits', short: 'Droit', color: '#ca8a04', icon: '🎁' },
-    norme: { label: 'Normes', short: 'Norme', color: '#92400e', icon: '📚' }
+    partie: { label: t('Parties & acteurs'), short: t('Partie'), color: '#2563eb', icon: '👥' },
+    contrat: { label: t('Contrats'), short: t('Contrat'), color: '#4f46e5', icon: '📃' },
+    clause: { label: t('Clauses'), short: t('Clause'), color: '#0891b2', icon: '🧩' },
+    limite: { label: t('Garde-fous & conditions'), short: t('Condition'), color: '#059669', icon: '🔒' },
+    obligation: { label: t('Obligations'), short: t('Obligation'), color: '#7c3aed', icon: '📌' },
+    manquement: { label: t('Fautes & manquements'), short: t('Manquement'), color: '#dc2626', icon: '⚡' },
+    rupture: { label: t('Ruptures du contrat'), short: t('Rupture'), color: '#ea580c', icon: '💔' },
+    etape: { label: t('Procédure'), short: t('Étape'), color: '#64748b', icon: '🔹' },
+    droit: { label: t('Indemnités & droits'), short: t('Droit'), color: '#ca8a04', icon: '🎁' },
+    norme: { label: t('Normes'), short: t('Norme'), color: '#92400e', icon: '📚' }
   };
   P.FAM_ORDER = ['partie', 'contrat', 'clause', 'limite', 'obligation', 'manquement', 'rupture', 'etape', 'droit', 'norme'];
 
@@ -50,7 +53,7 @@
   const G = 'grave', R = 'risque';
   const LIC = ['licenciement_personnel', 'licenciement_eco', 'licenciement_inaptitude'];
   const FG = ['faute_grave', 'faute_lourde'];
-  const C = P.CATALOG = {
+  const CAT_FR = {
     /* ---- parties */
     employeur: { fam: 'partie', icon: '🏢', label: 'Employeur', desc: "Personne physique ou morale qui embauche. Elle détient le pouvoir de direction, de contrôle et de sanction." },
     salarie: { fam: 'partie', icon: '👤', label: 'Salarié', desc: "Exécute un travail sous la subordination de l'employeur, contre rémunération. Le lien de subordination (ordres, contrôle, sanction) caractérise le contrat de travail.", params: ['categorie', 'anciennete', 'salaire'] },
@@ -324,10 +327,58 @@
     partie: { fam: 'partie', grp: 'Libre', icon: '👥', label: 'Autre acteur', desc: 'Acteur libre.' },
     contrat: { fam: 'contrat', grp: 'Libre', icon: '📃', label: 'Autre contrat', desc: 'Contrat libre (CDI de chantier, contrat de professionnalisation…).' }
   };
-  Object.keys(C).forEach(k => { C[k].key = k; });
+
+  /* ---- vérifications chiffrées du droit français
+   * check(a) reçoit : a.e (élément), a.param(cle) (donnée de l'élément ou du dossier),
+   * a.inDossier([kinds]), a.calc(texte), a.detail(texte), a.issue(level, effet, texte). */
+  const durCheck = key => function (a) {
+    const du = P.num(a.e.params && a.e.params.duree), cat = P.catKey(a.param('categorie') || ''), inCdd = a.inDossier(['cdd']);
+    if (du == null) return;
+    if (cat && !inCdd) {
+      const K = P.CATEGORIES[cat], max = K[key];
+      a.calc(t(key === 'essai' ? '{d} · maximum légal {c} : {m} mois' : '{d} · maximum légal {c} : {m} mois renouvellement compris', { d: P.mois(du), c: K.label.toLowerCase(), m: max }));
+      if (du > max + 1e-9) a.issue(G, t('durée excessive : ramenée à {m} mois au plus', { m: max }), t('Durée {d} > {m} mois', { d: P.mois(du), m: max }));
+    } else a.calc(P.mois(du) + (inCdd ? t(' (CDD : règles propres)') : ''));
+  };
+  CAT_FR.periode_essai.check = durCheck('essai');
+  CAT_FR.renouvellement_essai.check = durCheck('max');
+  CAT_FR.cdd.check = function (a) {
+    const du = P.num(a.e.params && a.e.params.duree); if (du == null) return;
+    a.calc(t('durée {d} · maximum 18 mois (cas général)', { d: P.mois(du) }));
+    if (du > 18 + 1e-9) a.issue(G, t('requalification en CDI'), t('Durée {d} > 18 mois', { d: P.mois(du) }));
+  };
+  CAT_FR.preavis.check = function (a) {
+    const ans = P.num(a.param('anciennete')); if (ans == null || !a.inDossier(LIC)) return;
+    const p = P.preavisLegal(ans);
+    a.calc(p ? t("préavis légal : {p} mois ({a} an(s) d'ancienneté)", { p, a: P.round2(ans).toLocaleString(P.locale()) }) : t("moins de 6 mois d'ancienneté : convention ou usage"));
+  };
+  const indCheck = function (a) {
+    const ans = P.num(a.param('anciennete')), sal = P.num(a.param('salaire')), rc = a.e.kind === 'indemnite_rc';
+    if (ans == null) return;
+    if (ans < 8 / 12 - 1e-9 && !rc) { a.issue(G, t("non due : moins de 8 mois d'ancienneté"), t('Ancienneté insuffisante')); return; }
+    if (sal == null) return;
+    const m = P.indemniteLegale(sal, ans), f = x => P.round2(x).toLocaleString(P.locale());
+    a.calc(t(rc ? 'minimum légal ≈ {m}' : 'montant légal ≈ {m}', { m: P.eur(m) }));
+    a.detail(`${P.eur(sal)} × (1/4 × ${f(Math.min(ans, 10))} ${t('an(s)')}${ans > 10 ? ` + 1/3 × ${f(ans - 10)} ${t('an(s)')}` : ''})`);
+    const mt = P.num(a.e.params && a.e.params.montant);
+    if (rc && mt != null && mt < m - 0.5) a.issue(G, t('inférieure au minimum légal : homologation refusée'), `${P.eur(mt)} < ${P.eur(m)}`);
+  };
+  CAT_FR.indemnite_licenciement.check = indCheck;
+  CAT_FR.indemnite_rc.check = indCheck;
+  CAT_FR.indemnite_precarite.check = function (a) {
+    const tot = P.num(a.param('remuneration_totale'));
+    if (tot != null) a.calc(`10 % × ${P.eur(tot)} = ${P.eur(tot * 0.1)}`);
+  };
+
+  /* ------------------------------------------------------------ droits (juridictions)
+   * Chaque droit fournit son catalogue (mêmes familles et relations), ses catégories de
+   * salariés, ses alias, sa monnaie, et éventuellement la traduction de ses textes :
+   * en: { kind: { label, desc, grp, okText, illicite, req: [{ effet, why }], excl: [{ effet }] } }. */
+  P.JURIS = P.JURIS || {};
+  P.registerJuris = function (j) { P.JURIS[j.id] = Object.assign(P.JURIS[j.id] || {}, j); };
 
   /* ------------------------------------------------------------ alias de types */
-  const extra = {
+  const ALIASES_FR = {
     salarie: ['salarie', 'salariee', 'employe', 'travailleur'], employeur: ['employeur', 'entreprise', 'societe'],
     prudhommes: ['cph', 'juge'], inspection: ['dreets', 'inspection_du_travail', 'administration'],
     non_concurrence: ['nc', 'clause_de_non_concurrence', 'non_concurrence'], mobilite: ['clause_de_mobilite'],
@@ -342,32 +393,27 @@
     indemnite_precarite: ['prime_de_precarite', 'precarite', 'indemnite_fin_cdd'], chomage: ['are'], interim: ['mission', 'ctt'],
     manquement: ['faute'], faute_simple: ['faute_serieuse'], documents_fin: ['documents'], condition: ['autre_condition']
   };
-  P.KIND_ALIASES = {};
-  Object.keys(C).forEach(k => {
-    [k, k.replace(/_/g, ''), P.key(C[k].label)].forEach(a => { P.KIND_ALIASES[a] = k; });
-  });
-  Object.keys(extra).forEach(k => extra[k].forEach(a => { P.KIND_ALIASES[P.key(a)] = k; }));
   P.kindOf = w => P.KIND_ALIASES[P.key(w)] || null;
 
   /* ------------------------------------------------------------ relations
    * up : orientation pour la disposition (1 : origine au-dessus, -1 : cible au-dessus,
    *      0 : même rangée — chaînes de procédure —, null : ignorée). */
   P.RELS = {
-    contient: { label: 'contient', color: '#94a3b8', up: 1, faint: true },
-    limite: { label: 'encadre', color: '#059669', up: -1 },
-    requiert: { label: 'requiert', color: '#0891b2', up: 1, dash: '7 5' },
-    exclut: { label: 'exclut', color: '#dc2626', up: null, dash: '8 6' },
-    signe: { label: 'signe', color: '#64748b', up: 1 },
-    doit: { label: 'doit', color: '#7c3aed', up: 1 },
-    viole: { label: 'viole', color: '#dc2626', up: -1, pill: '⚡' },
-    justifie: { label: 'justifie', color: '#ea580c', up: 1 },
-    initie: { label: "à l'initiative de", color: '#2563eb', up: 1 },
-    met_fin: { label: 'met fin à', color: '#ea580c', up: -1 },
-    puis: { label: 'puis', color: '#475569', up: 0 },
-    ouvre: { label: 'ouvre droit à', color: '#ca8a04', up: 1 },
-    encadre: { label: 'encadre', color: '#92400e', up: 1, dash: '3 4' },
-    prevaut: { label: 'prévaut sur', color: '#92400e', up: 1 },
-    lien: { label: 'lien', color: '#94a3b8', up: 1 }
+    contient: { label: t('contient'), color: '#94a3b8', up: 1, faint: true },
+    limite: { label: t('encadre'), color: '#059669', up: -1 },
+    requiert: { label: t('requiert'), color: '#0891b2', up: 1, dash: '7 5' },
+    exclut: { label: t('exclut'), color: '#dc2626', up: null, dash: '8 6' },
+    signe: { label: t('signe'), color: '#64748b', up: 1 },
+    doit: { label: t('doit'), color: '#7c3aed', up: 1 },
+    viole: { label: t('viole'), color: '#dc2626', up: -1, pill: '⚡' },
+    justifie: { label: t('justifie'), color: '#ea580c', up: 1 },
+    initie: { label: t("à l'initiative de"), color: '#2563eb', up: 1 },
+    met_fin: { label: t('met fin à'), color: '#ea580c', up: -1 },
+    puis: { label: t('puis'), color: '#475569', up: 0 },
+    ouvre: { label: t('ouvre droit à'), color: '#ca8a04', up: 1 },
+    encadre: { label: t('encadre'), color: '#92400e', up: 1, dash: '3 4' },
+    prevaut: { label: t('prévaut sur'), color: '#92400e', up: 1 },
+    lien: { label: t('lien'), color: '#94a3b8', up: 1 }
   };
   const relAliases = {
     contient: ['contient', 'inclut', 'comporte', 'contains'], limite: ['limite', 'encadre_la', 'garde_fou', 'protege', 'conditionne', 'valide'],
@@ -375,10 +421,17 @@
     signe: ['signe', 'conclut', 'partie_a'], doit: ['doit', 'debiteur', 'assume'], viole: ['viole', 'meconnait', 'enfreint'],
     justifie: ['justifie', 'motive', 'fonde', 'cause'], initie: ['initie', 'initiative', 'decide', 'engage'], met_fin: ['met_fin', 'rompt', 'termine'],
     puis: ['puis', 'ensuite', 'apres', 'then'], ouvre: ['ouvre', 'ouvre_droit', 'donne_droit', 'entraine'],
-    encadre: ['encadre', 'regit', 'applique'], prevaut: ['prevaut', 'prime', 'deroge'], lien: ['lien', 'relie', 'link']
+    encadre: ['encadre', 'regit', 'applique'], prevaut: ['prevaut', 'prime', 'deroge'], lien: ['lien', 'relie', 'link'],
+    // anglais
+    _contient: ['includes', 'contain'], _limite: ['limits', 'limit', 'guards', 'safeguards', 'restricts', 'conditions'],
+    _requiert: ['requires', 'needs'], _exclut: ['excludes', 'exclude', 'bars', 'prevents', 'cancels'],
+    _signe: ['signs', 'sign', 'party_to'], _doit: ['owes', 'owe', 'must', 'bound_by'], _viole: ['breaches', 'breach', 'violates'],
+    _justifie: ['justifies', 'justify', 'grounds'], _initie: ['initiates', 'initiate', 'starts'], _met_fin: ['ends', 'end', 'terminates'],
+    _puis: ['next', 'followed_by'], _ouvre: ['entitles', 'entitles_to', 'opens', 'gives'], _encadre: ['governs', 'govern', 'regulates'],
+    _prevaut: ['prevails', 'prevails_over', 'overrides'], _lien: ['related', 'relates']
   };
   P.REL_ALIASES = {};
-  Object.keys(relAliases).forEach(r => relAliases[r].forEach(a => { P.REL_ALIASES[a] = r; }));
+  Object.keys(relAliases).forEach(r => relAliases[r].forEach(a => { P.REL_ALIASES[P.key(a)] = r.replace(/^_/, ''); }));
   P.relOf = w => P.REL_ALIASES[P.key(w)] || null;
 
   /** Relation par défaut entre deux éléments, d'après leurs familles. Renvoie [rel, inverser]. */
@@ -446,11 +499,47 @@
   };
 
   /* ------------------------------------------------------------ calculs */
-  P.CATEGORIES = {
-    ouvrier: { label: 'Ouvrier', essai: 2, max: 4 }, employe: { label: 'Employé', essai: 2, max: 4 },
-    agent_maitrise: { label: 'Agent de maîtrise', essai: 3, max: 6 }, technicien: { label: 'Technicien', essai: 3, max: 6 },
-    cadre: { label: 'Cadre', essai: 4, max: 8 }
+  const CATEGORIES_FR = {
+    ouvrier: { label: t('Ouvrier'), essai: 2, max: 4 }, employe: { label: t('Employé'), essai: 2, max: 4 },
+    agent_maitrise: { label: t('Agent de maîtrise'), essai: 3, max: 6 }, technicien: { label: t('Technicien'), essai: 3, max: 6 },
+    cadre: { label: t('Cadre'), essai: 4, max: 8 }
   };
+  P.registerJuris({ id: 'fr', lang: 'fr', names: ['france', 'francais', 'french', 'droit_francais', 'french_law'], paramAliases: { seniority: 'anciennete', salary: 'salaire', category: 'categorie', duration: 'duree', amount: 'montant', total_pay: 'remuneration_totale' }, label: 'Droit français', labelEn: 'French law', flag: '🇫🇷', catalog: CAT_FR, categories: CATEGORIES_FR, aliases: ALIASES_FR, currency: 'EUR' });
+
+  /** Active un droit : catalogue (traduit dans la langue de l'interface si une traduction existe), catégories, alias. */
+  const cache = {};
+  P.setJuris = function (id) {
+    const J = P.JURIS[id] || P.JURIS.fr, lang = P.lang || 'fr', ck = J.id + '|' + lang + '|' + (J[lang] ? 1 : 0) + '|' + Object.keys(J.aliases || {}).length;   // reconstruit si une traduction ou des alias arrivent après coup
+    if (P.jurisId === J.id && C && cache[ck] === C) return;
+    if (!cache[ck]) {
+      const tr = J.lang !== lang && J[lang] ? J[lang] : null, cat = {};
+      Object.keys(J.catalog).forEach(k => {
+        const d = Object.assign({}, J.catalog[k], { key: k }), o = tr && tr[k];
+        if (o) {
+          ['label', 'desc', 'grp', 'okText', 'illicite'].forEach(f => { if (o[f] != null) d[f] = o[f]; });
+          if (d.req) d.req = d.req.map((r, i) => Object.assign({}, r, (o.req || [])[i] || {}));
+          if (d.excl) d.excl = d.excl.map((r, i) => Object.assign({}, r, (o.excl || [])[i] || {}));
+        }
+        cat[k] = d;
+      });
+      cache[ck] = cat;
+    }
+    C = P.CATALOG = cache[ck];
+    P.jurisId = J.id; P.juris = J;
+    P.CATEGORIES = J.categories || {};
+    const AL = P.KIND_ALIASES = {};
+    Object.keys(C).forEach(k => {
+      const labs = [C[k].label, J.catalog[k].label].concat(['fr', 'en'].filter(x => J[x] && J[x][k]).map(x => J[x][k].label));
+      [k, k.replace(/_/g, '')].concat(labs.filter(Boolean).map(P.key)).forEach(a => { AL[a] = k; });
+    });
+    Object.keys(J.aliases || {}).forEach(k => (J.aliases[k] || []).forEach(a => { if (C[k]) AL[P.key(a)] = k; }));
+  };
+  /** 'fr', 'france', 'uk', 'england'… → identifiant du droit (noms déclarés dans names) */
+  P.jurisOf = w => { const k = P.key(w); return Object.keys(P.JURIS).find(id => id === k || (P.JURIS[id].names || []).includes(k)) || null; };
+  P.jurisLabel = J => (P.lang === 'fr' ? J.label : (J.labelEn || J.label));
+  P.locale = () => (P.lang === 'en' ? 'en-GB' : 'fr-FR');
+  let C = null;
+  P.setJuris('fr');
   P.catKey = v => { const k = P.key(v); if (P.CATEGORIES[k]) return k; if (/maitrise/.test(k)) return 'agent_maitrise'; if (/cadre/.test(k)) return 'cadre'; if (/tech/.test(k)) return 'technicien'; if (/ouvr/.test(k)) return 'ouvrier'; if (/employ/.test(k)) return 'employe'; return null; };
   /** Indemnité légale de licenciement (art. R1234-2) : 1/4 de mois par an jusqu'à 10 ans, 1/3 au-delà. */
   P.indemniteLegale = (salaire, ans) => salaire * (Math.min(ans, 10) / 4 + Math.max(0, ans - 10) / 3);
@@ -458,6 +547,7 @@
 
   /* ------------------------------------------------------------ analyse */
   P.analyze = function (st) {
+    P.setJuris((st.options && st.options.droit) || 'fr');
     const E = st.entities, ids = Object.keys(E), verif = !(st.options && st.options.verif === false);
     const adj = {}, chainAdj = {}, contained = {};
     ids.forEach(i => { adj[i] = new Set(); chainAdj[i] = new Set(); });
@@ -519,13 +609,13 @@
       (d.req || []).forEach(r => {
         const via = Array.from(ctx).find(x => r.any.includes(kinds(x)));
         I.reqs.push({ any: r.any, ok: !!via, via: via || null, level: r.level, effet: r.effet, why: r.why });
-        if (!via) I.issues.push({ level: r.level, effet: r.effet, text: 'Manque : ' + C[r.any[0]].label + (r.any.length > 1 ? ' (ou équivalent)' : ''), why: r.why });
+        if (!via) I.issues.push({ level: r.level, effet: r.effet, text: t('Manque : ') + C[r.any[0]].label + (r.any.length > 1 ? t(' (ou équivalent)') : ''), why: r.why });
       });
       (e.conds || []).forEach(c => {
         I.reqs.push({ custom: true, label: c.label, ok: !!c.ok, level: c.level || G, effet: c.effet || '' });
-        if (!c.ok) I.issues.push({ level: c.level || G, effet: c.effet || 'condition non remplie', text: 'Manque : ' + c.label });
+        if (!c.ok) I.issues.push({ level: c.level || G, effet: c.effet || t('condition non remplie'), text: t('Manque : ') + c.label });
       });
-      if (d.illicite) I.issues.push({ level: G, effet: d.illicite, text: 'Clause illicite par nature' });
+      if (d.illicite) I.issues.push({ level: G, effet: d.illicite, text: t('Clause illicite par nature') });
       (d.excl || []).forEach(x => {
         ids.forEach(o => {
           if (o === id || !x.any.includes(kinds(o)) || !sameDossier(o, id)) return;
@@ -536,57 +626,31 @@
       st.links.forEach(l => {
         if (l.rel !== 'exclut' || l.to !== id || !E[l.from]) return;
         // exclusion explicite : effective seulement si les deux éléments sont dans le même dossier
-        if (sameDossier(l.from, id)) I.issues.push({ level: G, effet: l.label || 'incompatible avec ' + E[l.from].name, text: '⊘ ' + E[l.from].name, other: l.from });
+        if (sameDossier(l.from, id)) I.issues.push({ level: G, effet: l.label || t('incompatible avec ') + E[l.from].name, text: '⊘ ' + E[l.from].name, other: l.from });
       });
       /* obligations : violées si un manquement y est relié */
       if (d.fam === 'obligation') {
         const v = Array.from(adj[id]).filter(x => P.famOf(E[x]) === 'manquement');
         if (v.length) { I.violee = v; }
       }
-      /* calculs et contrôles chiffrés */
-      const ans = P.num(param(id, 'anciennete')), sal = P.num(param(id, 'salaire')), cat = P.catKey(param(id, 'categorie') || '');
-      if (e.kind === 'periode_essai' || e.kind === 'renouvellement_essai') {
-        const du = P.num(e.params && e.params.duree), inCdd = ids.some(x => kinds(x) === 'cdd' && sameDossier(x, id));
-        if (du != null && cat && !inCdd) {
-          const max = e.kind === 'periode_essai' ? P.CATEGORIES[cat].essai : P.CATEGORIES[cat].max;
-          I.calc.push(`${P.mois(du)} · maximum légal ${P.CATEGORIES[cat].label.toLowerCase()} : ${max} mois${e.kind === 'renouvellement_essai' ? ' renouvellement compris' : ''}`);
-          if (du > max + 1e-9) I.issues.push({ level: G, effet: `durée excessive : ramenée à ${max} mois au plus`, text: `Durée ${P.mois(du)} > ${max} mois` });
-        } else if (du != null) I.calc.push(P.mois(du) + (inCdd ? ' (CDD : règles propres)' : ''));
-      }
-      if (e.kind === 'cdd') {
-        const du = P.num(e.params && e.params.duree);
-        if (du != null) {
-          I.calc.push(`durée ${P.mois(du)} · maximum 18 mois (cas général)`);
-          if (du > 18 + 1e-9) I.issues.push({ level: G, effet: 'requalification en CDI', text: `Durée ${P.mois(du)} > 18 mois` });
-        }
-      }
-      if (e.kind === 'preavis' && ans != null) {
-        const lic = ids.some(x => LIC.includes(kinds(x)) && sameDossier(x, id));
-        if (lic) { const p = P.preavisLegal(ans); I.calc.push(p ? `préavis légal : ${p} mois (${P.round2(ans).toLocaleString('fr-FR')} an(s) d'ancienneté)` : "moins de 6 mois d'ancienneté : convention ou usage"); }
-      }
-      if ((e.kind === 'indemnite_licenciement' || e.kind === 'indemnite_rc') && ans != null) {
-        if (ans < 8 / 12 - 1e-9 && e.kind === 'indemnite_licenciement') I.issues.push({ level: G, effet: "non due : moins de 8 mois d'ancienneté", text: 'Ancienneté insuffisante' });
-        else if (sal != null) {
-          const m = P.indemniteLegale(sal, ans);
-          I.calc.push(`${e.kind === 'indemnite_rc' ? 'minimum légal' : 'montant légal'} ≈ ${P.eur(m)}`);
-          I.calcDetail = `${P.eur(sal)} × (1/4 × ${P.round2(Math.min(ans, 10)).toLocaleString('fr-FR')} an(s)${ans > 10 ? ` + 1/3 × ${P.round2(ans - 10).toLocaleString('fr-FR')} an(s)` : ''})`;
-          const mt = P.num(e.params && e.params.montant);
-          if (e.kind === 'indemnite_rc' && mt != null && mt < m - 0.5) I.issues.push({ level: G, effet: "inférieure au minimum légal : homologation refusée", text: `${P.eur(mt)} < ${P.eur(m)}` });
-        }
-      }
-      if (e.kind === 'indemnite_precarite') {
-        const tot = P.num(param(id, 'remuneration_totale'));
-        if (tot != null) I.calc.push(`10 % × ${P.eur(tot)} = ${P.eur(tot * 0.1)}`);
-      }
+      /* calculs et contrôles chiffrés propres au droit en vigueur (check du catalogue) */
+      if (d.check) d.check({
+        e, id, st, I,
+        param: k => param(id, k),
+        inDossier: ks => ids.some(x => x !== id && ks.includes(kinds(x)) && sameDossier(x, id)),
+        calc: txt => I.calc.push(txt),
+        detail: txt => { I.calcDetail = txt; },
+        issue: (level, effet, text) => I.issues.push({ level, effet, text: text || effet })
+      });
       /* statut */
       const ov = e.status && e.status.v;
-      if (ov && ov !== 'auto') { I.status = ov; I.verdict = e.status.text || ({ ok: 'valide', ko: 'nulle', risk: 'à risque', neutral: '' })[ov] || ''; I.override = true; }
-      else if (I.violee) { I.status = 'violee'; I.verdict = 'violée'; }
+      if (ov && ov !== 'auto') { I.status = ov; I.verdict = e.status.text || ({ ok: t('valide'), ko: t('nulle'), risk: t('à risque'), violee: t('violée'), neutral: '' })[ov] || ''; I.override = true; }
+      else if (I.violee) { I.status = 'violee'; I.verdict = t('violée'); }
       else {
         const g = I.issues.find(x => x.level === G), r = I.issues.find(x => x.level === R);
         if (g) { I.status = 'ko'; I.verdict = g.effet; }
         else if (r) { I.status = 'risk'; I.verdict = r.effet; }
-        else if (I.reqs.length) { I.status = 'ok'; I.verdict = d.okText || (d.fam === 'rupture' ? 'régulière' : d.fam === 'contrat' ? 'conditions remplies' : 'valide'); }
+        else if (I.reqs.length) { I.status = 'ok'; I.verdict = d.okText || t(d.fam === 'rupture' ? 'régulière' : d.fam === 'contrat' ? 'conditions remplies' : 'valide'); }
       }
       if (!verif && !I.override) { I.status = 'neutral'; I.verdict = ''; I.hidden = true; }
     });
@@ -612,11 +676,11 @@
   };
 
   P.STATUS = {
-    ok: { label: 'Valide', icon: '✅', color: '#16a34a' },
-    risk: { label: 'À risque', icon: '⚠️', color: '#d97706' },
-    ko: { label: 'Nulle / irrégulière', icon: '⛔', color: '#dc2626' },
-    violee: { label: 'Obligation violée', icon: '⚡', color: '#dc2626' },
-    neutral: { label: 'Sans vérification', icon: '', color: '#94a3b8' }
+    ok: { label: t('Valide'), icon: '✅', color: '#16a34a' },
+    risk: { label: t('À risque'), icon: '⚠️', color: '#d97706' },
+    ko: { label: t('Nulle / irrégulière'), icon: '⛔', color: '#dc2626' },
+    violee: { label: t('Obligation violée'), icon: '⚡', color: '#dc2626' },
+    neutral: { label: t('Sans vérification'), icon: '', color: '#94a3b8' }
   };
 
   /* ------------------------------------------------------------ disposition automatique

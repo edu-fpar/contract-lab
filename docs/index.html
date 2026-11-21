@@ -150,17 +150,18 @@
     var PUBLIC_DOCS = 'https://edu-fpar.github.io/contract-lab/docs/';
     function isLocal() { return location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname); }
     function docsBase() { return isLocal() ? PUBLIC_DOCS : location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, ''); }
+    /* pages anglaises (#/en/…) : messages en anglais */
+    function isEn() { return /^#\/en(\/|$)/.test(location.hash); }
     function fillAiBox() {
-      var url = docsBase() + 'instructions-ia.md';
-      document.querySelectorAll('.js-ia-url').forEach(function (e) { e.textContent = url; });
+      document.querySelectorAll('.js-ia-url').forEach(function (e) { e.textContent = docsBase() + (e.getAttribute('data-path') || 'instructions-ia.md'); });
       document.querySelectorAll('.js-ia-local').forEach(function (e) { e.hidden = !isLocal(); });
     }
     function copyText(text, btn) {
-      var done = function () { var old = btn.innerHTML; btn.innerHTML = '✅ Copié !'; setTimeout(function () { btn.innerHTML = old; }, 1600); };
+      var done = function () { var old = btn.innerHTML; btn.innerHTML = isEn() ? '✅ Copied!' : '✅ Copié !'; setTimeout(function () { btn.innerHTML = old; }, 1600); };
       var fallback = function () {
         var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
         document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); done(); } catch (e) { alert('Copie impossible : sélectionnez le texte manuellement.'); }
+        try { document.execCommand('copy'); done(); } catch (e) { alert(isEn() ? 'Copy failed: select the text manually.' : 'Copie impossible : sélectionnez le texte manuellement.'); }
         ta.remove();
       };
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
@@ -173,12 +174,14 @@
       if (b.hasAttribute('data-copy-sel')) { copyText(box.querySelector(b.getAttribute('data-copy-sel')).innerText.trim(), b); return; }
       // Version complète, pour une IA qui n'ouvre pas les liens : instructions + consigne (sans le lien)
       var f = b.getAttribute('data-copy-full');
-      var suite = consigne.trim().replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare');
+      var suite = consigne.trim().replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare')
+        .replace(/^Read the instructions at \S+ and prepare/, 'Following the instructions above, prepare');
+      var en = isEn();
       // fichier local d'abord ; sinon (ouverture en file://) la version publiée
       fetch(f).then(function (r) { if (!r.ok) throw 0; return r.text(); })
         .catch(function () { return fetch(PUBLIC_DOCS + f).then(function (r) { if (!r.ok) throw 0; return r.text(); }); })
-        .then(function (t) { copyText(t.trim() + '\n\n---\n\n# Ma demande\n\n' + suite + '\n\n', b); })
-        .catch(function () { alert('Lecture impossible : ouvrez la page des instructions (lien « voir les instructions ») et copiez son contenu.'); });
+        .then(function (t) { copyText(t.trim() + '\n\n---\n\n# ' + (en ? 'My request' : 'Ma demande') + '\n\n' + suite + '\n\n', b); })
+        .catch(function () { alert(en ? 'Could not read the file: open the instructions page ("see the instructions" link) and copy its content.' : 'Lecture impossible : ouvrez la page des instructions (lien « voir les instructions ») et copiez son contenu.'); });
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/docsify.min.js"></script>

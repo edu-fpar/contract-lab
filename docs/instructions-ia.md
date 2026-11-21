@@ -2,6 +2,7 @@
 
 > Page destinée aux assistants IA (ChatGPT, Claude, Gemini, Mistral, Copilot…). Enseignant : donnez l'adresse de cette page à votre IA, avec votre cours.
 > Atelier : https://edu-fpar.github.io/contract-lab/ · Documentation : https://edu-fpar.github.io/contract-lab/docs/
+> Cours de droit anglais (England & Wales) ou en anglais : utilisez la version anglaise, https://edu-fpar.github.io/contract-lab/docs/en/instructions-ia.md
 
 ## Ta mission
 

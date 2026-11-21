@@ -1,3 +1,5 @@
+[🇬🇧 English version](en/README.md)
+
 # Contract Lab — atelier contrat de travail
 
 **Contract Lab** est un outil pédagogique pour visualiser le **contrat de travail** et comprendre **ce qui rend une clause valable, une rupture régulière, et quels droits elle ouvre**.
@@ -5,6 +7,8 @@
 Chaque élément du droit du travail devient une carte : le contrat et ses clauses, les **garde-fous** qui les conditionnent, les **obligations** des parties et les **manquements**, les **ruptures** et leur procédure, les **indemnités**. L'outil vérifie l'ensemble et affiche un verdict : ✅ valide, ⚠️ à risque, ⛔ nulle ou irrégulière, ⚡ obligation violée. Une clause de non-concurrence sans contrepartie financière passe au rouge ; une faute grave fait disparaître le préavis et l'indemnité de licenciement.
 
 [▶ Ouvrir l'atelier](../index.html ':ignore') — en ligne : **https://edu-fpar.github.io/contract-lab/**, utilisable aussi sur téléphone.
+
+L'atelier existe aussi **en anglais** (`?lang=en`) et connaît deux droits : le **droit français** et le **droit anglais** (Angleterre et pays de Galles : *restrictive covenants*, *unfair dismissal*, *redundancy*, *settlement agreements*…), choisi par la ligne `droit: uk` en tête d'un scénario. Voir la [documentation en anglais](en/README.md).
 
 ![Mode libre : un CDI, ses clauses, et la vérification du renouvellement de la période d'essai](../contract-lab-libre.png)
 <p class="caption">Le mode libre (nuit) : le contrat de Léa et ses clauses dans leur cadre ; à droite, les conditions de validité du renouvellement de l'essai, toutes remplies.</p>

@@ -47,6 +47,11 @@ const SHOTS = [
     js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
   { file: 'contract-lab-libre', root: true, url: '', size: WIDE, theme: 'dark',
     js: `document.querySelector('#tool-example').click(); await wait(300); App.select({ kind: 'node', id: 'REN' }); await wait(200); App.fit(false);` },
+  /* version anglaise : droit anglais (England & Wales) */
+  { file: 'contract-lab-en', root: true, url: '?lang=en&scenario=uk-covenants&etape=5', size: WIDE, theme: 'light',
+    js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
+  { file: 'contract-lab-en-redundancy', root: true, url: '?lang=en&scenario=uk-redundancy&etape=6', size: WIDE, theme: 'dark',
+    js: `foldLegend(); App.reveal(); await wait(900);` },
   { file: 'contract-lab-rupture', root: true, url: '?scenario=faute-grave&etape=3', size: WIDE, theme: 'light',
     js: `foldLegend(); App.reveal(); await wait(900); App.select({ kind: 'node', id: 'IL' });` }
 ];

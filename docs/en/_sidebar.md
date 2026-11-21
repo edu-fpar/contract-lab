@@ -1,0 +1,14 @@
+- [Home](README.md)
+- [🤖 Prepare your course with an AI](ai-and-skill.md)
+- **Teaching in class**
+  - [Cinema mode: playback, questions, phone, sharing](cinema-mode.md)
+  - [Available scenarios](scenarios.md)
+- **Building**
+  - [Free mode and studio](getting-started.md)
+  - [Scenario format](format-scenario.md)
+- **Understanding**
+  - [Checking rules](checking-rules.md)
+- **Reference**
+  - [Instructions page for AI](instructions-ia.md)
+  - [Developers](developers.md)
+- [🇫🇷 Version française](../README.md)

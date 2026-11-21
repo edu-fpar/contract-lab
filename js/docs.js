@@ -6,37 +6,78 @@
 window.P = window.P || {};
 
 /* Aide rapide (fenêtre ❔ Aide) : l'essentiel, le détail est dans la documentation (docs/). */
-P.HELP_LIBRE = `- Cliquez ou glissez un **élément** de la palette (clauses, garde-fous, obligations, ruptures…) ; tirez la poignée **+** d'une carte vers une autre pour les relier.
+P.HELP_LIBRE = P.lang === 'en'
+  ? `- Click or drag an **item** from the palette (clauses, safeguards, obligations, terminations…); drag the **+** handle of a card onto another to link them.
+- With a card selected, clicking in the palette adds the item **and links it**.
+- Verdicts: ✅ valid, ⚠️ at risk, ⛔ void; the **badges** under a card are its safeguards (dotted: missing, ＋ to add them).
+- **🔍 Checks** unticked: verdicts hidden, the class decides. **📸 Studio**: turn a diagram into a scenario.`
+  : `- Cliquez ou glissez un **élément** de la palette (clauses, garde-fous, obligations, ruptures…) ; tirez la poignée **+** d'une carte vers une autre pour les relier.
 - Avec une carte sélectionnée, un clic dans la palette ajoute l'élément **et le relie**.
 - Verdicts : ✅ valide, ⚠️ à risque, ⛔ nulle ; les **pastilles** sous une carte sont ses garde-fous (pointillées : manquants, ＋ pour les ajouter).
 - **🔍 Vérification** décochée : verdicts masqués, la classe juge. **📸 Studio** : transformer une construction en scénario.`;
 
-P.HELP_CINEMA = `- **📚 Scénarios** : choisir, coller ou déposer un scénario markdown.
+P.HELP_CINEMA = P.lang === 'en'
+  ? `- **📚 Scenarios**: choose, paste or drop a markdown scenario.
+- **→ / Space**: next step (first reveals the answer to a question); **←**: previous.
+- **🔗 Share**: link to a step or a scenario. Also works on a phone.
+- **📦 SCORM**: .zip package for Moodle or another LMS (completion, resume, quiz score).`
+  : `- **📚 Scénarios** : choisir, coller ou déposer un scénario markdown.
 - **→ / Espace** : étape suivante (révèle d'abord la réponse d'une question) ; **←** : précédente.
 - **🔗 Partager** : lien vers une étape ou un scénario. Fonctionne aussi sur téléphone.
 - **📦 SCORM** : paquet .zip pour Moodle ou un autre LMS (achèvement, reprise, note des quiz).`;
 
-P.HELP_THANKS = `Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil imaginé par **Tao** pour sa classe de droit financier et transmis par **Yannick**.`;
+P.HELP_THANKS = P.lang === 'en'
+  ? `Contract Lab reuses the scenario engine of **Capital Lab**, which grew out of the tool devised by **Tao** for his financial law class and passed on by **Yannick**.`
+  : `Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil imaginé par **Tao** pour sa classe de droit financier et transmis par **Yannick**.`;
 
 P.IA_INSTRUCTIONS_URL = 'https://edu-fpar.github.io/contract-lab/docs/instructions-ia.md';
-P.IA_CONSIGNE = `Lis les instructions sur ${P.IA_INSTRUCTIONS_URL} et prépare un scénario Contract Lab à partir du cours ci-dessous (ou du fichier joint). Public : BTS / licence RH, 6 à 8 étapes, avec deux questions pour la salle.`;
+P.IA_CONSIGNE = P.lang === 'en'
+  ? 'Read the instructions at https://edu-fpar.github.io/contract-lab/docs/en/instructions-ia.md and prepare a Contract Lab scenario from the course below (or the attached file). Audience: HR / employment law students (undergraduate), 6 to 8 steps, with two questions for the class.'
+  : `Lis les instructions sur ${P.IA_INSTRUCTIONS_URL} et prépare un scénario Contract Lab à partir du cours ci-dessous (ou du fichier joint). Public : BTS / licence RH, 6 à 8 étapes, avec deux questions pour la salle.`;
 /** Version pour une IA qui n'ouvre pas les liens : la consigne sans le lien, à placer après les instructions. */
-P.iaConsigneSansLien = c => c.trim().replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare');
+P.iaConsigneSansLien = c => c.trim()
+  .replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare')
+  .replace(/^Read the instructions at \S+ and prepare/, 'Following the instructions above, prepare');
 
-/** Catalogue des types, en tableaux markdown, à partir de P.CATALOG */
-P.catalogDoc = function () {
-  const C = P.CATALOG;
+/** Libellés des familles dans chaque langue (indépendants de la langue de chargement de model.js). */
+P.FAM_LABELS_DOC = {
+  fr: { partie: 'Parties & acteurs', contrat: 'Contrats', clause: 'Clauses', limite: 'Garde-fous & conditions', obligation: 'Obligations', manquement: 'Fautes & manquements', rupture: 'Ruptures du contrat', etape: 'Procédure', droit: 'Indemnités & droits', norme: 'Normes' },
+  en: { partie: 'Parties & actors', contrat: 'Contracts', clause: 'Clauses', limite: 'Safeguards & conditions', obligation: 'Obligations', manquement: 'Misconduct & breaches', rupture: 'Termination of the contract', etape: 'Procedure', droit: 'Payments & entitlements', norme: 'Legal sources' }
+};
+
+/** Catalogue des types, en tableaux markdown, pour un droit et une langue donnés.
+ *  P.catalogDoc() : droit français, en français (comportement historique, utilisé par P.FORMAT_DOC).
+ *  P.catalogDoc('uk', 'en') : droit anglais, en anglais ; P.catalogDoc('fr', 'en') : droit français, textes anglais.
+ *  level : niveau des titres de familles (3 par défaut). */
+P.catalogDoc = function (jurisId, lang, level) {
+  jurisId = jurisId || 'fr'; lang = lang || 'fr';
+  const h = '#'.repeat(level || 3), en = lang === 'en';
+  const prevLang = P.lang, prevJuris = P.jurisId || 'fr';
   let md = '';
-  P.FAM_ORDER.forEach(f => {
-    const F = P.FAMS[f], ks = Object.keys(C).filter(k => C[k].fam === f);
-    md += `\n### ${F.icon} ${F.label}\n\n| Type | Icône | Libellé | Conditions vérifiées (garde-fous) |\n|---|---|---|---|\n`;
-    ks.forEach(k => {
-      const d = C[k];
-      const req = (d.req || []).map(r => r.any.map(x => '`' + x + '`').join(' ou ') + (r.level === 'risque' ? ' (risque)' : '')).join(', ');
-      const ex = (d.excl || []).map(x => '⊘ ' + x.any.map(y => '`' + y + '`').join('/')).join(', ');
-      md += `| \`${k}\` | ${d.icon} | ${d.label} | ${[req, ex, d.illicite ? 'illicite par nature' : ''].filter(Boolean).join(' ; ') || '—'} |\n`;
+  P.lang = lang; P.setJuris(jurisId);
+  try {
+    const C = P.CATALOG, J = P.juris || {}, labs = P.FAM_LABELS_DOC[lang] || P.FAM_LABELS_DOC.fr;
+    P.FAM_ORDER.forEach(f => {
+      const F = P.FAMS[f], ks = Object.keys(C).filter(k => C[k].fam === f);
+      if (!ks.length) return;
+      md += en
+        ? `\n${h} ${F.icon} ${labs[f]}\n\n| Type | Icon | Label | Data (\`key=value\`) | Conditions checked (safeguards) | Also accepted |\n|---|---|---|---|---|---|\n`
+        : `\n${h} ${F.icon} ${labs[f]}\n\n| Type | Icône | Libellé | Conditions vérifiées (garde-fous) |\n|---|---|---|---|\n`;
+      ks.forEach(k => {
+        const d = C[k];
+        const req = (d.req || []).map(r => r.any.map(x => '`' + x + '`').join(en ? ' or ' : ' ou ') + (r.level === 'risque' ? (en ? ' (risk)' : ' (risque)') : '')).join(', ');
+        const ex = (d.excl || []).map(x => '⊘ ' + x.any.map(y => '`' + y + '`').join('/')).join(', ');
+        const cond = [req, ex, d.illicite ? (en ? 'unlawful by nature' : 'illicite par nature') : ''].filter(Boolean).join(' ; ') || '—';
+        if (en) {
+          const params = (d.params || []).map(p => '`' + p + '`').join(', ') || '—';
+          const al = ((J.aliases || {})[k] || []).filter((a, i, arr) => a !== k && arr.indexOf(a) === i).map(a => '`' + a + '`').join(', ') || '—';
+          md += `| \`${k}\` | ${d.icon} | ${d.label} | ${params} | ${cond} | ${al} |\n`;
+        } else md += `| \`${k}\` | ${d.icon} | ${d.label} | ${cond} |\n`;
+      });
     });
-  });
+  } finally {
+    P.lang = prevLang; P.setJuris(prevJuris);
+  }
   return md;
 };
 
@@ -189,4 +230,193 @@ Les vérifications (validité des clauses, incompatibilités, calculs) sont fait
 ----- SUJET DEMANDÉ -----
 
 [Décris ici la notion à expliquer, le public (ex. BTS SAM, licence RH) et le nombre d'étapes souhaité.]
+`;
+
+/* ------------------------------------------------------------ English versions
+ * P.FORMAT_DOC_EN and P.AI_PROMPT_EN: used by the app when P.lang === 'en',
+ * and published as docs/en/format-scenario.md (tools/build.js). */
+P.FORMAT_DOC_EN = `# Scenario format ("cinema" mode)
+
+A scenario is an ordinary **markdown** file. The tool splits it into **steps** (one per level-2 heading) and, at each step, runs the **commands** of the \`scene\` blocks, which build a diagram: a contract and its clauses, their safeguards, the parties and their obligations, a termination and its procedure, the payments it opens. The tool then **checks** each item (✅ valid, ⚠️ at risk, ⛔ void, unfair or unenforceable, ⚡ obligation breached).
+
+Two laws are available: **English law (England & Wales)** and **French law**. A scenario uses one of them (see "Choosing the law"); the commands are the same, the catalogue of types differs.
+
+## Structure
+
+~~~
+---
+droit: uk
+---
+# Scenario title
+> A one-line description (optional).
+
+Introductory text (optional: it becomes the first step).
+
+## 1. Title of the first step
+Commentary in markdown: **bold**, *italics*, lists, tables, quotes…
+An item can be cited by its identifier: [[NC]].
+
+\`\`\`scene
+employer EMP "Hartley Recruitment Ltd"
+employee TOM "Tom Bradley" service=3 weekly_pay=900 age=34
+permanent CT "Tom's contract"
+EMP TOM -> CT
+non_compete NC "Non-compete"
+CT -> NC
+focus NC
+\`\`\`
+
+## 2. Title of the next step
+…
+~~~
+
+Rules:
+- steps are **cumulative**: each step starts from the state of the previous one;
+- \`focus\`, \`note\` and \`select\` only apply to the step where they are written; \`view\` stays active until \`view none\`;
+- blocks can be written \`\`\`scene or ~~~scene (aliases: canvas, actions, script);
+- inside a block, a line starting with # or // is a comment;
+- identifiers have no spaces (CT, NC, TOM…); names go between double quotes;
+- \`[[ID]]\` in the commentary shows the item's name, highlighted on the canvas when hovered (\`[[ID|other text]]\` to choose the text).
+
+## Choosing the law
+
+| Law | How to choose it | Type keys |
+|---|---|---|
+| English law (England & Wales) | front matter \`droit: uk\` at the very top of the file (also \`law: uk\`), or the command \`law uk\` (French: \`droit uk\`) in the first block | English: \`employee\`, \`permanent\`, \`non_compete\`, \`conduct_dismissal\`, \`statutory_redundancy_pay\`… |
+| French law | the default: nothing to write (or \`droit: fr\`) | French keys (\`salarie\`, \`cdi\`, \`non_concurrence\`, \`licenciement_personnel\`…); English aliases are accepted (\`employee\`, \`permanent\`, \`non_compete\`, \`dismissal\`, \`gross_misconduct\`…) |
+
+- Accepted names: \`uk\`, \`england\`, \`england_wales\`, \`english_law\`, \`gb\`… for English law; \`fr\`, \`france\`, \`french_law\` for French law.
+- One scenario, one law. The front matter is the recommended form: the library and the share links then show the right flag. It must start on the first line of the file.
+- The language of the text and the law are independent: a French-law scenario can be written in English (comparative law), and vice versa. The labels of the catalogue follow the language of the interface.
+- English law: amounts in £, \`service\` in years, \`weekly_pay\` per week. French law: amounts in €, \`anciennete\` (seniority) in years, \`salaire\` (salary) per month.
+
+## Quiz steps
+
+A step can question the audience. A window then rises at the bottom of the canvas with the question and the choices as large cards. The teacher can click the class's choice, then reveals the answer: button, **→** or presentation remote. The cards change colour; clicking a card flips it to show its explanation. The general explanation appears in the right-hand panel. In continuous play, the playback waits for the reveal. In a SCORM package, questions give a score.
+
+~~~
+## Question: is this non-compete enforceable?
+Optional context, displayed in the right-hand panel.
+
+\`\`\`scene
+verification off
+focus NC
+\`\`\`
+
+- [ ] Yes, Tom signed his contract
+  A signature is not enough: the covenant is a restraint of trade.
+- [x] No, it needs a reasonable duration
+  The safeguards are cumulative: without a reasonable duration, the restraint is unenforceable.
+- [ ] Yes, if the employer pays Tom during the restriction
+  That is French law: English law requires no payment.
+
+### Answer
+General explanation, displayed after the reveal.
+
+\`\`\`scene
+verification on
+reasonable_duration RD "6 months"
+RD -> NC
+note NC "Enforceable: four safeguards"
+\`\`\`
+~~~
+
+Rules:
+- a step is a question if its title starts with "Question" (or "Quiz", "❓"), if it contains \`- [ ]\` / \`- [x]\` choices, or a \`### Answer\` section (also: Explanation, Solution, Correction; French: Réponse);
+- \`[x]\` marks a right answer; there can be several, or no boxes at all for an **open question**;
+- the question text is the heading, without the "Question:" prefix;
+- context goes **before** the choices; indented lines (or "> ") just under a choice are its explanation;
+- commands placed **after** \`### Answer\` only run at the reveal, so the answer can be shown on the canvas; they remain applied in the following steps (except \`focus\`, \`note\` and \`select\`, which belong to the step);
+- \`verification off\` before the question hides verdicts and badges (otherwise the canvas gives the answer away), \`verification on\` in the answer restores them;
+- make sure the text of the previous steps does not already give the answer.
+
+## Commands
+
+Every command has an English and a French name (\`remove\` / \`retirer\`…); both can be mixed.
+
+| Command | Effect |
+|---|---|
+| \`TYPE ID "Name"\` | creates or updates an item of the given type (see the catalogue below), e.g. \`garden_leave GL "Garden leave"\` |
+| \`TYPE ID "Name" key=value …\` | with data: \`employee TOM "Tom" service=3 weekly_pay=900 age=34\`, \`probation PR duration=6\`, \`notice_clause NC1 notice_weeks=4\`; French law: \`salarie LEA "Léa" categorie=cadre anciennete=4 salaire=3200\` (or \`category=cadre seniority=4 salary=3200\`) |
+| \`clause ID "Name" icon=🧸\` | free item, with the icon of your choice (also \`other_condition\`, \`obligation\`, \`other_termination\`, \`other_step\`, \`other_party\`, \`other_contract\`, \`norme\` for a source; a payment: \`other_payment_or_right\` under English law, \`other_entitlement\` under French law) |
+| \`TYPE ID "Name" at 200 150\` | fixed position; without \`at\`, automatic layout |
+| \`A -> B\` | links A to B; the relation is chosen from the types (see below) |
+| \`A B C -> D\` | links A, B and C to D (e.g. three safeguards to one clause) |
+| \`A -> B C D\` | links A to B, C and D (e.g. a contract to its clauses) |
+| \`A -> B relation\` | forced relation: \`includes\`, \`limits\`, \`requires\`, \`excludes\`, \`signs\`, \`owes\`, \`breaches\`, \`justifies\`, \`initiates\`, \`ends\`, \`then\`, \`entitles\`, \`governs\`, \`prevails\`, \`link\` (French: \`contient\`, \`limite\`, \`requiert\`, \`exclut\`, \`signe\`, \`doit\`, \`viole\`, \`justifie\`, \`initie\`, \`met_fin\`, \`puis\`, \`ouvre\`, \`encadre\`, \`prevaut\`, \`lien\`) |
+| \`A -> B then "7 days"\` | relation with a label shown on the link (time limit, amount…) |
+| \`limits RD NC\` | other form: the relation first, then the origin and the target(s) |
+| \`remove ID\` / \`remove A -> B\` | deletes an item / a link (\`retirer\`) |
+| \`rename ID "New name"\` · \`type ID fixed_term\` | renames / changes the type (\`renommer\`, \`type\`) |
+| \`param ID key=value\` · \`icon ID 🧸\` | adds or changes data / the icon (\`param\`, \`icone\`) |
+| \`condition ID "Label" met\` / \`missing\` | custom condition shown as a badge (\`missing risk\`: amber; \`"effect"\` at the end of the line); \`condition ID none\` removes them (French: \`ok\` / \`manque\`) |
+| \`status ID void "text"\` | forces a verdict: \`valid\`, \`risk\`, \`void\`, \`breached\`, \`neutral\` (also \`fair\`, \`unfair\`, \`unenforceable\`, \`lawful\`); \`status ID auto\` returns to the computed verdict (\`statut\`) |
+| \`verification off\` / \`on\` | hides / shows verdicts and badges (for questions; also \`check off\`) |
+| \`view ID\` / \`view none\` | zooms on the case file of an item, the rest is dimmed (\`vue\`) |
+| \`focus ID ID…\` | highlights items (also \`highlight\`) |
+| \`note ID "text"\` | speech bubble above an item |
+| \`select ID\` | shows the validity conditions of ID under the commentary (\`selection\`) |
+| \`duration 12\` | duration of the step in continuous play, in seconds (\`duree\`) |
+| \`move ID X Y\` · \`layout\` · \`clear\` | move, back to automatic layout, empty the canvas (\`deplacer\`, \`disposition\`, \`effacer\`) |
+| \`law uk\` · \`law fr\` | chooses the law (\`droit\`); prefer the front matter \`droit: uk\` |
+
+An item cited in a link without having been declared is created automatically (as a free clause, or of the type whose name it bears) and a warning is shown: always declare your items.
+
+### Relations chosen automatically
+
+| From → to | Relation |
+|---|---|
+| safeguard → any item | \`limits\` ("safeguards", green link 🔒) |
+| party → contract | \`signs\` |
+| contract → clause | \`includes\` (the clause enters the contract's frame) |
+| party → obligation | \`owes\` |
+| misconduct / breach → obligation | \`breaches\` (the obligation turns ⚡ breached) |
+| misconduct → termination | \`justifies\` (the misconduct counts as the ground of the termination) |
+| party → termination | \`initiates\` |
+| termination → contract | \`ends\` |
+| termination → step, step → step | \`then\` (procedure chain, shown in a row) |
+| termination or step → payment / right | \`entitles\` |
+| source → source / other | \`prevails\` / \`governs\` |
+
+### What the tool checks
+
+- **Safeguards**: each type has its conditions (column "Conditions checked" of the catalogue). A condition is met if an item of the expected type is **linked directly** to the item, or belongs to the same **procedure chain** (\`then\`), or is attached to the **contract** that includes the clause (e.g. \`written_particulars\` linked to the contract counts for its probation clause). Missing conditions appear as dotted badges under the card.
+- **Incompatibilities** (⊘): checked within the same **case file** — the items linked to one another, not through parties or sources. E.g. \`gross_misconduct\` in the case file of a dismissal neutralises the \`notice\` and the \`notice_pay\`; a \`wrongful_dismissal\` releases the employee from a \`non_compete\`; under French law, \`faute_grave\` neutralises \`preavis\` and \`indemnite_licenciement\`.
+- **Data**: a figure is looked up on the item itself, then in its case file, then on the parties linked to it: put \`service\`, \`weekly_pay\` and \`age\` (English law) or \`categorie\`, \`anciennete\` and \`salaire\` (French law) on the employee.
+- **Calculations, English law**: unfair dismissal qualifying period (\`service\` vs \`qualifying_years\`, default 2), statutory minimum notice (ERA 1996 s.86) vs \`notice_weeks\`, notice pay, statutory redundancy pay and basic award (age bands, 20 years, week's pay capped by \`week_cap\`, default £751), compensatory award (\`loss\`, \`polkey\` %, \`uplift\` % up to 25, cap \`comp_cap\` default £123,543 or 52 weeks' pay), National Minimum Wage (\`hourly_rate\` vs the rate for the \`age\`), 4 years of successive fixed-term contracts (\`successive_years\`), holiday pay (\`untaken_days\` × \`day_pay\`). The annual figures change every April: they are parameters, overridable on any item (e.g. \`param SRP week_cap=719\`).
+- **Calculations, French law**: probationary period (\`duree\` in months, employee's \`categorie\`: ouvrier, employe, technicien, agent_maitrise, cadre), CDD (\`duree\` > 18 months), statutory notice and statutory severance pay (\`anciennete\` in years, gross monthly \`salaire\`), mutual termination payment (\`montant\` compared with the statutory minimum), end-of-CDD payment (\`remuneration_totale\`).
+- ⚠️ **Employment Rights Act 2025**: the English catalogue states the law in force on 20 November 2026. The reforms announced for 1 January 2027 (6-month qualifying period, no cap on the compensatory award) are flagged in the descriptions, not applied: use \`qualifying_years=0.5\` or a larger \`comp_cap\` to show them.
+
+## Catalogue of types
+
+### English law (England & Wales)
+
+Front matter \`droit: uk\`. Type keys are English.
+` + P.catalogDoc('uk', 'en', 4) + `
+### French law (labels in English)
+
+The default law. Type keys are French; the "Also accepted" column gives the aliases, English ones included.
+` + P.catalogDoc('fr', 'en', 4) + `
+## Writing tips
+
+- 5 to 9 steps; each step adds only one idea (a clause and its safeguards, a procedural step, a misconduct…).
+- Show the clause **alone** first (⛔, dotted badges), then add its safeguards one by one: the card turns green before the class's eyes.
+- For a termination, set the termination, then its procedure chain (\`then\` with the time limits as labels), then the rights it opens (\`entitles\`).
+- Put the figures on the employee (\`service\`, \`weekly_pay\`, \`age\`; French law: \`anciennete\`, \`salaire\`, \`categorie\`): the calculations find them. Give the calculation in the text ("12 weeks × £751 = £9,012"): the tool shows the same figures.
+- Use \`focus\` and \`note\` to guide the eye; a bubble stays short (about 60 characters).
+- When the tool cannot represent a rule (tribunal's assessment of the facts, contractual enhancements, real dates and time limits…), use \`condition\` or \`status\` with a text, and explain in the commentary.
+- English law: say which figures are those from 6 April 2026 and flag the Employment Rights Act 2025 reforms when they matter ("> ⚠️ …").
+`;
+
+P.AI_PROMPT_EN = `You are going to write a teaching scenario for Contract Lab, a tool that visualises the contract of employment and employment law (clauses, safeguards, obligations, terminations), under English law (England & Wales) or French law.
+The scenario must follow EXACTLY the format described below: a markdown document, a level-1 title, then one step per level-2 heading, each step containing a teaching commentary in English and a \`\`\`scene command block. For English law, start the file with the front matter --- / droit: uk / ---.
+The checks (validity of clauses, incompatibilities, calculations) are done by the tool: your commentary must announce the same verdicts. Answer only with the markdown of the scenario.
+
+----- FORMAT SPECIFICATION -----
+
+` + P.FORMAT_DOC_EN + `
+
+----- REQUESTED TOPIC -----
+
+[Describe here the notion to explain, the law (English or French), the audience (e.g. undergraduate HR or law students) and the number of steps wanted.]
 `;

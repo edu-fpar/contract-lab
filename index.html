@@ -59,6 +59,8 @@
     <button id="btn-to-libre" title="Reprendre l'état affiché en mode libre">✏️<span class="lbl"> Explorer librement</span></button>
   </div>
   <div class="actions right">
+    <select id="opt-droit" class="hsel" aria-label="Droit applicable"></select>
+    <select id="opt-lang" class="hsel" aria-label="Langue de l'interface" title="Langue de l'interface"></select>
     <label class="opt" title="Affiche les verdicts (valide, à risque, nulle) et les pastilles de garde-fous. Décochez pour laisser la classe juger."><input type="checkbox" id="opt-verif" checked> 🔍 Vérification</label>
     <button id="btn-theme" class="theme-btn" title="Mode jour / nuit">🌙</button>
     <button id="btn-help" title="Aide">❔<span class="lbl"> Aide</span></button>
@@ -113,10 +115,16 @@
 <div id="modal" hidden><div class="dialog"><button class="close" title="Fermer (Échap)">×</button><div class="content"></div></div></div>
 <input type="file" id="file-input" accept=".md,.markdown,.txt,.json" hidden>
 
+<script src="js/i18n.js"></script>
+<script src="js/i18n-en.js"></script>
 <script src="js/model.js"></script>
+<script src="js/catalog-fr-en.js"></script>
+<script src="js/catalog-uk.js"></script>
 <script src="js/scenario.js"></script>
 <script src="js/docs.js"></script>
 <script src="js/library.js"></script>
+<script src="js/library-en.js"></script>
+<script src="js/library-uk.js"></script>
 <script src="js/scorm.js"></script>
 <script src="js/app.js"></script>
 </body>

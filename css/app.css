@@ -535,3 +535,8 @@ details.adv .conds .x { border: none; background: none; color: var(--muted); pad
   body.libre #palette { display: block; max-height: 30vh; }
   body.libre #palette .pal-fam summary { display: flex; }
 }
+
+/* sélecteurs de langue et de droit (barre du haut) */
+.hsel { padding: 3px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); font-size: 12.5px; max-width: 170px; }
+.hsel:disabled { opacity: .7; }
+@media (max-width: 760px) { #opt-droit { display: none; } }

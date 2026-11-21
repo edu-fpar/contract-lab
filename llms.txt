@@ -1,6 +1,6 @@
 # Contract Lab
 
-> Atelier pédagogique 100 % navigateur pour visualiser le contrat de travail et le droit du travail français (clauses et leurs garde-fous, incompatibilités, obligations des parties, ruptures et procédures, indemnités, sources du droit), avec vérification automatique des conditions de validité, et pour les présenter en classe sous forme de scénarios animés pas à pas, écrits en markdown.
+> Atelier pédagogique 100 % navigateur pour visualiser le contrat de travail et le droit du travail français (clauses et leurs garde-fous, incompatibilités, obligations des parties, ruptures et procédures, indemnités, sources du droit), avec vérification automatique des conditions de validité, et pour les présenter en classe sous forme de scénarios animés pas à pas, écrits en markdown. Deux droits (droit français ; droit anglais, England & Wales) et deux langues (français, anglais).
 
 ## Pour les IA
 
@@ -8,7 +8,15 @@
 - [Format des scénarios](https://edu-fpar.github.io/contract-lab/docs/format-scenario.md): syntaxe des étapes, des commandes et des questions, catalogue des éléments.
 - [Règles de vérification](https://edu-fpar.github.io/contract-lab/docs/regles-de-calcul.md): ce que l'outil vérifie et calcule, et ce qu'il ne représente pas.
 
+## For AIs (English)
+
+- [Instructions: creating a scenario from a course](https://edu-fpar.github.io/contract-lab/docs/en/instructions-ia.md): mission (English law with `droit: uk`, or French law), full scenario format, checking rules, worked example.
+- [Scenario format](https://edu-fpar.github.io/contract-lab/docs/en/format-scenario.md): syntax of steps, commands and questions, catalogues of English law and French law.
+- [Checking rules](https://edu-fpar.github.io/contract-lab/docs/en/checking-rules.md): what the tool checks and calculates under each law, annual figures, Employment Rights Act 2025, limits.
+
 ## Pour les humains
 
 - [Atelier en ligne](https://edu-fpar.github.io/contract-lab/)
 - [Documentation](https://edu-fpar.github.io/contract-lab/docs/)
+- [Workshop in English](https://edu-fpar.github.io/contract-lab/?lang=en)
+- [Documentation in English](https://edu-fpar.github.io/contract-lab/docs/#/en/)
