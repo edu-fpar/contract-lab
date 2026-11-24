@@ -96,6 +96,18 @@ Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil 
 
 <a id="english"></a>
 
+## Licence et citation
+
+© 2026 François Parlant — [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr). L'usage en classe et en formation est libre, en citant l'auteur ; vos adaptations se partagent sous la même licence. Voir [LICENSE](LICENSE).
+
+**Usage commercial** (organisme de formation, éditeur, marque blanche, scénarios sur mesure, paquets SCORM personnalisés) : une licence commerciale est possible sur accord. [Me contacter](https://edu-fpar.github.io/about.html).
+
+**Citer cet outil** (bouton *Cite this repository* de GitHub, d'après [CITATION.cff](CITATION.cff)) :
+
+> Parlant, F. (2026). *Contract Lab* [Logiciel pédagogique]. https://github.com/edu-fpar/contract-lab
+
+Vous l'utilisez en cours ? [Dites-le-moi](https://www.linkedin.com/in/francois-parlant/) : ces retours m'aident à faire connaître et améliorer l'outil.
+
 ## 🇬🇧 English
 
 **Contract Lab** is a browser-only teaching tool to visualise and explain the **contract of employment** and **employment law**:
@@ -147,3 +159,15 @@ After changing the engine, the catalogues or the scenarios: `node tools/build.js
 
 Contract Lab reuses the scenario engine of **Capital Lab**, which grew out of the tool devised by **Tao** to show his financial law class how a company
 can be controlled by a minority shareholder, and passed on by **Yannick**. Many thanks to them.
+
+### License and citation
+
+© 2026 François Parlant — [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Using it in class or in training is free, with credit to the author; adaptations must be shared under the same license. See [LICENSE](LICENSE).
+
+**Commercial use** (training company, publisher, white label, custom scenarios, tailored SCORM packages): a commercial license is available by agreement. [Get in touch](https://edu-fpar.github.io/about.html?lang=en).
+
+**How to cite** (GitHub's *Cite this repository* button, from [CITATION.cff](CITATION.cff)):
+
+> Parlant, F. (2026). *Contract Lab* [Educational software]. https://github.com/edu-fpar/contract-lab
+
+Using it in class? [Let me know](https://www.linkedin.com/in/francois-parlant/): this feedback helps me improve the tool and spread the word.

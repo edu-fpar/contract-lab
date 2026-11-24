@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this tool in teaching or research, please cite it as below."
+type: software
+title: "Contract Lab"
+abstract: "Interactive teaching tool to build an employment contract clause by clause, see which safeguards make a clause valid, and walk through dismissals and other terminations step by step (French law and English law). Runs in the browser, SCORM export for Moodle."
+authors:
+  - family-names: Parlant
+    given-names: François
+    orcid: "https://orcid.org/0009-0002-8059-6408"
+version: "1.0.0"
+date-released: "2026-11-24"
+license: CC-BY-NC-SA-4.0
+repository-code: "https://github.com/edu-fpar/contract-lab"
+url: "https://edu-fpar.github.io/contract-lab/"
+keywords:
+  - employment law
+  - labour law
+  - HR
+  - education
+  - SCORM
