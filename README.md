@@ -1,5 +1,7 @@
 # Contract Lab — atelier contrat de travail
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24508195.svg)](https://doi.org/10.5281/zenodo.24508195)
+
 **🇬🇧 [English below](#english) · English law (England & Wales) and English interface: [edu-fpar.github.io/contract-lab/?lang=en](https://edu-fpar.github.io/contract-lab/?lang=en)**
 
 [![Contract Lab en mode cinéma : une clause de non-concurrence et ses cinq garde-fous, avec la question posée à la salle et la réponse révélée](contract-lab.png)](https://edu-fpar.github.io/contract-lab/?scenario=non-concurrence&etape=6)
@@ -104,7 +106,7 @@ Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil 
 
 **Citer cet outil** (bouton *Cite this repository* de GitHub, d'après [CITATION.cff](CITATION.cff)) :
 
-> Parlant, F. (2026). *Contract Lab* [Logiciel pédagogique]. https://github.com/edu-fpar/contract-lab
+> Parlant, F. (2026). *Contract Lab* [Logiciel pédagogique]. Zenodo. https://doi.org/10.5281/zenodo.24508195
 
 Vous l'utilisez en cours ? [Dites-le-moi](https://www.linkedin.com/in/francois-parlant/) : ces retours m'aident à faire connaître et améliorer l'outil.
 
@@ -168,6 +170,6 @@ can be controlled by a minority shareholder, and passed on by **Yannick**. Many 
 
 **How to cite** (GitHub's *Cite this repository* button, from [CITATION.cff](CITATION.cff)):
 
-> Parlant, F. (2026). *Contract Lab* [Educational software]. https://github.com/edu-fpar/contract-lab
+> Parlant, F. (2026). *Contract Lab* [Educational software]. Zenodo. https://doi.org/10.5281/zenodo.24508195
 
 Using it in class? [Let me know](https://www.linkedin.com/in/francois-parlant/): this feedback helps me improve the tool and spread the word.
