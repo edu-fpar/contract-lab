@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24508195.svg)](https://doi.org/10.5281/zenodo.24508195)
 
-**🇬🇧 [English below](#english) · English law (England & Wales) and English interface: [edu-fpar.github.io/contract-lab/?lang=en](https://edu-fpar.github.io/contract-lab/?lang=en)**
+**▶ En ligne : [edu-fpar.github.io/contract-lab](https://edu-fpar.github.io/contract-lab/)** (aussi sur téléphone) · [documentation](https://edu-fpar.github.io/contract-lab/docs/) · 🇬🇧 [English below](#english) (English law and English interface)
 
 [![Contract Lab en mode cinéma : une clause de non-concurrence et ses cinq garde-fous, avec la question posée à la salle et la réponse révélée](contract-lab.png)](https://edu-fpar.github.io/contract-lab/?scenario=non-concurrence&etape=6)
 
@@ -13,9 +13,6 @@ L'outil vérifie chaque élément et affiche un verdict : ✅ valide, ⚠️ à 
 
 Deux droits : le **droit français** et le **droit anglais** (Angleterre et pays de Galles : *written statement*, *restrictive covenants*, *unfair dismissal*, *redundancy*, *settlement agreements*…), choisi dans la barre d'outils ou par `droit: uk` en tête d'un scénario.
 Deux langues d'interface : français et anglais (`?lang=en`).
-
-**▶ En ligne : [edu-fpar.github.io/contract-lab](https://edu-fpar.github.io/contract-lab/)** (aussi sur téléphone) ·
-[documentation](https://edu-fpar.github.io/contract-lab/docs/)
 
 Aucune installation : ouvrez `index.html` (double-clic) ou servez le dossier avec UwAmp
 (`http://localhost/edu-fpar/contract-lab/`). Pas de dépendance externe, fonctionne hors ligne.
@@ -96,8 +93,6 @@ Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil 
 
 ---
 
-<a id="english"></a>
-
 ## Licence et citation
 
 © 2026 François Parlant — [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr). L'usage en classe et en formation est libre, en citant l'auteur ; vos adaptations se partagent sous la même licence. Voir [LICENSE](LICENSE).
@@ -109,6 +104,8 @@ Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil 
 > Parlant, F. (2026). *Contract Lab* [Logiciel pédagogique]. Zenodo. https://doi.org/10.5281/zenodo.24508195
 
 Vous l'utilisez en cours ? [Dites-le-moi](https://www.linkedin.com/in/francois-parlant/) : ces retours m'aident à faire connaître et améliorer l'outil.
+
+<a id="english"></a>
 
 ## 🇬🇧 English
 
