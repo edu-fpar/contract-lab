@@ -362,5 +362,7 @@ P.I18N.en = Object.assign(P.I18N.en || {}, {
   'Droit applicable : {d}': 'Applicable law: {d}',
   'Scénario introuvable : ': 'Scenario not found: ',
   '⚠ Lien de scénario illisible (incomplet ?)': '⚠ Unreadable scenario link (incomplete?)',
-  '⚠ Impossible de charger ': '⚠ Unable to load '
+  '⚠ Impossible de charger ': '⚠ Unable to load ',
+  'Vidéo de présentation': 'Introductory video',
+  'Revoir la vidéo de présentation': 'Watch the introductory video again'
 });

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<!--
+  Contract Lab – visite guidée en vidéo (animation anim-kit).
+  Kit : intro/kit/anim.css et intro/kit/anim.js, copiés tels quels depuis anim-kit (kit/) le 25/11/2026.
+  Ne pas les modifier ici : ce qui est propre à Contract Lab (couleurs, maquettes) est dans le <style> ci-dessous.
+  Relecture : intro/kit/planche.html?src=../../intro.html (outil de contrôle, exclu du git), ?dev=1 pour le format et les Coulisses.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contract Lab – Visite guidée</title>
+<meta name="description" content="Contract Lab en une minute : le contrat de travail en icônes, le mode cinéma et ses questions à la salle, le mode libre, le droit français et le droit anglais.">
+<link rel="canonical" href="https://edu-fpar.github.io/contract-lab/intro.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 6h44l20 20v68H18z' fill='%230891b2'/%3E%3Cpath d='M30 46h40M30 60h40M30 74h26' stroke='%23fff' stroke-width='7'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="intro/kit/anim.css">
+<style>
+ /* ================= page de présentation (autour de l'animation) =================
+    Couleurs reprises de css/app.css (jour / nuit). */
+ :root { --pg-bg: #f3f5fa; --pg-surface: #fff; --pg-line: #e2e8f0; --pg-ink: #1e293b; --pg-muted: #64748b;
+  --pg-accent: #4f46e5; --pg-accent-soft: #eef2ff; color-scheme: light; }
+ @media (prefers-color-scheme: dark) { :root { --pg-bg: #0b1120; --pg-surface: #141c2f; --pg-line: #2a3550; --pg-ink: #e2e8f0; --pg-muted: #94a3b8;
+  --pg-accent: #818cf8; --pg-accent-soft: #252a4d; color-scheme: dark; } }
+ [hidden] { display: none !important; }
+ html, body { margin: 0; }
+ body { background: var(--pg-bg); color: var(--pg-ink); font: 16px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+ a { color: var(--pg-accent); }
+ :focus-visible { outline: 3px solid var(--pg-accent); outline-offset: 2px; border-radius: 6px; }
+ .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+ .pg-top { background: var(--pg-surface); border-bottom: 1px solid var(--pg-line); }
+ .pg-top .wrap { display: flex; align-items: center; gap: 14px; min-height: 68px; flex-wrap: wrap; padding-block: 8px; }
+ .pg-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; margin-right: auto; }
+ .pg-logo { width: 42px; height: 42px; border-radius: 11px; background: linear-gradient(145deg, #22d3ee, #0891b2 55%, #155e75); display: grid; place-items: center; flex: none; }
+ .pg-logo svg { width: 22px; height: 22px; }
+ .pg-brand b { display: block; font-size: 18px; }
+ .pg-brand small { display: block; color: var(--pg-muted); font-size: 13px; }
+ .pg-langs { display: flex; border: 1px solid var(--pg-line); border-radius: 8px; overflow: hidden; }
+ .pg-langs button { border: 0; background: transparent; padding: 6px 11px; cursor: pointer; font: 600 14px system-ui; color: var(--pg-muted); }
+ .pg-langs button[aria-pressed="true"] { background: var(--pg-accent); color: #fff; }
+ .pg-btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--pg-line); background: var(--pg-surface); border-radius: 8px; padding: 8px 14px;
+  font: 600 15px system-ui, sans-serif; text-decoration: none; color: var(--pg-ink); cursor: pointer; }
+ .pg-btn.primary { background: var(--pg-accent); border-color: var(--pg-accent); color: #fff; }
+ @media (prefers-color-scheme: dark) { .pg-btn.primary, .pg-langs button[aria-pressed="true"] { color: #0b1120; } }
+ .pg-btn svg { width: 18px; height: 18px; }
+ .pg-hero { padding: 34px 20px 18px; }
+ .pg-hero h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); letter-spacing: -.02em; line-height: 1.15; }
+ .pg-hero p { color: var(--pg-muted); max-width: 780px; margin: 8px 0 0; }
+ .pg-blk { padding: 44px 0 8px; }
+ .pg-blk h2 { margin: 0; font-size: 26px; letter-spacing: -.01em; }
+ .pg-blk .wrap > p { color: var(--pg-muted); margin: 6px 0 20px; max-width: 780px; }
+ .pg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+ .pg-card { background: var(--pg-surface); border: 1px solid var(--pg-line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+ .pg-card h3 { margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+ .pg-card h3 span { width: 32px; height: 32px; border-radius: 9px; background: var(--pg-accent-soft); display: grid; place-items: center; flex: none; font-size: 17px; }
+ .pg-card p { margin: 0; color: var(--pg-muted); font-size: 15px; }
+ .pg-card .pg-btn { margin-top: auto; align-self: flex-start; font-size: 14px; padding: 6px 12px; }
+ .pg-foot { padding: 40px 0; color: var(--pg-muted); font-size: 14px; }
+ .pg-foot .wrap { display: flex; gap: 16px; justify-content: space-between; flex-wrap: wrap; border-top: 1px solid var(--pg-line); padding-top: 18px; }
+ .pg-foot .wrap > span:last-child { display: flex; gap: 16px; }
+
+ /* lecteur du kit : aux couleurs de Contract Lab, sans les commandes de fabrication (format, coulisses), sauf ?dev=1 */
+ .ap { --apa: #4f46e5; --aps: #eef2ff; }
+ @media (prefers-color-scheme: dark) { .ap { --apb: #141c2f; --apl: #2a3550; --apt: #e2e8f0; --apm: #94a3b8; --apa: #818cf8; --aps: #252a4d; } }
+ .ap-view { background: #0b1120; box-shadow: 0 14px 40px rgba(15, 23, 42, .3); }
+ .ap-big { background: rgba(79, 70, 229, .92); }
+ body:not(.dev) .ap-seg[data-group="format"], body:not(.dev) .ap [data-act="dbg"], body:not(.dev) .ap-dbg { display: none !important; }
+ .ap-end { gap: 12px; flex-wrap: wrap; }
+ .ap-end .pg-btn, .ap-end .ap-btn { font-size: 17px; padding: 12px 20px; }
+
+ /* mode intégré (?embed=app) : ouverte par l'application dans une fenêtre */
+ .pg-embedbar { display: none; }
+ body.embed { background: #0b1120; color: #e2e8f0; min-height: 100vh; }
+ body.embed .pg-top, body.embed .pg-hero, body.embed .pg-blk, body.embed .pg-foot { display: none !important; }
+ body.embed .pg-embedbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; }
+ body.embed .pg-embedbar .pg-brand small { color: #94a3b8; }
+ body.embed .ap { --apb: #141c2f; --apl: #2a3550; --apt: #e2e8f0; --apm: #94a3b8; --apa: #818cf8; }
+ .pg-embed-r { display: flex; align-items: center; gap: 10px; }
+ body.embed .pg-langs { border-color: rgba(255,255,255,.25); }
+ body.embed .pg-langs button { color: #94a3b8; }
+ body.embed .pg-langs button[aria-pressed="true"] { background: #818cf8; color: #0b1120; }
+ .pg-skip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08); color: #fff;
+  border-radius: 8px; padding: 8px 14px; font: 600 15px system-ui, sans-serif; cursor: pointer; }
+ .pg-skip svg { width: 16px; height: 16px; }
+ @media (max-width: 640px) { .pg-top .pg-btn span { display: none; } }
+ /* rendu (?render=1 : planche contact, export vidéo) : l'animation seule */
+ .anim-render .pg-top, .anim-render .pg-hero, .anim-render .pg-blk, .anim-render .pg-foot, .anim-render .pg-embedbar { display: none !important; }
+ .anim-render .wrap { max-width: none; padding: 0; }
+
+ /* ================= thème Contract Lab ================= */
+ .anim {
+  --bg1: #0b1120; --bg2: #1e1b4b; --glow: 129, 140, 248;
+  --ink: #eef2ff; --soft: #c7d2fe; --muted: #94a3b8;
+  --accent: #4f46e5; --accent2: #a5b4fc; --ok: #15803d; --okL: #4ade80; --warn: #f59e0b; --ko: #f87171;
+  --font: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  /* application (thème jour de css/app.css) */
+  --a-bg: #f3f5fa; --a-panel: #fff; --a-ink: #1e293b; --a-muted: #64748b; --a-line: #e2e8f0; --a-dot: #d5dbe7;
+  --a-accent: #4f46e5; --a-soft: #eef2ff; --a-ok: #15803d; --a-ok-soft: #ecfdf5; --a-ok-line: #a7f3d0;
+  --a-ko: #dc2626; --a-ko-soft: #fef2f2; --a-warn: #b45309; --a-warn-soft: #fffbeb; --a-warn-line: #fed7aa;
+ }
+ .anim .k-logo { background: linear-gradient(145deg, #22d3ee, #0891b2 55%, #155e75); }
+ .anim .k-logo svg { width: 50%; height: 50%; filter: drop-shadow(0 4px 8px rgba(8,51,68,.45)); }
+ .anim .k-pill.is-green { background: #15803d; }
+ .anim .k-stat b { background: linear-gradient(#e0e7ff, #a5b4fc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+ .k-h1.grad { background: linear-gradient(90deg, #fff, #c7d2fe 60%, #a5b4fc); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .05em; }
+ .stack { display: grid; } .stack > * { grid-area: 1 / 1; }
+
+ /* ================= maquette de l'application ================= */
+ .g-demo.wide { grid-template-columns: minmax(0, 2.15fr) minmax(0, 1fr); gap: 3%; }
+ .anim[data-format="16x9"] .g-demo .g-side .k-h2 { font-size: 1.6em; }
+ .anim[data-format="9x16"] .g-demo.wide, .anim[data-format="1x1"] .g-demo.wide { grid-template-columns: minmax(0, 1fr); }
+ .anim[data-format="9x16"] .g-demo .g-side { order: -1; gap: .45em; }
+ .anim[data-format="1x1"] .g-demo .g-side { order: -1; gap: .3em; }
+ .anim[data-format="1x1"] .g-demo .k-h2 { font-size: 1.45em; }
+ .g-side .k-list { font-size: .9em; }
+ .app { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--a-bg); color: var(--a-ink);
+  border-radius: 16px; overflow: hidden; font-size: .74em; line-height: 1.3; box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(165,180,252,.2); }
+ .anim[data-format="9x16"] .app { font-size: .7em; }
+ .anim[data-format="1x1"] .app { font-size: .68em; }
+ .app-top { display: flex; align-items: center; gap: .7em; padding: .6em 1em; background: var(--a-panel); border-bottom: 1px solid var(--a-line); white-space: nowrap; }
+ .app-brand { font-weight: 800; font-size: 1.1em; }
+ .app-brand small { color: var(--a-muted); font-weight: 400; font-size: .75em; margin-left: .3em; }
+ .app-modes { display: flex; background: #eef1f6; border-radius: .6em; padding: .2em; }
+ .app-modes > span { padding: .25em .8em; border-radius: .45em; font-weight: 600; color: var(--a-muted); }
+ .app-modes .on { background: #fff; color: var(--a-accent); box-shadow: 0 1px 3px rgba(15,23,42,.15); }
+ .app-sp { flex: 1; }
+ .app-b { border: 1px solid var(--a-line); background: var(--a-panel); border-radius: .5em; padding: .25em .7em; font-weight: 600; }
+ .app-chk { display: inline-flex; align-items: center; gap: .35em; font-weight: 600; }
+ .app-chk i { width: 1em; height: 1em; border-radius: .2em; display: grid; place-items: center; font-style: normal; font-size: .9em; }
+ .app-chk i.on { background: var(--a-accent); color: #fff; } .app-chk i.off { background: #fff; box-shadow: inset 0 0 0 .12em #94a3b8; }
+ .anim[data-format="9x16"] .app-brand small, .anim[data-format="1x1"] .app-brand small { display: none; }
+ .canvas { position: relative; min-height: 0; padding: 1.2em 1em; display: grid; align-content: center; justify-items: center; gap: .9em;
+  background: radial-gradient(var(--a-dot) 1.2px, transparent 1.4px) 0 0 / 20px 20px, var(--a-bg); }
+ .row { display: flex; gap: .8em; justify-content: center; align-items: center; flex-wrap: wrap; }
+ /* carte (nœud du canevas) */
+ .cn { position: relative; display: flex; align-items: center; gap: .55em; min-width: 9.5em; max-width: 13em; padding: .5em .7em; background: #fff; color: var(--a-ink);
+  border: .1em solid #c7d2fe; border-radius: .6em; box-shadow: 0 .3em .8em rgba(15,23,42,.08); text-align: left; }
+ .cn > i:first-child { flex: none; width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center; font-style: normal; background: #eef2ff; }
+ .cn > span { display: grid; min-width: 0; }
+ .cn b { font-weight: 600; } .cn small { color: var(--a-muted); font-size: .8em; }
+ .cn.lim { border-radius: 1.2em; border-color: #a7f3d0; }
+ .cn.etape { min-width: 7.5em; border-color: #cbd5e1; }
+ .cn .ring { position: absolute; inset: -.15em; border-radius: inherit; pointer-events: none; }
+ .ring.ok { border: .15em solid #16a34a; background: rgba(22,163,74,.07); }
+ .ring.ko { border: .15em solid #dc2626; background: rgba(220,38,38,.06); }
+ .ring.warn { border: .15em solid #d97706; background: rgba(217,119,6,.06); }
+ .ring.sel { inset: -.35em; border: .15em solid #fbbf24; border-radius: .9em; box-shadow: 0 0 0 .25em rgba(251,191,36,.25); }
+ /* verdict et pastilles sous la carte */
+ .under { display: grid; justify-items: start; gap: .2em; margin-top: .25em; }
+ .vd { font-style: normal; font-weight: 700; font-size: .85em; padding: .05em .5em; border-radius: 999px; white-space: nowrap; }
+ .vd.ko { color: var(--a-ko); background: var(--a-ko-soft); } .vd.ok { color: var(--a-ok); background: var(--a-ok-soft); } .vd.warn { color: var(--a-warn); background: var(--a-warn-soft); }
+ .pz { display: flex; gap: .25em; }
+ .pz > span { position: relative; width: 1.3em; height: 1.3em; }
+ .pz > span > i { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: .7em; }
+ .pz .off { border: .12em dashed #94a3b8; background: #fff; }
+ .pz .on { background: #16a34a; color: #fff; font-size: .75em; }
+ .node { display: grid; justify-items: start; }
+ /* liens */
+ .vl { width: .14em; height: 1.1em; background: #94a3b8; justify-self: center; }
+ .arrow { color: #64748b; font-weight: 700; display: grid; justify-items: center; font-size: .9em; line-height: 1; }
+ .arrow small { font-size: .75em; color: var(--a-accent); background: #fff; border: 1px solid #c7d2fe; border-radius: 999px; padding: .05em .45em; white-space: nowrap; }
+ .chain { flex-wrap: nowrap; gap: .5em; } .chain .cn { min-width: 0; }
+ .anim[data-format="9x16"] .chain { flex-direction: column; gap: .3em; }
+ .anim[data-format="9x16"] .chain .arrow { display: flex; gap: .5em; align-items: center; }
+ .anim[data-format="9x16"] .chain .ag { rotate: 90deg; }
+ .bracket { width: 82%; height: .8em; border: .14em solid #86efac; border-bottom: 0; border-radius: .4em .4em 0 0; }
+ /* barre de question (mode cinéma) */
+ .qbar { background: #fff; border-top: 1px solid var(--a-line); padding: .7em 1em .9em; display: grid; gap: .55em; }
+ .qh { display: flex; align-items: center; gap: .6em; font-size: 1.15em; font-weight: 700; }
+  .qh .tag { font-size: .75em; padding: .15em .6em; border-radius: 999px; background: var(--a-soft); color: var(--a-accent); }
+ .opts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5em; }
+ .anim[data-format="9x16"] .opts, .anim[data-format="1x1"] .opts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .opt { position: relative; display: flex; gap: .5em; align-items: center; padding: .5em .6em; border: 1px solid var(--a-line); border-radius: .6em; background: #fbfcfe; }
+ .opt > b { flex: none; width: 1.6em; height: 1.6em; border-radius: 50%; display: grid; place-items: center; background: #94a3b8; color: #fff; font-size: .85em; }
+ .opt .pick { position: absolute; inset: -1px; border-radius: .6em; border: .15em solid var(--a-accent); }
+ .opt .good { position: absolute; inset: -1px; border-radius: .6em; border: .15em solid #16a34a; background: rgba(22,163,74,.1); }
+ .opt .dim { position: absolute; inset: -1px; border-radius: .6em; background: rgba(243,245,250,.7); }
+ .opt .tick { position: absolute; right: -.45em; top: -.55em; width: 1.5em; height: 1.5em; border-radius: 50%; display: grid; place-items: center; background: #16a34a; color: #fff; font-weight: 900; font-style: normal; }
+
+ /* ================= 1. accroche ================= */
+ .s-hook { font-size: 1.3em; }
+ .s-hook .big { font-size: 1.5em; }
+ .s-hook .big .cn { min-width: 11em; }
+ .s-hook .stamp { justify-self: center; margin-top: .3em; font-size: 1.3em; font-weight: 800; letter-spacing: .02em; padding: .15em .8em; border-radius: .4em;
+  color: #fecaca; border: .12em solid #f87171; background: rgba(220,38,38,.18); rotate: -4deg; }
+ .s-hook .k-h2 { margin-top: .2em; }
+
+ /* ================= 3. cinéma ================= */
+ .s-cine .canvas { gap: .55em; }
+ .anim[data-format="9x16"] .s-cine .g5 { flex-basis: 100%; display: flex; justify-content: center; }
+
+ /* ================= 4. faute grave ================= */
+ .fault .cn { min-width: 11em; }
+ .rights .cn { min-width: 10.5em; }
+ .rights .under { justify-items: center; justify-self: center; }
+ .rights .node { justify-items: center; }
+ .x { position: absolute; right: -.5em; top: -.6em; width: 1.5em; height: 1.5em; border-radius: 50%; display: grid; place-items: center; background: #dc2626; color: #fff; font-style: normal; font-weight: 800; }
+ .strike-me { position: absolute; left: .4em; right: .4em; top: 50%; height: .12em; background: #dc2626; transform-origin: left center; }
+
+ /* ================= 5. libre ================= */
+ .libre { display: grid; grid-template-columns: 12em minmax(0, 1fr); min-height: 0; }
+ .pal { background: var(--a-panel); border-right: 1px solid var(--a-line); padding: .7em; display: grid; gap: .35em; align-content: start; }
+ .pal .search { border: 1px solid var(--a-line); border-radius: .5em; padding: .35em .6em; color: var(--a-muted); min-height: 2em; }
+ .pal .search span { color: var(--a-ink); }
+ .pal .fam { display: flex; gap: .45em; align-items: center; padding: .3em .5em; border-radius: .45em; font-weight: 600; }
+ .pal .fam small { margin-left: auto; color: var(--a-muted); font-weight: 400; }
+ .pal .hit { position: relative; display: flex; gap: .45em; align-items: center; padding: .35em .55em; border-radius: .45em; background: var(--a-soft); color: var(--a-accent); font-weight: 700; border: 1px solid #c7d2fe; }
+ .anim[data-format="9x16"] .libre { grid-template-columns: 9.5em minmax(0, 1fr); }
+ .anim[data-format="9x16"] .pal .fam small, .anim[data-format="1x1"] .pal .fam small { display: none; }
+ .anim[data-format="1x1"] .libre { grid-template-columns: 10em minmax(0, 1fr); }
+ .insp { background: #fff; border: 1px solid #c7d2fe; border-radius: .7em; padding: .55em .7em; display: grid; gap: .4em; box-shadow: 0 .6em 1.4em rgba(15,23,42,.12); font-size: .92em; }
+ .insp p { color: var(--a-muted); }
+ .insp .add { display: inline-flex; align-items: center; gap: .4em; justify-self: start; padding: .3em .65em; border-radius: .5em; background: var(--a-accent); color: #fff; font-weight: 700; }
+ .judge { justify-self: center; padding: .35em .9em; border-radius: 999px; background: #fffbeb; color: #92400e; border: 1px solid #fed7aa; font-weight: 700; }
+
+ /* ================= 6. deux droits ================= */
+ .law { position: relative; display: grid; border: 1px solid var(--a-line); border-radius: .5em; background: #fff; font-weight: 600; min-width: 9.5em; }
+ .law > span { grid-area: 1 / 1; padding: .25em .7em; }
+ .calc { display: grid; gap: .25em; background: #fff; border: 1px solid #fde68a; border-radius: .7em; padding: .6em .8em; min-width: 18em; box-shadow: 0 .3em .8em rgba(15,23,42,.08); }
+ .calc header { display: flex; gap: .5em; align-items: center; font-weight: 700; }
+ .calc .ln { display: flex; justify-content: space-between; gap: 1.2em; color: var(--a-muted); }
+ .calc .tot { display: flex; justify-content: space-between; gap: 1em; border-top: 1px solid var(--a-line); padding-top: .3em; font-weight: 800; color: var(--a-ink); }
+ .calc .tot b { color: #15803d; font-size: 1.2em; font-variant-numeric: tabular-nums; }
+ .twolaw { display: grid; align-content: center; justify-items: center; gap: .9em; }
+
+ /* ================= 7–8. chiffres, appel à l'action ================= */
+ .k-stat span { max-width: 9em; }
+ .s-cta .doi { color: var(--muted); font-size: .7em; }
+</style>
+</head>
+<body>
+
+<header class="pg-top">
+ <div class="wrap">
+  <a class="pg-brand" href="index.html" data-app><span class="pg-logo"></span><span><b>Contract Lab</b><small data-p="tagline">Visite guidée en vidéo</small></span></a>
+  <div class="pg-langs" role="group" aria-label="Langue / Language">
+   <button type="button" data-plang="fr" aria-pressed="false">FR</button><button type="button" data-plang="en" aria-pressed="false">EN</button>
+  </div>
+  <a class="pg-btn primary" href="index.html" data-app><span data-p="openApp">Ouvrir l'application</span></a>
+ </div>
+</header>
+
+<main>
+ <div class="wrap pg-hero">
+  <h1 data-p="h1">Contract Lab en une minute</h1>
+  <p data-p="lead"></p>
+ </div>
+
+ <div class="wrap">
+  <div class="pg-embedbar">
+   <span class="pg-brand"><span class="pg-logo"></span><span><b>Contract Lab</b><small data-p="tagline">Visite guidée en vidéo</small></span></span>
+   <span class="pg-embed-r"><span class="pg-langs" role="group" aria-label="Langue / Language"><button type="button" data-plang="fr" aria-pressed="false">FR</button><button type="button" data-plang="en" aria-pressed="false">EN</button></span>
+   <button class="pg-skip" id="pg-skip" type="button"><span data-p="skip">Passer l'introduction</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 6 6 6-6 6M13 6l6 6-6 6"/></svg></button></span>
+  </div>
+
+<!-- L'animation : une .anim de scènes (anim-kit). Le lecteur se construit autour. -->
+<div class="anim" data-title="title">
+
+ <!-- ============ 1. Accroche : valable ou nulle ? ============ -->
+ <section class="scene g-center s-hook" data-dur="5" data-chapter="ch1" data-say="say1" data-key="4.3">
+  <p class="k-kicker" data-in="fade 0.1 0.5" data-t="hookK"></p>
+  <div class="big" data-in="zoom 0.2 0.6">
+   <div class="node">
+    <div class="cn"><i>🚫</i><span><b data-t="ncName"></b><small data-t="tClause"></small></span><i class="ring ko" data-in="fade 2.6 0.4"></i></div>
+    <div class="under">
+     <span class="pz" data-stagger="0.9 0.12"><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span></span>
+    </div>
+   </div>
+  </div>
+  <h2 class="k-h2" data-in="fade-up 1.4 0.6" data-t="hookQ"></h2>
+  <span class="stamp" data-in="pop 2.6 0.5" data-t="hookA"></span>
+ </section>
+
+ <!-- ============ 2. Titre ============ -->
+ <section class="scene g-center" data-dur="4.5" data-chapter="ch2" data-say="say2">
+  <div class="k-logo" data-in="pop 0.1 0.7"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 3h16l8 8v26H9z" fill="#fff"/><path d="M14 19h14M14 25h14M14 31h9" stroke="#0891b2" stroke-width="2.6"/></svg></div>
+  <p class="k-kicker" data-in="fade 0.6" data-t="kicker"></p>
+  <h1 class="k-h1 grad" data-in="blur 0.75 0.7">Contract Lab</h1>
+  <p class="k-sub" data-in="fade-up 1.2" data-t="sub"></p>
+  <div class="k-row k-center" data-stagger="1.9 0.15">
+   <span class="k-pill" data-in="pop">🧩 <span data-t="chip1"></span></span>
+   <span class="k-pill is-green" data-in="pop">🔒 <span data-t="chip2"></span></span>
+   <span class="k-pill is-amber" data-in="pop">💔 <span data-t="chip3"></span></span>
+   <span class="k-pill is-glass" data-in="pop">🎁 <span data-t="chip4"></span></span>
+  </div>
+ </section>
+
+ <!-- ============ 3. Mode cinéma : la non-concurrence et sa question à la salle ============ -->
+ <section class="scene g-demo wide s-cine" data-dur="10" data-chapter="ch3" data-say="say3" data-key="8.6">
+  <div class="app" data-in="fade-up 0.1 0.6">
+   <div class="app-top"><span class="app-brand">📜 Contract Lab<small data-t="appSub"></small></span>
+    <span class="app-modes"><span>✏️ <span data-t="mLibre"></span></span><span class="on">🎬 <span data-t="mCine"></span></span></span><span class="app-sp"></span>
+    <span class="app-b hide-9x16 hide-1x1">📚 <span data-t="bScen"></span></span></div>
+   <div class="canvas">
+    <div class="cn" data-in="pop 0.4 0.4"><i>📃</i><span><b data-t="ctK"></b><small>CDI</small></span></div>
+    <div class="vl" data-in="fade 0.6 0.3"></div>
+    <div class="node" data-in="pop 0.6 0.4">
+     <div class="cn"><i>🚫</i><span><b data-t="ncName"></b><small data-t="tClause"></small></span><i class="ring ko" data-out="fade 6.8 0.3"></i><i class="ring ok" data-in="fade 6.8 0.4"></i></div>
+     <div class="under">
+      <span class="stack"><em class="vd ko" data-out="fade 6.8 0.2" data-t="vNulle"></em><em class="vd ok" data-in="pop 6.9 0.4" data-t="vValide"></em></span>
+      <span class="pz"><span><i class="off"></i><i class="on" data-in="pop 1.25 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 1.65 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 2.05 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 2.45 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 6.5 0.3">✓</i></span></span>
+     </div>
+    </div>
+    <div class="bracket" data-in="fade 1.0 0.3"></div>
+    <div class="row">
+     <div class="cn lim" data-in="pop 1.1 0.35"><i>🏰</i><span><b data-t="g1"></b></span></div>
+     <div class="cn lim" data-in="pop 1.5 0.35"><i>⌛</i><span><b data-t="g2"></b></span></div>
+     <div class="cn lim" data-in="pop 1.9 0.35"><i>🗺️</i><span><b data-t="g3"></b></span></div>
+     <div class="cn lim" data-in="pop 2.3 0.35"><i>🧩</i><span><b data-t="g4"></b></span></div>
+     <div class="g5"><div class="cn lim" data-in="pop 6.3 0.4"><i>💰</i><span><b data-t="g5"></b></span><i class="ring sel" data-in="fade 6.5 0.3"></i></div></div>
+    </div>
+   </div>
+   <div class="qbar" data-in="fade-up 3.2 0.5">
+    <div class="qh"><span class="tag">❓ <span data-t="qTag"></span></span><span data-t="qT"></span></div>
+    <div class="opts" data-stagger="3.5 0.12">
+     <div class="opt" data-in="fade-up"><b>A</b><span data-t="qA"></span><i class="dim" data-in="fade 5.9 0.3"></i></div>
+     <div class="opt" id="c-b" data-in="fade-up"><b>B</b><span data-t="qB"></span><i class="pick" data-in="fade 5.2 0.2" data-out="fade 5.8 0.2"></i><i class="good" data-in="fade 5.8 0.3"></i><i class="tick" data-in="pop 5.9 0.4">✓</i></div>
+     <div class="opt" data-in="fade-up"><b>C</b><span data-t="qC"></span><i class="dim" data-in="fade 5.9 0.3"></i></div>
+     <div class="opt" data-in="fade-up"><b>D</b><span data-t="qD"></span><i class="dim" data-in="fade 5.9 0.3"></i></div>
+    </div>
+   </div>
+  </div>
+  <div class="g-side">
+   <p class="k-kicker" data-in="fade 0.3" data-t="cinK"></p>
+   <h2 class="k-h2" data-in="fade-up 0.45" data-t="cinT"></h2>
+   <ul class="k-list hide-9x16 hide-1x1" data-stagger="1.0 0.2">
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="cin1"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="cin2"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="cin3"></span></li>
+   </ul>
+  </div>
+  <div class="k-pointer" data-in="fade 4.3 0.3" data-out="fade 8.8 0.3" data-moves="#c-b 5.1" data-clicks="5.2"></div>
+ </section>
+
+ <!-- ============ 4. Vérification : la faute grave neutralise le préavis et l'indemnité ============ -->
+ <section class="scene g-demo wide" data-dur="8.5" data-chapter="ch4" data-say="say4" data-key="7.6">
+  <div class="app" data-in="fade-up 0.1 0.6">
+   <div class="app-top"><span class="app-brand">📜 Contract Lab<small data-t="appSub"></small></span>
+    <span class="app-modes"><span>✏️ <span data-t="mLibre"></span></span><span class="on">🎬 <span data-t="mCine"></span></span></span><span class="app-sp"></span>
+    <span class="app-b hide-9x16 hide-1x1" data-t="fgLaw"></span></div>
+   <div class="canvas">
+    <div class="row" data-stagger="0.4 0.1">
+     <div class="cn" data-in="pop"><i>👤</i><span><b data-t="fgEmp"></b><small data-t="tSal"></small></span></div>
+     <div class="cn" data-in="pop"><i>🏢</i><span><b data-t="fgCo"></b><small data-t="tEmployeur"></small></span></div>
+    </div>
+    <div class="row">
+     <div class="cn" data-in="pop 0.7 0.4"><i>💔</i><span><b data-t="fgLic"></b><small data-t="tRupture"></small></span></div>
+     <span class="arrow" data-in="fade 0.9 0.3">←</span>
+     <div class="fault stack" data-in="pop 0.9 0.4">
+      <div class="cn" data-out="fade 2.4 0.3"><i>⚡</i><span><b data-t="fgF1"></b><small data-t="fgF1t"></small></span></div>
+      <div class="cn" data-in="zoom 2.5 0.45"><i>🔥</i><span><b data-t="fgF2"></b><small data-t="fgF2t"></small></span><i class="ring ko"></i></div>
+     </div>
+    </div>
+    <div class="row chain" data-stagger="1.1 0.15">
+     <div class="cn etape" data-in="fade-up"><i>✉️</i><span><b data-t="st1"></b></span></div>
+     <span class="arrow" data-in="fade"><span class="ag">→</span><small data-t="st1d"></small></span>
+     <div class="cn etape" data-in="fade-up"><i>💬</i><span><b data-t="st2"></b></span></div>
+     <span class="arrow" data-in="fade"><span class="ag">→</span><small data-t="st2d"></small></span>
+     <div class="cn etape" data-in="fade-up"><i>📨</i><span><b data-t="st3"></b></span></div>
+    </div>
+    <div class="row rights">
+     <div class="node" data-in="pop 1.8 0.4">
+      <div class="cn"><i>🔔</i><span><b data-t="r1"></b></span><i class="ring ko" data-in="fade 3.4 0.3"></i><i class="x" data-in="pop 3.4 0.4">⊘</i></div>
+      <div class="under stack"><em class="vd ok" data-out="fade 3.4 0.2" data-t="due"></em><em class="vd ko" data-in="fade 3.5 0.3" data-t="r1ko"></em></div>
+     </div>
+     <div class="node" data-in="pop 1.95 0.4">
+      <div class="cn"><i>💶</i><span><b data-t="r2"></b></span><i class="ring ko" data-in="fade 3.8 0.3"></i><i class="x" data-in="pop 3.8 0.4">⊘</i></div>
+      <div class="under stack"><em class="vd ok" data-out="fade 3.8 0.2" data-t="due"></em><em class="vd ko" data-in="fade 3.9 0.3" data-t="r2ko"></em></div>
+     </div>
+     <div class="node" data-in="pop 2.1 0.4">
+      <div class="cn"><i>🏖️</i><span><b data-t="r3"></b></span><i class="ring ok" data-in="fade 4.4 0.4"></i></div>
+      <div class="under stack"><em class="vd ok" data-out="fade 4.4 0.2" data-t="due"></em><em class="vd ok" data-in="pop 4.5 0.4" data-t="r3ok"></em></div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="g-side">
+   <p class="k-kicker" data-in="fade 0.3" data-t="verK"></p>
+   <h2 class="k-h2" data-in="fade-up 0.45" data-t="verT"></h2>
+   <ul class="k-list hide-9x16 hide-1x1" data-stagger="1.0 0.2">
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="ver1"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="ver2"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="ver3"></span></li>
+   </ul>
+  </div>
+ </section>
+
+ <!-- ============ 5. Mode libre : on construit, on masque la vérification ============ -->
+ <section class="scene g-demo wide" data-dur="9" data-chapter="ch5" data-say="say5" data-key="8.2">
+  <div class="app" data-in="fade-up 0.1 0.6">
+   <div class="app-top"><span class="app-brand">📜 Contract Lab<small data-t="appSub"></small></span>
+    <span class="app-modes"><span class="on">✏️ <span data-t="mLibre"></span></span><span>🎬 <span data-t="mCine"></span></span></span><span class="app-sp"></span>
+    <span class="app-chk" id="l-chk"><span class="stack"><i class="on" data-out="fade 5.7 0.15">✓</i><i class="off" data-in="fade 5.7 0.15"></i></span>🔍 <span data-t="chk"></span></span></div>
+   <div class="libre">
+    <div class="pal">
+     <div class="search">🔍 <span data-t="srch" data-type="0.9 0.6"></span></div>
+     <div class="hit" id="l-hit" data-in="fade-down 1.5 0.3">🧳 <span data-t="mob"></span></div>
+     <div class="fam">👥 <span data-t="f1"></span></div>
+     <div class="fam">📃 <span data-t="f2"></span></div>
+     <div class="fam">🧩 <span data-t="f3"></span></div>
+     <div class="fam">🔒 <span data-t="f4"></span></div>
+     <div class="fam hide-1x1">📌 <span data-t="f5"></span></div>
+     <div class="fam hide-1x1">⚡ <span data-t="f6"></span></div>
+     <div class="fam">💔 <span data-t="f7"></span></div>
+     <div class="fam">🎁 <span data-t="f8"></span></div>
+    </div>
+    <div class="canvas">
+     <div class="cn" data-in="pop 0.4 0.4"><i>📃</i><span><b data-t="ctK"></b><small>CDI</small></span></div>
+     <div class="vl" data-in="wipe-up 2.4 0.3"></div>
+     <div class="node" data-in="pop 2.2 0.4">
+      <div class="cn"><i>🧳</i><span><b data-t="mob"></b><small data-t="tClause"></small></span>
+       <i class="ring ko" data-out="fade 4.3 0.3"></i><i class="ring warn" data-in="fade 4.3 0.3" data-out="fade 5.8 0.3"></i></div>
+      <div class="under" data-out="fade 5.8 0.3">
+       <span class="stack"><em class="vd ko" data-out="fade 4.3 0.2" data-t="vNulle"></em><em class="vd warn" data-in="pop 4.4 0.4" data-t="vRisque"></em></span>
+       <span class="pz"><span><i class="off"></i><i class="on" data-in="pop 4.2 0.3">✓</i></span><span><i class="off"></i></span><span><i class="off"></i></span></span>
+      </div>
+     </div>
+     <div class="vl" data-in="wipe-up 4.0 0.3"></div>
+     <div class="stack">
+      <div class="insp" data-in="fade-up 2.8 0.35" data-out="fade 4.0 0.3">
+       <p data-t="inspT"></p>
+       <span class="add" id="l-add" data-in="press 3.7 0.3">＋ 📌 <span data-t="zone"></span></span>
+      </div>
+      <div class="cn lim" data-in="pop 4.0 0.4"><i>📌</i><span><b data-t="zoneV"></b><small data-t="zone"></small></span></div>
+     </div>
+     <span class="judge" data-in="pop 6.2 0.5">🤔 <span data-t="judge"></span></span>
+    </div>
+   </div>
+  </div>
+  <div class="g-side">
+   <p class="k-kicker" data-in="fade 0.3" data-t="libK"></p>
+   <h2 class="k-h2" data-in="fade-up 0.45" data-t="libT"></h2>
+   <ul class="k-list hide-9x16 hide-1x1" data-stagger="1.0 0.2">
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="lib1"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="lib2"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="lib3"></span></li>
+   </ul>
+  </div>
+  <div class="k-pointer" data-in="fade 1.2 0.3" data-out="fade 8.3 0.3" data-moves="#l-hit 1.9, #l-add 3.6, #l-chk 5.5" data-clicks="2.0 3.7 5.6"></div>
+ </section>
+
+ <!-- ============ 6. Deux droits : français et anglais ============ -->
+ <section class="scene g-demo wide" data-dur="8" data-chapter="ch6" data-say="say6" data-key="7.2">
+  <div class="app" data-in="fade-up 0.1 0.6">
+   <div class="app-top"><span class="app-brand">📜 Contract Lab<small data-t="appSub"></small></span>
+    <span class="app-modes hide-9x16"><span class="on">✏️ <span data-t="mLibre"></span></span><span>🎬 <span data-t="mCine"></span></span></span><span class="app-sp"></span>
+    <span class="law" id="w-law"><span data-out="fade 1.5 0.2">⚖️ <span data-t="lawFr"></span> ▾</span><span data-in="fade 1.5 0.2">⚖️ <span data-t="lawUk"></span> ▾</span></span></div>
+   <div class="canvas">
+    <div class="stack">
+     <div class="twolaw" data-in="fade 0.4 0.4" data-out="fade 1.5 0.3">
+      <div class="cn"><i>📃</i><span><b>CDI</b><small data-t="frLaw"></small></span></div>
+      <div class="row"><div class="cn"><i>🤝</i><span><b data-t="frRc"></b><small data-t="tRupture"></small></span></div>
+       <div class="cn"><i>🎁</i><span><b data-t="frInd"></b><small data-t="tDroit"></small></span></div></div>
+     </div>
+     <div class="twolaw">
+      <div class="row" data-stagger="1.8 0.12">
+       <div class="cn" data-in="pop"><i>🏭</i><span><b>Corvid Print Ltd</b><small>Employer</small></span></div>
+       <div class="cn" data-in="pop"><i>👤</i><span><b>Alan Hughes</b><small>45 · 10 years · £820/wk</small></span></div>
+      </div>
+      <div class="cn" data-in="pop 2.2 0.4"><i>✂️</i><span><b>Redundancy</b><small>Dismissal</small></span></div>
+      <div class="calc" data-in="fade-up 2.6 0.5">
+       <header>💷 Statutory redundancy pay</header>
+       <div class="ln" data-in="fade 3.0 0.3"><span>4 years aged 41–44 × 1.5</span><span>6 weeks</span></div>
+       <div class="ln" data-in="fade 3.3 0.3"><span>6 years aged 35–40 × 1</span><span>6 weeks</span></div>
+       <div class="ln" data-in="fade 3.6 0.3"><span>Week's pay (capped)</span><span>£751</span></div>
+       <div class="tot" data-in="fade 3.9 0.3"><span>12 weeks × £751</span><b data-in="pop 4.0 0.5">£9,012</b></div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="g-side">
+   <p class="k-kicker" data-in="fade 0.3" data-t="lawK"></p>
+   <h2 class="k-h2" data-in="fade-up 0.45" data-t="lawT"></h2>
+   <ul class="k-list hide-9x16 hide-1x1" data-stagger="1.0 0.2">
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="law1"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="law2"></span></li>
+    <li data-in="fade-left"><span class="k-check">✓</span><span data-t="law3"></span></li>
+   </ul>
+  </div>
+  <div class="k-pointer" data-in="fade 0.6 0.3" data-out="fade 2.6 0.3" data-moves="#w-law 1.3" data-clicks="1.4"></div>
+ </section>
+
+ <!-- ============ 7. Chiffres ============ -->
+ <section class="scene g-stats" data-dur="5" data-chapter="ch7" data-say="say7">
+  <p class="k-kicker" data-in="fade 0.1" data-t="statsK"></p>
+  <div class="k-stats" data-stagger="0.3 0.2">
+   <div class="k-stat" data-in="fade-up"><b data-count="0.4 1.2">22</b><span data-t="stat1"></span></div>
+   <div class="k-stat" data-in="fade-up"><b data-count="0.6 0.8">2</b><span data-t="stat2"></span></div>
+   <div class="k-stat" data-in="fade-up"><b>0</b><span data-t="stat3"></span></div>
+  </div>
+  <div class="k-row k-center" data-stagger="2.2 0.15">
+   <span class="k-pill is-glass" data-in="pop">🤖 <span data-t="x1"></span></span>
+   <span class="k-pill is-glass" data-in="pop">📦 <span data-t="x2"></span></span>
+   <span class="k-pill is-glass" data-in="pop">📱 <span data-t="x3"></span></span>
+  </div>
+ </section>
+
+ <!-- ============ 8. Appel à l'action ============ -->
+ <section class="scene g-center s-cta" data-dur="4.5" data-chapter="ch8" data-say="say8" data-key="3.9">
+  <div class="k-logo" data-in="pop 0 0.7"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 3h16l8 8v26H9z" fill="#fff"/><path d="M14 19h14M14 25h14M14 31h9" stroke="#0891b2" stroke-width="2.6"/></svg></div>
+  <h1 class="k-h1 grad" data-in="fade-up 0.4" data-t="cta"></h1>
+  <p class="k-url" data-in="wipe 1.0 0.8">edu-fpar.github.io/contract-lab</p>
+  <div class="k-row k-center" data-stagger="1.8 0.15">
+   <span class="k-pill is-glass" data-in="pop" data-t="b1"></span>
+   <span class="k-pill is-glass" data-in="pop" data-t="b2"></span>
+   <span class="k-pill is-glass" data-in="pop" data-t="b3"></span>
+  </div>
+  <p class="doi" data-in="fade 2.6 0.6">© 2026 François Parlant · CC BY-NC-SA 4.0 · DOI 10.5281/zenodo.24508195</p>
+ </section>
+</div>
+ </div>
+
+ <section class="pg-blk">
+  <div class="wrap">
+   <h2 data-p="toolsT">Par où commencer ?</h2>
+   <p data-p="toolsP"></p>
+   <div class="pg-grid">
+    <article class="pg-card"><h3><span>🎬</span><b data-p="c1T"></b></h3><p data-p="c1P"></p><a class="pg-btn" href="index.html?scenario=non-concurrence" data-app data-p="c1B"></a></article>
+    <article class="pg-card"><h3><span>❓</span><b data-p="c2T"></b></h3><p data-p="c2P"></p><a class="pg-btn" href="index.html?scenario=faute-grave&amp;etape=3" data-app data-en="index.html?scenario=uk-gross-misconduct&amp;etape=6" data-p="c2B"></a></article>
+    <article class="pg-card"><h3><span>⚖️</span><b data-p="c3T"></b></h3><p data-p="c3P"></p><a class="pg-btn" href="index.html?scenario=uk-redundancy" data-app data-lang="en" data-p="c3B"></a></article>
+    <article class="pg-card"><h3><span>📚</span><b data-p="c4T"></b></h3><p data-p="c4P"></p><a class="pg-btn" href="index.html?scenarios" data-app data-p="c4B"></a></article>
+    <article class="pg-card"><h3><span>🤖</span><b data-p="c5T"></b></h3><p data-p="c5P"></p><a class="pg-btn" href="docs/index.html#/ia-et-skill" data-en="docs/index.html#/en/ai-and-skill" data-p="c5B"></a></article>
+    <article class="pg-card"><h3><span>📦</span><b data-p="c6T"></b></h3><p data-p="c6P"></p><a class="pg-btn" href="docs/index.html#/mode-cinema" data-en="docs/index.html#/en/cinema-mode" data-p="c6B"></a></article>
+   </div>
+  </div>
+ </section>
+</main>
+
+<footer class="pg-foot"><div class="wrap"><span>© 2026 François Parlant · <a href="LICENSE">CC BY-NC-SA 4.0</a> · <a href="https://doi.org/10.5281/zenodo.24508195">DOI 10.5281/zenodo.24508195</a></span><span><a href="docs/index.html" data-en="docs/index.html#/en/" data-p="docs">Documentation</a><a href="https://github.com/edu-fpar/contract-lab">GitHub</a></span></div></footer>
+
+<!-- Tous les textes de l'animation, par langue (seulement celles du projet : FR, EN). La voix lit les clés data-say. -->
+<script type="application/json" id="anim-texts">
+{
+ "fr": {
+  "title": "Contract Lab – Visite guidée",
+  "ch1": "Valable ou nulle ?", "ch2": "Contract Lab", "ch3": "Mode cinéma", "ch4": "Vérification", "ch5": "Mode libre", "ch6": "Deux droits", "ch7": "En chiffres", "ch8": "Essayer",
+  "say1": "Une clause de non-concurrence : valable ou nulle ? Ça se voit.",
+  "say2": "Contract Lab : le contrat de travail et ses règles, en icônes.",
+  "say3": "En mode cinéma, un scénario se déroule pas à pas, avec des questions posées à la salle.",
+  "say4": "L'outil vérifie et calcule : la faute grave supprime le préavis et l'indemnité.",
+  "say5": "En mode libre, vous construisez le contrat ; masquez la vérification et laissez la classe juger.",
+  "say6": "Deux droits : le droit français et le droit anglais, avec leurs propres calculs.",
+  "say7": "Des scénarios prêts, un prompt pour l'IA, un export SCORM pour Moodle.",
+  "say8": "Gratuit, sans installation : essayez-le en classe.",
+  "hookK": "Droit du travail",
+  "ncName": "Non-concurrence", "tClause": "Clause",
+  "hookQ": "Valable ou nulle ?",
+  "hookA": "⛔ Nulle : 5 garde-fous manquants",
+  "kicker": "Atelier contrat de travail",
+  "sub": "Le contrat de travail et ses règles, en icônes",
+  "chip1": "Clauses", "chip2": "Garde-fous", "chip3": "Ruptures", "chip4": "Indemnités",
+  "appSub": "atelier contrat de travail", "mLibre": "Libre", "mCine": "Cinéma", "bScen": "Scénarios",
+  "ctK": "CDI de Karim",
+  "vNulle": "⛔ nulle", "vValide": "✅ valide", "vRisque": "⚠️ à risque",
+  "g1": "Clientèle et tarifs", "g2": "1 an", "g3": "Loire-Atlantique", "g4": "Vente d'optique seulement", "g5": "30 % du salaire pendant 1 an",
+  "qTag": "Question", "qT": "Quel est le garde-fou manquant ?",
+  "qA": "L'accord écrit de Karim", "qB": "Une contrepartie financière", "qC": "Une homologation", "qD": "Une durée de moins de 6 mois",
+  "cinK": "🎬 Mode cinéma", "cinT": "Un scénario, pas à pas",
+  "cin1": "Pas à pas ou lecture continue", "cin2": "Des questions à la salle", "cin3": "Une vue pour le téléphone",
+  "fgLaw": "⚖️ Droit français",
+  "fgEmp": "Julie Garnier", "tSal": "Salariée", "fgCo": "Mode & Co", "tEmployeur": "Employeur",
+  "fgLic": "Licenciement de Julie", "tRupture": "Rupture",
+  "fgF1": "Erreurs de caisse", "fgF1t": "Faute sérieuse", "fgF2": "Vols dans la caisse", "fgF2t": "Faute grave",
+  "st1": "Convocation", "st1d": "≥ 5 j. ouvrables", "st2": "Entretien préalable", "st2d": "≥ 2 j. ouvrables", "st3": "Lettre de licenciement",
+  "r1": "Préavis 2 mois", "r2": "Indemnité de licenciement", "r3": "Congés payés",
+  "due": "✅ dû", "r1ko": "⊘ perdu : faute grave", "r2ko": "⊘ perdue : faute grave", "r3ok": "✅ reste dû",
+  "verK": "⚖️ Vérification automatique", "verT": "L'outil vérifie et calcule",
+  "ver1": "Conditions de validité des clauses", "ver2": "Délais de procédure", "ver3": "Préavis et indemnités",
+  "chk": "Vérification", "srch": "mobi", "mob": "Mobilité",
+  "f1": "Parties", "f2": "Contrats", "f3": "Clauses", "f4": "Garde-fous", "f5": "Obligations", "f6": "Fautes", "f7": "Ruptures", "f8": "Indemnités",
+  "inspT": "Garde-fou manquant :", "zone": "Zone géographique précise", "zoneV": "Pays de la Loire",
+  "judge": "Verdicts masqués : la classe juge",
+  "libK": "✏️ Mode libre", "libT": "Vous construisez, l'outil vérifie",
+  "lib1": "Une palette par familles", "lib2": "Les garde-fous en pastilles", "lib3": "Vérification masquable",
+  "lawFr": "Droit français", "lawUk": "Droit anglais", "frLaw": "Droit français", "frRc": "Rupture conventionnelle", "frInd": "Indemnité spécifique", "tDroit": "Indemnité",
+  "lawK": "🌍 Deux droits", "lawT": "Droit français, droit anglais",
+  "law1": "CDI, CDD, faute grave, rupture conventionnelle", "law2": "Unfair dismissal, redundancy, covenants", "law3": "Interface en français et en anglais",
+  "statsK": "Prêt pour la classe",
+  "stat1": "scénarios intégrés", "stat2": "droits : français et anglais", "stat3": "installation : tout dans le navigateur",
+  "x1": "Prompt pour une IA", "x2": "Export SCORM", "x3": "Sur téléphone",
+  "cta": "Essayez-le en classe",
+  "b1": "Gratuit", "b2": "Hors ligne", "b3": "Sur téléphone"
+ },
+ "en": {
+  "title": "Contract Lab – Guided tour",
+  "ch1": "Valid or void?", "ch2": "Contract Lab", "ch3": "Cinema mode", "ch4": "Checks", "ch5": "Free mode", "ch6": "Two laws", "ch7": "In numbers", "ch8": "Try it",
+  "say1": "A non-compete clause: valid or void? You can see it.",
+  "say2": "Contract Lab: the employment contract and its rules, as icons.",
+  "say3": "In cinema mode, a scenario plays step by step, with questions for the class.",
+  "say4": "The tool checks and calculates: gross misconduct removes notice and notice pay.",
+  "say5": "In free mode, build the contract; hide the checks and let the class decide.",
+  "say6": "Two laws: French law and English law, each with its own calculations.",
+  "say7": "Ready-made scenarios, an AI prompt, and SCORM export for Moodle.",
+  "say8": "Free, nothing to install: try it in class.",
+  "hookK": "Employment law",
+  "ncName": "Non-compete", "tClause": "Clause",
+  "hookQ": "Valid or void?",
+  "hookA": "⛔ Void: 5 missing safeguards",
+  "kicker": "Employment contract workshop",
+  "sub": "The employment contract and its rules, as icons",
+  "chip1": "Clauses", "chip2": "Safeguards", "chip3": "Terminations", "chip4": "Payments",
+  "appSub": "employment contract workshop", "mLibre": "Free", "mCine": "Cinema", "bScen": "Scenarios",
+  "ctK": "Karim's CDI",
+  "vNulle": "⛔ void", "vValide": "✅ valid", "vRisque": "⚠️ at risk",
+  "g1": "Clients and prices", "g2": "1 year", "g3": "Loire-Atlantique", "g4": "Optical retail only", "g5": "30% of salary for 1 year",
+  "qTag": "Question", "qT": "Which safeguard is missing?",
+  "qA": "Karim's written consent", "qB": "Financial compensation", "qC": "Official approval", "qD": "Less than 6 months",
+  "cinK": "🎬 Cinema mode", "cinT": "A scenario, step by step",
+  "cin1": "Step by step or continuous play", "cin2": "Questions for the class", "cin3": "A phone layout",
+  "fgLaw": "⚖️ English law",
+  "fgEmp": "Sarah Mitchell", "tSal": "Employee", "fgCo": "Larkspur Retail Ltd", "tEmployeur": "Employer",
+  "fgLic": "Summary dismissal", "tRupture": "Dismissal",
+  "fgF1": "Till shortfall", "fgF1t": "Misconduct", "fgF2": "Theft from the till", "fgF2t": "Gross misconduct",
+  "st1": "Suspension on full pay", "st1d": "then", "st2": "Investigation", "st2d": "then", "st3": "Hearing (ACAS Code)",
+  "r1": "Notice (4 weeks)", "r2": "Notice pay £1,920", "r3": "Holiday pay £480",
+  "due": "✅ due", "r1ko": "⊘ lost: gross misconduct", "r2ko": "⊘ lost: gross misconduct", "r3ok": "✅ still due",
+  "verK": "⚖️ Automatic checks", "verT": "The tool checks and calculates",
+  "ver1": "Validity of clauses and covenants", "ver2": "Procedure and time limits", "ver3": "Notice and payments",
+  "chk": "Checks", "srch": "mobi", "mob": "Mobility",
+  "f1": "Parties", "f2": "Contracts", "f3": "Clauses", "f4": "Safeguards", "f5": "Obligations", "f6": "Misconduct", "f7": "Terminations", "f8": "Payments",
+  "inspT": "Missing safeguard:", "zone": "Precisely defined area", "zoneV": "Pays de la Loire",
+  "judge": "Verdicts hidden: the class decides",
+  "libK": "✏️ Free mode", "libT": "You build, the tool checks",
+  "lib1": "A palette by family", "lib2": "Safeguards as badges", "lib3": "Checks you can hide",
+  "lawFr": "French law", "lawUk": "English law", "frLaw": "French law", "frRc": "Mutual termination", "frInd": "Termination payment", "tDroit": "Payment",
+  "lawK": "🌍 Two laws", "lawT": "French law, English law",
+  "law1": "Unfair dismissal, redundancy, covenants", "law2": "CDI, CDD, gross misconduct, rupture conventionnelle", "law3": "Interface in English and French",
+  "statsK": "Ready for the classroom",
+  "stat1": "built-in scenarios", "stat2": "laws: French and English", "stat3": "installs: it all runs in the browser",
+  "x1": "AI prompt", "x2": "SCORM export", "x3": "On a phone",
+  "cta": "Try it in class",
+  "b1": "Free", "b2": "Works offline", "b3": "On a phone"
+ }
+}
+</script>
+<script src="intro/kit/anim.js"></script>
+
+<!-- Textes de la page autour de l'animation (les textes de l'animation sont dans anim-texts). -->
+<script type="application/json" id="page-texts">
+{
+ "fr": {
+  "tagline": "Visite guidée en vidéo",
+  "openApp": "Ouvrir l'application",
+  "skip": "Passer l'introduction",
+  "start": "Commencer",
+  "scenario": "Voir un scénario",
+  "h1": "Contract Lab en une minute",
+  "lead": "Le contrat de travail et le droit du travail en icônes : les clauses et leurs garde-fous, les obligations, les ruptures et leurs indemnités, vérifiés automatiquement. En droit français et en droit anglais, avec des scénarios animés pour la classe.",
+  "toolsT": "Par où commencer ?",
+  "toolsP": "Chaque lien ouvre l'application directement au bon endroit. Rien à installer, aucun compte : tout fonctionne dans le navigateur, même hors ligne.",
+  "c1T": "La clause de non-concurrence",
+  "c1P": "Le scénario de la vidéo : les cinq garde-fous cumulatifs, et la question du garde-fou manquant.",
+  "c1B": "Lancer le scénario",
+  "c2T": "Une question à la salle",
+  "c2P": "Les faits sont en réalité des vols : qu'est-ce que Julie perd ? Les étudiants votent, puis on révèle la réponse.",
+  "c2B": "Ouvrir la question",
+  "c3T": "Le droit anglais",
+  "c3P": "Redundancy, unfair dismissal, restrictive covenants, settlement agreements : neuf scénarios en anglais, avec leurs calculs.",
+  "c3B": "Voir un scénario anglais",
+  "c4T": "Les 22 scénarios",
+  "c4P": "Contrat, clauses, CDD, temps de travail, obligations, licenciement, faute grave, rupture conventionnelle, période d'essai, hiérarchie des normes…",
+  "c4B": "Choisir un scénario",
+  "c5T": "Votre cours devient un scénario",
+  "c5P": "Une consigne prête à copier pour votre IA, et une skill Claude qui vérifie le scénario avec le vrai moteur.",
+  "c5B": "Préparer avec une IA",
+  "c6T": "Dans Moodle",
+  "c6P": "Exportez un scénario en paquet SCORM : achèvement, reprise et note remontent dans la plateforme.",
+  "c6B": "En savoir plus",
+  "docs": "Documentation"
+ },
+ "en": {
+  "tagline": "Guided video tour",
+  "openApp": "Open the app",
+  "skip": "Skip intro",
+  "start": "Get started",
+  "scenario": "See a scenario",
+  "h1": "Contract Lab in one minute",
+  "lead": "The employment contract and employment law as icons: clauses and their safeguards, obligations, terminations and the payments they open, all checked automatically. Under English law and French law, with animated scenarios for the classroom.",
+  "toolsT": "Where to start?",
+  "toolsP": "Each link opens the app right where you need it. Nothing to install, no account: everything runs in the browser, even offline.",
+  "c1T": "The non-compete clause",
+  "c1P": "The scenario from the video (French law): five cumulative safeguards, and the question of the missing one.",
+  "c1B": "Launch the scenario",
+  "c2T": "A question for the class",
+  "c2P": "Sarah was dismissed on the spot for theft, but the CCTV shows only lateness: what follows? Students vote, then you reveal the answer.",
+  "c2B": "Open the question",
+  "c3T": "English law",
+  "c3P": "Redundancy, unfair dismissal, restrictive covenants, settlement agreements: nine scenarios, with their calculations.",
+  "c3B": "See the redundancy scenario",
+  "c4T": "All the scenarios",
+  "c4P": "Nine English-law scenarios, and the thirteen French-law scenarios in English.",
+  "c4B": "Pick a scenario",
+  "c5T": "Your course becomes a scenario",
+  "c5P": "A ready-to-copy prompt for your AI, and a Claude skill that checks the scenario with the real engine.",
+  "c5B": "Prepare it with an AI",
+  "c6T": "In Moodle",
+  "c6P": "Export a scenario as a SCORM package: completion, resume and score are reported to the platform.",
+  "c6B": "Learn more",
+  "docs": "Documentation"
+ }
+}
+</script>
+<script>
+/* Page de présentation : langue de la page, liens vers les versions de l'application, boutons de fin,
+   mode intégré (?embed=app), format portrait sur téléphone. L'animation et son lecteur viennent d'anim-kit. */
+(function () {
+  "use strict";
+  const params = new URLSearchParams(location.search);
+  const EMBED = params.get("embed") === "app";
+  const DEV = params.get("dev") === "1";          // ?dev=1 : format et coulisses visibles (fabrication)
+  if (EMBED) document.body.classList.add("embed");
+  if (DEV) document.body.classList.add("dev");
+  let T = {};
+  try { T = JSON.parse(document.getElementById("page-texts").textContent); } catch (e) { /* rien */ }
+  const LOGO = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M9 3h16l8 8v26H9z" fill="#fff"/><path d="M14 19h14M14 25h14M14 31h9" stroke="#0891b2" stroke-width="2.6"/></svg>';
+  const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  document.querySelectorAll(".pg-logo").forEach((e) => { e.innerHTML = LOGO; });
+
+  const lang = () => (T[document.documentElement.lang] ? document.documentElement.lang : "fr");
+
+  /* Liens : data-en = cible en anglais (scénario de droit anglais, page de documentation anglaise) ;
+     data-app = lien vers l'application, qui reçoit ?lang= (data-lang pour imposer une langue). */
+  function links() {
+    const l = lang();
+    document.querySelectorAll("a[data-app], a[data-en]").forEach((a) => {
+      if (!a.dataset.base) a.dataset.base = a.getAttribute("href");
+      const href = l === "en" && a.dataset.en ? a.dataset.en : a.dataset.base;
+      if (!a.hasAttribute("data-app")) { a.setAttribute("href", href); return; }
+      const u = new URL(href, location.href);
+      u.searchParams.set("lang", a.dataset.lang || l);
+      a.setAttribute("href", u.pathname.split("/").pop() + u.search.replace("scenarios=", "scenarios"));
+    });
+  }
+  function applyPage() {
+    links();
+    const d = T[lang()] || T.fr || {};
+    document.querySelectorAll("[data-p]").forEach((e) => { const v = d[e.dataset.p]; if (v != null) e.textContent = v; });
+    document.querySelectorAll("[data-plang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.plang === lang()));
+  }
+
+  function closeEmbed() {
+    try { parent.postMessage({ contractLab: "intro-close" }, location.origin === "null" ? "*" : location.origin); } catch (e) { /* rien */ }
+  }
+
+  function start() {
+    const A = window.__ANIM; if (!A) return;
+    // téléphone tenu droit : la version 9:16 de l'animation
+    if (!params.get("format") && window.innerHeight > window.innerWidth * 1.15) A.setFormat("9x16");
+    // boutons de fin, à côté de « Revoir » du lecteur
+    const end = document.querySelector(".ap-end");
+    if (end) {
+      const mk = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+      if (EMBED) {
+        const b = mk('<button class="pg-btn primary" type="button" data-p="start"></button>');
+        b.addEventListener("click", closeEmbed); end.prepend(b);
+      } else {
+        end.prepend(mk('<a class="pg-btn" href="index.html?scenario=non-concurrence" data-app data-p="scenario"></a>'));
+        end.prepend(mk('<a class="pg-btn primary" href="index.html" data-app data-p="openApp"></a>'));
+      }
+    }
+    document.querySelectorAll(".pg-top .pg-btn.primary").forEach((a) => { if (!a.querySelector("svg")) a.insertAdjacentHTML("beforeend", ARROW); });
+    document.querySelectorAll("[data-plang]").forEach((b) => b.addEventListener("click", () => { A.setLang(b.dataset.plang); applyPage(); }));
+    // la langue peut aussi changer par le lecteur ou le clavier (touche L) : on suit l'attribut lang
+    new MutationObserver(applyPage).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+    applyPage();
+  }
+  document.getElementById("pg-skip").addEventListener("click", closeEmbed);
+  addEventListener("keydown", (e) => { if (EMBED && e.key === "Escape") closeEmbed(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+</script>
+</body>
+</html>

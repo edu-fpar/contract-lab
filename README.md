@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24508195.svg)](https://doi.org/10.5281/zenodo.24508195)
 
-**▶ En ligne : [edu-fpar.github.io/contract-lab](https://edu-fpar.github.io/contract-lab/)** (aussi sur téléphone) · [documentation](https://edu-fpar.github.io/contract-lab/docs/) · 🇬🇧 [English below](#english) (English law and English interface)
+**▶ En ligne : [edu-fpar.github.io/contract-lab](https://edu-fpar.github.io/contract-lab/)** (aussi sur téléphone) · 🎬 [visite guidée en vidéo](https://edu-fpar.github.io/contract-lab/intro.html) · [documentation](https://edu-fpar.github.io/contract-lab/docs/) · 🇬🇧 [English below](#english) (English law and English interface)
 
 [![Contract Lab en mode cinéma : une clause de non-concurrence et ses cinq garde-fous, avec la question posée à la salle et la réponse révélée](contract-lab.png)](https://edu-fpar.github.io/contract-lab/?scenario=non-concurrence&etape=6)
 
@@ -86,6 +86,7 @@ focus NC
 | `js/library.js`, `js/library-en.js`, `js/library-uk.js` | scénarios intégrés (français, anglais, droit anglais) |
 | `js/docs.js` | aide, spécification du format, prompt IA |
 | `js/scorm.js`, `js/scorm-runtime.js` | export SCORM et dialogue avec la plateforme dans le paquet |
+| `intro.html`, `intro/kit/`, `js/intro-launcher.js` | visite guidée en vidéo (anim-kit) et son ouverture dans l'application (bouton 🎬 Intro, première visite) |
 
 ## Remerciements
 
@@ -115,6 +116,7 @@ the parties' **obligations**, **terminations** with their procedure and the **pa
 The tool checks each item and shows a verdict: ✅ valid, ⚠️ at risk, ⛔ void, unfair or unenforceable, ⚡ obligation breached.
 
 **▶ Online: [edu-fpar.github.io/contract-lab/?lang=en](https://edu-fpar.github.io/contract-lab/?lang=en)** (also on a phone) ·
+🎬 [guided video tour](https://edu-fpar.github.io/contract-lab/intro.html?lang=en) ·
 [documentation in English](https://edu-fpar.github.io/contract-lab/docs/#/en/)
 
 No installation: open `index.html` (double-click) or serve the folder with any web server, then add `?lang=en`. No external dependency, works offline.
