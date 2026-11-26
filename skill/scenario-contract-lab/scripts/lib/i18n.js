@@ -1,26 +1,33 @@
 /* ============================================================
- * Contract Lab — langue de l'interface (français / anglais).
+ * Contract Lab — langue de l'interface (français / anglais / espagnol).
  * Chargé en premier. Les chaînes sont écrites en français dans le
- * code et traduites par P.t() à partir du dictionnaire P.I18N.en
- * (js/i18n-en.js). Une chaîne absente du dictionnaire reste en français.
+ * code et traduites par P.t() à partir des dictionnaires P.I18N.en et
+ * P.I18N.es (js/i18n-en.js, js/i18n-es.js). Une chaîne absente du
+ * dictionnaire reste en français (tools/i18n-check.js les signale).
  *
- *   P.t('Valide')                       → 'Valid'
+ *   P.t('Valide')                       → 'Valid' / 'Válida'
  *   P.t('{n} élément(s)', { n: 3 })     → '3 item(s)'
+ *
+ * Langue : ?lang=fr|en|es, sinon choix mémorisé (contract-lab.lang),
+ * sinon langue du navigateur (français, espagnol, sinon anglais).
  * ============================================================ */
 (function () {
   'use strict';
   const P = window.P = window.P || {};
-  P.I18N = P.I18N || { en: {} };
-  P.LANGS = { fr: 'Français', en: 'English' };
+  P.I18N = P.I18N || {};
+  P.LANGS = { fr: 'Français', en: 'English', es: 'Español' };
 
-  /* langue : ?lang=en, sinon choix mémorisé, sinon langue du navigateur */
+  /* langue : ?lang=fr|en|es, sinon choix mémorisé, sinon langue du navigateur */
   let lang = null;
   try {
     const q = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('lang') : null;
     if (q && P.LANGS[q]) { lang = q; try { localStorage.setItem('contract-lab.lang', q); } catch (e) { /* */ } }
     if (!lang) { const s = localStorage.getItem('contract-lab.lang'); if (P.LANGS[s]) lang = s; }
   } catch (e) { /* stockage ou adresse indisponible */ }
-  if (!lang && typeof navigator !== 'undefined') lang = /^fr\b/i.test(navigator.language || 'fr') ? 'fr' : 'en';
+  if (!lang && typeof navigator !== 'undefined') {
+    const n = (navigator.language || 'fr').toLowerCase();
+    lang = n.startsWith('fr') ? 'fr' : n.startsWith('es') ? 'es' : 'en';
+  }
   P.lang = lang || 'fr';
 
   const fill = (s, v) => v ? String(s).replace(/\{(\w+)\}/g, (m, k) => (v[k] != null ? v[k] : m)) : s;

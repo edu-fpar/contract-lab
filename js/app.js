@@ -17,8 +17,18 @@
   const mqMobile = window.matchMedia ? window.matchMedia('(max-width: 760px)') : null;
   function isMobile() { return !!(mqMobile && mqMobile.matches); }
 
+  /* droit d'un canevas neuf : en espagnol, le droit espagnol s'il est chargé (js/catalog-es.js) ;
+   * sinon aucun, c'est-à-dire le droit français (le français et l'anglais gardent ce comportement) */
+  const LANG_DROIT = { es: 'es' };
+  const defaultDroit = () => (LANG_DROIT[P.lang] && P.JURIS[LANG_DROIT[P.lang]] ? LANG_DROIT[P.lang] : null);
+  function freshState() {
+    const st = P.newState(), d = defaultDroit();
+    if (d) st.options.droit = d;
+    return st;
+  }
+
   const App = window.App = {
-    mode: 'libre', state: P.newState(), an: null, sel: null,
+    mode: 'libre', state: freshState(), an: null, sel: null,
     undoStack: [], redoStack: [], editing: false,
     disp: {}, ldisp: {},
     cam: { x: 0, y: 150, k: 1 }, camT: null,
@@ -698,7 +708,7 @@
     let h = '<h4>' + t('Données chiffrées') + '</h4>';
     keys.forEach(k => {
       if (k === 'categorie') h += `<div class="prow"><label>${PARAM_LABELS[k]}</label><select data-act="param" data-k="categorie"><option value="">—</option>${Object.keys(P.CATEGORIES).map(c => `<option value="${c}"${p.categorie === c ? ' selected' : ''}>${P.CATEGORIES[c].label}</option>`).join('')}</select></div>`;
-      else h += `<div class="prow"><label>${esc(PARAM_LABELS[k] || k)}</label><input type="text" data-act="param" data-k="${esc(k)}" value="${esc(p[k] == null ? '' : p[k])}"></div>`;
+      else h += `<div class="prow"><label>${esc(((P.juris && P.juris.paramLabels) || {})[k] || PARAM_LABELS[k] || k)}</label><input type="text" data-act="param" data-k="${esc(k)}" value="${esc(p[k] == null ? '' : p[k])}"></div>`;
     });
     h += `<input type="text" class="addparam" data-act="addparam" placeholder="${t('＋ autre donnée : cle=valeur (ex. icone=🧸)')}">`;
     if (!keys.length && P.jurisId === 'fr') h += '<p class="small muted">' + t("Ancienneté, salaire et catégorie se renseignent sur le salarié : les indemnités, le préavis et la période d'essai les utilisent.") + '</p>';
@@ -905,14 +915,19 @@
   App.closeModal = () => { $('#modal').hidden = true; };
   $('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal' || ev.target.closest('.close')) App.closeModal(); });
 
+  /** titre affiché d'une étape : l'étape d'introduction (texte avant le premier titre) est nommée par le parseur */
+  const stepTitle = s => (s.title === 'Introduction' ? t('Introduction') : s.title);
+
   /** scénarios de la bibliothèque dans la langue de l'interface (ceux sans langue sont en français) */
   const libLang = s => s.lang || 'fr';
   App.libFind = (id, lang) => P.LIBRARY.find(s => s.id === id && libLang(s) === (lang || P.lang)) || P.LIBRARY.find(s => s.id === id);
   function openLibrary(all) {
     const list = P.LIBRARY.filter(s => all || libLang(s) === P.lang);
-    // d'abord les scénarios du droit « natif » de la langue (droit anglais en anglais, droit français en français)
-    const native = s => { const J = P.JURIS[P.jurisOf(P.parseScenario(s.md).meta.droit || 'fr') || 'fr']; return J && J.lang === P.lang ? 0 : 1; };
-    list.sort((a, b) => native(a) - native(b));
+    // d'abord les scénarios de la langue, et parmi eux ceux du droit « natif » de la langue
+    // (droit anglais en anglais, droit espagnol en espagnol, droit français en français)
+    const native = s => { const J = P.JURIS[P.jurisOf(P.parseScenario(s.md).meta.droit || 'fr') || 'fr']; return (libLang(s) === P.lang ? 0 : 2) + (J && J.lang === P.lang ? 0 : 1); };
+    const rank = new Map(list.map(s => [s, native(s)]));
+    list.sort((a, b) => rank.get(a) - rank.get(b));
     const cards = (list.length ? list : P.LIBRARY).map(s => {
       const sc = P.parseScenario(s.md);
       const J = P.JURIS[P.jurisOf(sc.meta.droit || sc.meta.law || 'fr') || 'fr'];
@@ -960,17 +975,21 @@
   /* Instructions complètes pour une IA : la page publiée (à jour), sinon la version embarquée (hors ligne). */
   function copyAllInstructions(consigne) {
     const demande = '\n\n---\n\n# ' + t('Ma demande') + '\n\n' + P.iaConsigneSansLien(consigne) + '\n\n';
-    const en = P.lang === 'en';
-    fetch(en ? 'docs/en/instructions-ia.md' : 'docs/instructions-ia.md').then(r => { if (!r.ok) throw 0; return r.text(); })
-      .catch(() => fetch(en ? P.IA_INSTRUCTIONS_URL.replace('/docs/', '/docs/en/') : P.IA_INSTRUCTIONS_URL).then(r => { if (!r.ok) throw 0; return r.text(); }))
-      .then(t => copyText(t.trim() + demande), () => copyText(((en && P.AI_PROMPT_EN) || P.AI_PROMPT).trim() + demande));
+    const sub = P.lang === 'fr' ? '' : P.lang + '/';   // docs/instructions-ia.md, docs/en/…, docs/es/…
+    const embedded = ({ en: P.AI_PROMPT_EN, es: P.AI_PROMPT_ES })[P.lang] || P.AI_PROMPT;
+    fetch('docs/' + sub + 'instructions-ia.md').then(r => { if (!r.ok) throw 0; return r.text(); })
+      .catch(() => fetch(P.IA_INSTRUCTIONS_URL.replace('/docs/', '/docs/' + sub)).then(r => { if (!r.ok) throw 0; return r.text(); }))
+      .then(t => copyText(t.trim() + demande), () => copyText(embedded.trim() + demande));
   }
 
   /** page de documentation dans la langue de l'interface */
-  const DOC_EN = { 'prise-en-main': 'getting-started', 'mode-cinema': 'cinema-mode', scenarios: 'scenarios', 'regles-de-calcul': 'checking-rules', 'format-scenario': 'format-scenario', 'ia-et-skill': 'ai-and-skill', '': '' };
-  const docPage = p => (P.lang === 'en' && DOC_EN[p] != null ? 'en/' + DOC_EN[p] : p);
+  const DOC_PAGES = {
+    en: { 'prise-en-main': 'getting-started', 'mode-cinema': 'cinema-mode', scenarios: 'scenarios', 'regles-de-calcul': 'checking-rules', 'format-scenario': 'format-scenario', 'ia-et-skill': 'ai-and-skill', '': '' },
+    es: { 'prise-en-main': 'primeros-pasos', 'mode-cinema': 'modo-cine', scenarios: 'escenarios', 'regles-de-calcul': 'reglas-de-verificacion', 'format-scenario': 'formato-escenario', 'ia-et-skill': 'ia-y-skill', '': '' }
+  };
+  const docPage = p => { const D = DOC_PAGES[P.lang]; return D && D[p] != null ? P.lang + '/' + D[p] : p; };
   function openHelp(which) {
-    const fmtDoc = (P.lang === 'en' && P.FORMAT_DOC_EN) || P.FORMAT_DOC;
+    const fmtDoc = ({ en: P.FORMAT_DOC_EN, es: P.FORMAT_DOC_ES })[P.lang] || P.FORMAT_DOC;
     if (which === 'format') {
       const c = App.modal(`<div class="help-doc md">${P.md(fmtDoc)}</div>
         <div class="btns"><button class="primary" id="hp-dl">⬇ ${t('Télécharger la spécification (.md)')}</button><a class="btnlink" href="docs/index.html#/${docPage('format-scenario')}" target="_blank" rel="noopener">📖 ${t('Dans la documentation')}</a></div>`);
@@ -1030,8 +1049,15 @@
   }
   $('#file-input').addEventListener('change', ev => { const f = ev.target.files[0]; if (f) openFile(f); ev.target.value = ''; });
 
+  /* l'exemple : un scénario de la langue et du droit en vigueur ; en espagnol, à défaut, un scénario
+   * de droit espagnol (le canevas passe alors au droit espagnol) ; sinon le premier de la bibliothèque */
   function loadExample() {
-    const sc = P.parseScenario((P.LIBRARY.find(s => (s.lang || 'fr') === P.lang && P.jurisOf(P.parseScenario(s.md).meta.droit || 'fr') === ((App.state.options && App.state.options.droit) || 'fr')) || App.libFind(P.LIBRARY[0].id)).md);
+    const droitOf = s => P.jurisOf(P.parseScenario(s.md).meta.droit || 'fr') || 'fr';
+    const cur = (App.state.options && App.state.options.droit) || 'fr', d = defaultDroit();
+    const pick = P.LIBRARY.find(s => libLang(s) === P.lang && droitOf(s) === cur)
+      || (d && P.LIBRARY.find(s => libLang(s) === P.lang && droitOf(s) === d))
+      || App.libFind(P.LIBRARY[0].id);
+    const sc = P.parseScenario(pick.md);
     const st = P.buildState(sc, sc.steps.length - 1);
     P.layout(st);
     Object.values(st.entities).forEach(e => { e.fixed = true; });
@@ -1093,12 +1119,14 @@
     const local = location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname);
     return local ? PUBLIC_BASE : location.origin + location.pathname;
   }
-  function scenarioUrl(base, step) {
+  /* lang : langue imposée au lien (menu Partager) ; sans elle, la langue courante si elle n'est pas le français */
+  function scenarioUrl(base, step, lang) {
     const o = App.origin; if (!o) return null;
     const u = new URL(base);
     if (o.id) u.searchParams.set('scenario', o.id);
     if (o.id && (P.lang !== 'fr' || (o.lang || 'fr') !== 'fr')) u.searchParams.set('lang', P.lang !== 'fr' ? P.lang : o.lang);
     else if (o.url) u.searchParams.set('md', o.url);
+    if (lang) u.searchParams.set('lang', lang);
     if (step > 0) u.searchParams.set('etape', step + 1);
     if (o.packed) u.hash = 'md=' + o.packed;
     return u.toString();
@@ -1125,26 +1153,89 @@
     return await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
   }
 
+  const libraryUrl = (base, lang) => { const u = new URL(base); u.searchParams.set('scenarios', ''); u.searchParams.set('lang', lang); return u.toString().replace('scenarios=', 'scenarios'); };
+
+  /** Fenêtre 🔗 Partager (mode cinéma et mode libre) : choix de la langue des liens, puis des liens à copier.
+   *  o : { intro (HTML), links(lang) → [[titre, description, url]], note(lang) → HTML, long (seuil de longueur) } */
+  function shareDialog(o) {
+    const langs = Object.keys(P.LANGS);
+    let lang = P.lang;   // langue des liens : celle de l'interface par défaut
+    /* hors français, le lien passe par la page d'entrée de la langue (…/en/, …/es/) : les réseaux sociaux,
+       qui n'exécutent pas le JavaScript, y trouvent l'aperçu (titre, image) dans cette langue ; elle renvoie
+       ensuite vers l'atelier en gardant les paramètres et le #. */
+    const viaLangPage = (url, l) => {
+      if (l === 'fr') return url;
+      const u = new URL(url);
+      if (!/\/(index\.html)?$/.test(u.pathname)) return url;
+      u.pathname = u.pathname.replace(/index\.html$/, '') + l + '/';
+      u.searchParams.delete('lang');
+      return u.toString().replace(/([?&])scenarios=(?=&|#|$)/, '$1scenarios');
+    };
+    const rows = () => {
+      const L = o.links(lang).map(([a, b, u]) => [a, b, viaLangPage(u, lang)]), long = L[0][2].length > (o.long || 6000);
+      return (o.note ? o.note(lang) : '') + (long ? '<p class="small" style="color:var(--warn)">' + t('⚠ Lien très long : certaines messageries peuvent le couper.') + (o.longTip ? ' ' + o.longTip : '') + '</p>' : '') +
+        L.map(([t, d, u], i) => `<div class="share-row"><div><b>${t}</b><span class="small muted"> — ${d}</span></div><div class="share-line"><input type="text" readonly value="${esc(u)}" id="sh-${i}"><button data-copy="${i}">📋 ${P.t('Copier')}</button><a class="btnlink" href="${esc(u)}" target="_blank" rel="noopener">↗</a></div></div>`).join('');
+    };
+    const c = App.modal(`<h2>🔗 ${t('Partager')}</h2>${o.intro || ''}
+      <div class="share-lang"><span>${t('Langue des liens')}</span><span class="share-seg" role="group" aria-label="${t('Langue des liens')}">${langs.map(l => `<button type="button" data-lang="${l}" aria-pressed="${l === lang}">${esc(P.LANGS[l])}</button>`).join('')}</span></div>
+      <div id="sh-rows">${rows()}</div>`, 'narrow');
+    c.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-copy]'); if (b) { copyText($('#sh-' + b.dataset.copy, c).value); return; }
+      const l = ev.target.closest('[data-lang]');
+      if (l && l.dataset.lang !== lang) {
+        lang = l.dataset.lang;
+        $$('[data-lang]', c).forEach(x => x.setAttribute('aria-pressed', x.dataset.lang === lang));
+        $('#sh-rows', c).innerHTML = rows();
+      }
+    });
+    c.addEventListener('focusin', ev => { if (ev.target.matches('input[readonly]')) ev.target.select(); });
+  }
+  const publicNote = (base, extra) => base !== location.origin + location.pathname
+    ? `<p class="small muted">${t("Liens construits sur l'adresse publique")} <b>${esc(PUBLIC_BASE)}</b>${extra || ''}.</p>` : '';
+
   async function openShare() {
     if (!App.scenario) { openLibrary(); return; }
-    const base = baseUrl(), isLocal = base !== location.origin + location.pathname;
+    const base = baseUrl();
     if (!App.origin) { try { App.origin = { packed: await packMd(App.scenarioSrc) }; } catch (e) { toast(t('Encodage du scénario impossible dans ce navigateur.')); return; } }
-    const lib = new URL(base); lib.searchParams.set('scenarios', '');
-    const links = [
-      [t('Cette étape'), t("Ouvre « {s} » directement à l'étape {n}.", { s: esc(App.scenario.title), n: App.step + 1 }), scenarioUrl(base, App.step)],
-      [t('Début du scénario'), t('Ouvre le scénario à sa première étape.'), scenarioUrl(base, 0)],
-      [t('Bibliothèque'), t('Ouvre le choix des scénarios.'), lib.toString().replace('scenarios=', 'scenarios')]
-    ];
-    const long = App.origin.packed && links[0][2].length > 6000;
-    const c = App.modal(`<h2>🔗 ${t('Partager')}</h2>
-      ${App.origin.packed ? '<p class="small muted">' + t('Ce scénario ne fait pas partie de la bibliothèque : son texte est encodé dans le lien lui-même (après le #). Aucun serveur ne le reçoit.') + '</p>' : ''}
-      ${long ? '<p class="small" style="color:var(--warn)">' + t('⚠ Lien très long : certaines messageries peuvent le couper. Pour un long scénario, publiez plutôt le fichier .md et utilisez ?md=adresse-du-fichier.') + '</p>' : ''}
-      ${isLocal ? `<p class="small muted">${t("Liens construits sur l'adresse publique")} <b>${esc(PUBLIC_BASE)}</b>${App.origin.id ? t(' : le scénario doit y avoir été publié') : ''}.</p>` : ''}
-      ${links.map(([t, d, u], i) => `<div class="share-row"><div><b>${t}</b><span class="small muted"> — ${d}</span></div><div class="share-line"><input type="text" readonly value="${esc(u)}" id="sh-${i}"><button data-copy="${i}">📋 ${P.t('Copier')}</button><a class="btnlink" href="${esc(u)}" target="_blank" rel="noopener">↗</a></div></div>`).join('')}`, 'narrow');
-    c.addEventListener('click', ev => { const b = ev.target.closest('[data-copy]'); if (b) copyText($('#sh-' + b.dataset.copy, c).value); });
-    $$('input[readonly]', c).forEach(i => i.addEventListener('focus', () => i.select()));
+    // un scénario de la bibliothèque n'existe pas forcément dans chaque langue
+    const hasVersion = l => !App.origin.id || P.LIBRARY.some(s => s.id === App.origin.id && libLang(s) === l);
+    shareDialog({
+      intro: (App.origin.packed ? '<p class="small muted">' + t('Ce scénario ne fait pas partie de la bibliothèque : son texte est encodé dans le lien lui-même (après le #). Aucun serveur ne le reçoit.') + '</p>' : '') +
+        publicNote(base, App.origin.id ? t(' : le scénario doit y avoir été publié') : ''),
+      links: lang => [
+        [t('Cette étape'), t("Ouvre « {s} » directement à l'étape {n}.", { s: esc(App.scenario.title), n: App.step + 1 }), scenarioUrl(base, App.step, lang)],
+        [t('Début du scénario'), t('Ouvre le scénario à sa première étape.'), scenarioUrl(base, 0, lang)],
+        [t('Bibliothèque'), t('Ouvre le choix des scénarios.'), libraryUrl(base, lang)]
+      ],
+      note: lang => hasVersion(lang) ? '' : `<p class="small muted">${t("Ce scénario n'existe pas dans cette langue : l'interface sera traduite, le scénario restera dans sa langue d'origine.")}</p>`,
+      longTip: t('Pour un long scénario, publiez plutôt le fichier .md et utilisez ?md=adresse-du-fichier.')
+    });
   }
   $('#btn-share').onclick = openShare;
+
+  /* ---- partage du mode libre : le schéma du canevas, compressé dans le lien (#schema=…), ouvert en mode libre */
+  const SCHEMA_KEYS = ['entities', 'links', 'options'];
+  async function openShareLibre() {
+    if (!Object.keys(App.state.entities).length) { toast(t('Le canevas est vide : ajoutez des éléments avant de partager.')); return; }
+    const base = baseUrl();
+    const pack = async verif => {
+      const st = {}; SCHEMA_KEYS.forEach(k => { st[k] = P.clone(App.state[k]); });
+      st.options = Object.assign({}, st.options, { verif });
+      return await packMd(JSON.stringify(st));
+    };
+    let withVerif, noVerif;
+    try { [withVerif, noVerif] = await Promise.all([pack(true), pack(false)]); } catch (e) { toast(t('Encodage du schéma impossible dans ce navigateur.')); return; }
+    const url = (lang, code) => { const u = new URL(base); u.searchParams.set('lang', lang); u.hash = 'schema=' + code; return u.toString(); };
+    shareDialog({
+      intro: '<p class="small muted">' + t("Le schéma est encodé dans le lien lui-même (après le #) : aucun serveur ne le reçoit. Il s'ouvre en mode libre, où chacun peut le modifier sans toucher à l'original.") + '</p>' + publicNote(base),
+      links: lang => [
+        [t('Ce schéma'), t('Ouvre le schéma avec ses verdicts.'), url(lang, withVerif)],
+        [t('Ce schéma, verdicts masqués'), t('Ouvre le schéma sans les verdicts, pour laisser juger.'), url(lang, noVerif)],
+        [t('Bibliothèque'), t('Ouvre le choix des scénarios.'), libraryUrl(base, lang)]
+      ]
+    });
+  }
+  $('#btn-share-libre').onclick = openShareLibre;
 
   /* ---- export SCORM : l'atelier et le scénario dans un paquet pour Moodle ou un autre LMS (js/scorm.js) */
   function openScorm() {
@@ -1283,7 +1374,7 @@
     $('.speed').style.display = cont ? '' : 'none';
     if (!sc) { $('#pl-count').textContent = '–'; $('#pl-dots').innerHTML = ''; return; }
     $('#pl-count').textContent = `${App.step + 1} / ${sc.steps.length}`;
-    $('#pl-dots').innerHTML = sc.steps.map((s, i) => `<button data-go="${i}" class="${i === App.step ? 'cur' : i < App.step ? 'done' : ''}" title="${esc((i + 1) + '. ' + s.title)}"></button>`).join('');
+    $('#pl-dots').innerHTML = sc.steps.map((s, i) => `<button data-go="${i}" class="${i === App.step ? 'cur' : i < App.step ? 'done' : ''}" title="${esc((i + 1) + '. ' + stepTitle(s))}"></button>`).join('');
     $('#pl-reset').hidden = !Object.keys(App.cinePos).length && !Object.keys(App.noteOff).length;
     $('#pl-prev').disabled = App.step <= 0;
     const pending = !!curQuestion() && !App.q.revealed;
@@ -1322,7 +1413,7 @@
     }
     const s = sc.steps[App.step], st = App.state;
     let h = `<div class="sc-head"><div class="sc-title">${esc(sc.title)}</div><div class="sc-no">${t('Étape {n} / {t}', { n: App.step + 1, t: sc.steps.length })}</div></div>`;
-    h += `<h2 class="step-title">${s.question ? '❓ ' : ''}${esc(s.title)}</h2><div class="md">${P.md(s.md, { nameOf })}</div>`;
+    h += `<h2 class="step-title">${s.question ? '❓ ' : ''}${esc(stepTitle(s))}</h2><div class="md">${P.md(s.md, { nameOf })}</div>`;
     if (s.question) {
       const q = s.question, good = q.choices.map((c, i) => c.correct ? `<b>${'ABCDEFGHIJ'[i] || i + 1}</b> — ${P.md(c.text, { nameOf }).replace(/^<p>|<\/p>$/g, '')}` : null).filter(Boolean);
       if (isMobile()) h += `<div class="qinline">${qsheetHTML(q, true)}</div>`;
@@ -1334,7 +1425,7 @@
     const target = App.sel && App.sel.kind === 'node' ? App.sel.id : null;
     if (target && st.entities[target]) h += `<div class="auto"><div class="auto-h">🔍 ${iconOf(target)} ${esc(nameOf(target))}<button data-act="unsel" title="${t('Fermer')}">×</button></div>${App.analysisHTML(target, false)}</div>`;
     else if (st.view.perspective && st.entities[st.view.perspective]) h += dossierSummary(st.view.perspective);
-    h += `<details class="plan"${App.planOpen ? ' open' : ''}><summary>${t('Plan du scénario')}</summary><ol>${sc.steps.map((x, i) => `<li class="${i === App.step ? 'cur' : ''}${i < App.step ? ' done' : ''}"><a data-go="${i}">${esc(x.title)}</a></li>`).join('')}</ol></details>`;
+    h += `<details class="plan"${App.planOpen ? ' open' : ''}><summary>${t('Plan du scénario')}</summary><ol>${sc.steps.map((x, i) => `<li class="${i === App.step ? 'cur' : ''}${i < App.step ? ' done' : ''}"><a data-go="${i}">${esc(stepTitle(x))}</a></li>`).join('')}</ol></details>`;
     if (sc.errors.length) h += `<details class="errs"><summary>${t('⚠ {n} avertissement(s) dans le scénario', { n: sc.errors.length })}</summary><ul>${sc.errors.map(e => `<li>${t('Étape {n}, ligne {l} :', { n: (e.step || 0) + 1, l: e.line })} <code>${esc(e.text)}</code> — ${esc(e.msg)}</li>`).join('')}</ul></details>`;
     h += '<p class="hint">' + t('Cliquez sur une carte du canevas pour afficher ses conditions de validité. Glissez une carte ou une bulle pour la déplacer.') + '</p>';
     el.innerHTML = h;
@@ -1433,7 +1524,7 @@
       App.pause();
       App.mode = 'libre';
       document.body.classList.remove('cinema'); document.body.classList.add('libre');
-      App.state = App.libreState || P.newState(); App.sel = null; App.disp = {}; App.ldisp = {};
+      App.state = App.libreState || freshState(); App.sel = null; App.disp = {}; App.ldisp = {};
       App.commit({ animate: false }); App.fit(false);
     }
     $$('.modes button').forEach(b => b.classList.toggle('active', b.dataset.mode === App.mode));
@@ -1450,7 +1541,7 @@
   /* ============================================================ barre d'actions */
   $('#btn-new').onclick = () => {
     if (Object.keys(App.state.entities).length && !confirm(t('Vider le canevas ? (Ctrl+Z pour annuler)'))) return;
-    pushUndo(); App.state = P.newState(); App.sel = null; App.commit(); App.fit(true);
+    pushUndo(); App.state = freshState(); App.sel = null; App.commit(); App.fit(true);
   };
   $('#btn-undo').onclick = undo;
   $('#btn-redo').onclick = redo;
@@ -1587,6 +1678,8 @@
       if (pm) { App.playMode = pm; $('#pl-mode').value = pm; }
       const s = localStorage.getItem(LS_KEY);
       if (s) App.state = sanitize(JSON.parse(s));
+      // canevas vide enregistré : il prend le droit de la langue (droit espagnol en espagnol)
+      if (!Object.keys(App.state.entities).length && defaultDroit()) App.state.options.droit = defaultDroit();
     } catch (e) { /* stockage indisponible */ }
     App.commit({ animate: false });
     updatePlayer();
@@ -1599,6 +1692,16 @@
     const sid = q.get('scenario'), url = q.get('md');
     const step = Math.max(0, (parseInt(q.get('etape') || q.get('step'), 10) || 1) - 1);
     const hash = (location.hash.match(/(?:^#|&)md=([A-Za-z0-9_-]+)/) || [])[1];
+    const schema = (location.hash.match(/(?:^#|&)schema=([A-Za-z0-9_-]+)/) || [])[1];
+    if (schema && !sid && !url) {   // schéma partagé depuis le mode libre : il remplace le canevas (Ctrl+Z pour retrouver le sien)
+      unpackMd(schema).then(txt => {
+        const st = sanitize(JSON.parse(txt));
+        pushUndo(); App.state = st; App.sel = null; App.disp = {}; App.commit({ animate: false }); App.fit(false);
+        try { history.replaceState(null, '', location.href.split('#')[0]); } catch (e) { /* adresse non modifiable */ }
+        toast(t('🔗 Schéma partagé ouvert (Ctrl+Z pour retrouver votre canevas)'), 5000);
+      }).catch(() => toast(t('⚠ Lien de schéma illisible (incomplet ?)')));
+      return;
+    }
     if (sid) {
       const s = App.libFind(sid, q.get('lang') || P.lang);
       if (s) App.loadScenario(s.md, { id: sid, lang: s.lang || 'fr' }, step); else { toast(t('Scénario introuvable : ') + esc(sid)); setMode('cinema'); }

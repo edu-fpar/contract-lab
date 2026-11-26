@@ -103,6 +103,7 @@ Sans sélection, l'inspecteur compte les éléments ✅ valides, ⚠️ à risqu
 ## Enregistrer, ouvrir, réorganiser
 
 - **💾 Enregistrer** télécharge la construction au format `.json` ; **📂 Ouvrir** la recharge (ou ouvre un scénario `.md`). Un fichier peut aussi être déposé sur la fenêtre.
+- **🔗 Partager** donne un lien qui contient la construction (encodée après le `#`, aucun serveur ne la reçoit), au choix en français ou en anglais, avec ou sans les verdicts : à envoyer aux élèves ou à un collègue. Le lien ouvre le schéma en mode libre ; **Ctrl+Z** rend le canevas qu'on avait avant.
 - Le travail en cours est conservé automatiquement dans le navigateur.
 - **⇅ Disposer** range automatiquement les cartes : les parties en haut, les contrats, puis les clauses et leurs garde-fous ; les chaînes de procédure (« puis ») sur une même rangée, de gauche à droite.
 - **🗋 Nouveau** vide le canevas.

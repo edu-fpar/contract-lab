@@ -7,9 +7,11 @@
  *  - docs/en/format-scenario.md         ← P.FORMAT_DOC_EN (droit anglais puis droit français, en anglais)
  *  - docs/scenarios/<id>.md             ← scénarios français de js/library.js
  *  - docs/en/scenarios/<id>.md          ← scénarios anglais (js/library-en.js, js/library-uk.js)
- *  - docs/instructions-ia.md, docs/en/instructions-ia.md  ← pages d'instructions pour une IA
- *  - skill/scenario-contract-lab/references/ : format.md, format-en.md, regles-de-calcul.md,
- *    checking-rules-en.md, exemple.md, example-en.md
+ *  - docs/es/formato-escenario.md       ← P.FORMAT_DOC_ES (derecho español, luego francés, en español)
+ *  - docs/es/scenarios/<id>.md          ← scénarios espagnols (js/library-es.js)
+ *  - docs/instructions-ia.md, docs/en/instructions-ia.md, docs/es/instructions-ia.md  ← pages d'instructions pour une IA
+ *  - skill/scenario-contract-lab/references/ : format.md, format-en.md, formato-es.md, regles-de-calcul.md,
+ *    checking-rules-en.md, reglas-es.md (← docs/es/reglas-de-verificacion.md), exemple.md, example-en.md, ejemplo-es.md
  *  - skill/scenario-contract-lab/scripts/lib/ : moteur utilisé par verifier.js
  */
 'use strict';
@@ -20,10 +22,10 @@ const root = path.join(__dirname, '..');
 const r = (...p) => path.join(root, ...p);
 global.window = global;
 // i18n d'abord ; la langue est fixée avant model.js (familles et relations traduites au chargement)
-['i18n', 'i18n-en'].forEach(f => require(r('js', f + '.js')));
+['i18n', 'i18n-en', 'i18n-es'].forEach(f => require(r('js', f + '.js')));
 const P = global.P;
 P.lang = 'fr';
-['model', 'catalog-fr-en', 'catalog-uk', 'scenario', 'docs', 'library', 'library-en', 'library-uk'].forEach(f => require(r('js', f + '.js')));
+['model', 'catalog-fr-en', 'catalog-uk', 'catalog-es', 'scenario', 'docs', 'library', 'library-en', 'library-uk', 'library-es'].forEach(f => require(r('js', f + '.js')));
 
 const write = (file, text) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, text, 'utf8'); console.log('écrit  ' + path.relative(root, file)); };
 const copy = (from, to) => { fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(from, to); console.log('copié  ' + path.relative(root, to)); };
@@ -33,9 +35,11 @@ const toFences = md => md.replace(/^~~~scene\s*$/gm, '```scene').replace(/^~~~\s
 const noImages = md => md.replace(/^!\[[^\]]*\]\([^)]*\)\n(<p class="caption">.*<\/p>\n)?\n?/gm, '');
 const regles = noImages(fs.readFileSync(r('docs', 'regles-de-calcul.md'), 'utf8'));
 const rulesEn = noImages(fs.readFileSync(r('docs', 'en', 'checking-rules.md'), 'utf8'));
+const reglasEs = noImages(fs.readFileSync(r('docs', 'es', 'reglas-de-verificacion.md'), 'utf8'));
 const langOf = s => s.lang || 'fr';
 const LIB_FR = P.LIBRARY.filter(s => langOf(s) === 'fr');
 const LIB_EN = P.LIBRARY.filter(s => langOf(s) === 'en');
+const LIB_ES = P.LIBRARY.filter(s => langOf(s) === 'es');
 const scen = (list, id) => { const s = list.find(x => x.id === id); if (!s) throw new Error('scénario introuvable : ' + id); return toFences(s.md); };
 
 /* ---- documentation */
@@ -43,6 +47,8 @@ write(r('docs', 'format-scenario.md'), P.FORMAT_DOC);
 write(r('docs', 'en', 'format-scenario.md'), P.FORMAT_DOC_EN);
 LIB_FR.forEach(s => write(r('docs', 'scenarios', s.id + '.md'), toFences(s.md)));
 LIB_EN.forEach(s => write(r('docs', 'en', 'scenarios', s.id + '.md'), toFences(s.md)));
+write(r('docs', 'es', 'formato-escenario.md'), P.FORMAT_DOC_ES);
+LIB_ES.forEach(s => write(r('docs', 'es', 'scenarios', s.id + '.md'), toFences(s.md)));
 
 /* ---- skill : références */
 const skill = r('skill', 'scenario-contract-lab');
@@ -52,6 +58,9 @@ write(path.join(skill, 'references', 'regles-de-calcul.md'), regles);
 write(path.join(skill, 'references', 'checking-rules-en.md'), rulesEn);
 write(path.join(skill, 'references', 'exemple.md'), scen(LIB_FR, 'non-concurrence'));
 write(path.join(skill, 'references', 'example-en.md'), scen(LIB_EN, 'uk-covenants'));
+write(path.join(skill, 'references', 'formato-es.md'), P.FORMAT_DOC_ES);
+write(path.join(skill, 'references', 'reglas-es.md'), reglasEs);
+write(path.join(skill, 'references', 'ejemplo-es.md'), scen(LIB_ES, 'es-no-competencia'));
 
 /* Page d'instructions pour n'importe quelle IA (lisible par URL) : mission + format + règles de vérification + exemple.
  * C'est la version « sans outils » de la skill : l'IA ne peut pas lancer le vérificateur, elle refait les calculs. */
@@ -115,6 +124,37 @@ write(r('docs', 'en', 'instructions-ia.md'), IA_INTRO_EN + P.FORMAT_DOC_EN.repla
   '# Annex 3 — Complete example\n\nA real scenario of the workshop (restrictive covenants, English law), with a question step preceded by `verification off`:\n\n````markdown\n' +
   scen(LIB_EN, 'uk-covenants').trim() + '\n````\n');
 
+const IA_INTRO_ES = `# Instrucciones para una IA: crear un escenario de Contract Lab
+
+> Página destinada a los asistentes de IA (ChatGPT, Claude, Gemini, Mistral, Copilot…). Docente: dé la dirección de esta página a su IA, junto con su material de clase.
+> Taller: https://edu-fpar.github.io/contract-lab/es/ · Documentación: https://edu-fpar.github.io/contract-lab/docs/#/es/
+> Curso de derecho inglés (England & Wales): use la versión inglesa, https://edu-fpar.github.io/contract-lab/docs/en/instructions-ia.md
+
+## Tu misión
+
+El docente te facilita un material de clase de derecho del trabajo o de recursos humanos (texto, PDF, diapositivas, apuntes, caso práctico). Tú produces un **escenario en markdown** que el taller Contract Lab reproducirá en modo «cine»: en cada paso se muestra un comentario y unos comandos construyen un esquema — un contrato y sus cláusulas, las salvaguardas que las condicionan, las obligaciones de las partes, una extinción y su procedimiento, las indemnizaciones — que la herramienta verifica (✅ válido, ⚠️ en riesgo, ⛔ nulo, improcedente o irregular, ⚡ obligación incumplida).
+
+1. **Elige el derecho.** Para un curso de **derecho español** — Estatuto de los Trabajadores, contratos tras la reforma de 2021, periodo de prueba, pactos del art. 21 ET, despido disciplinario u objetivo, improcedencia y nulidad, extinción del art. 50… — empieza el archivo con el encabezado \`droit: es\` (tres líneas: \`---\`, \`droit: es\`, \`---\`) y usa las claves de tipos españolas del catálogo (anexo 1). Para un curso de **derecho francés**, no escribas encabezado y usa las claves francesas (también en el anexo 1). No mezcles dos derechos en un escenario; para una comparación, menciona el otro derecho en el comentario.
+2. **Elige lo que se puede representar.** Quédate con las nociones que se traducen en elementos unidos: cláusulas y sus salvaguardas (condiciones acumulativas de validez), formalidades del contrato (forma escrita, causa temporal precisa), incompatibilidades (funciones previas y periodo de prueba, dimisión y prestación por desempleo, contrato de sustitución e indemnización de 12 días…), obligaciones e incumplimientos, extinciones y procedimientos, indemnizaciones y cálculos (duración máxima de la prueba y de los pactos, regla de los 18 meses en 24, SMI, 20 días por año con tope de 12 mensualidades, 33 días con tope de 24, 12 días por fin de contrato, prescripción de las faltas, caducidad de 20 días hábiles, prestación por desempleo). Lo que la herramienta no sabe juzgar (apreciación de los hechos por el juez, mejoras del convenio colectivo, régimen transitorio de los 45 días, fechas reales…) va en el comentario, en un bocadillo (\`nota\`) o en un veredicto impuesto (\`estado\`), nunca como una falsa salvaguarda que pondría una tarjeta en verde. Si lo esencial del material no se puede representar, díselo al docente en lugar de forzarlo.
+3. **Construye la progresión.** De 5 a 9 pasos, una idea por paso, de lo simple a lo complejo: muestra primero una cláusula sola (⛔, salvaguardas que faltan) y añade después sus salvaguardas una a una; para una extinción, la extinción, luego su procedimiento, luego los derechos a los que da lugar. Retoma los ejemplos, nombres y cifras del material. Añade uno o dos **pasos pregunta** justo antes del paso que explicaría la noción, con opciones erróneas verosímiles y una explicación para cada opción. Cada pregunta empieza por \`verificacion off\` (si no, los veredictos en pantalla dan la respuesta) y su sección «### Respuesta» restablece \`verificacion on\`.
+4. **Escribe el escenario** respetando exactamente el formato descrito más abajo. Declara cada elemento antes de unirlo; une cada salvaguarda con la cláusula que condiciona; pon \`antiguedad\`, \`salario\` (bruto mensual con prorrata de pagas extra) y \`categoria\` en el trabajador, y \`plantilla\` en la empresa. Da los cálculos en el texto («100 días × 60 € = 6.000 €»): la herramienta mostrará las mismas cifras.
+5. **Comprueba que los veredictos anunciados corresponden a las reglas** del anexo 2: una condición se cumple si un elemento del tipo esperado está unido directamente, en la misma cadena «luego» o unido al contrato que contiene la cláusula; las incompatibilidades se aplican en todo el expediente (elementos unidos entre sí, sin pasar por las partes ni por las normas); una obligación unida a un incumplimiento queda incumplida; una causa de nulidad (embarazo, vulneración de derechos fundamentales) prevalece sobre la improcedencia; un veredicto impuesto con \`estado\` sigue visible incluso con \`verificacion off\`. Si la herramienta fuera a mostrar otra cosa que tu texto, corrige el texto o los datos.
+6. **Sé exacto jurídicamente.** Cita un artículo (ET, LRJS, LGSS) o una sentencia solo si figura en el material o si estás seguro; si no, describe la regla sin número. No des duraciones, plazos ni importes sin comprobar. Las cifras anuales (SMI) cambian cada año: indica el año de las que usas. Señala las simplificaciones en una cita «> ⚠️».
+
+## Tu respuesta
+
+- **Un único bloque de código** con el escenario completo (primero el encabezado \`droit: es\` para el derecho español, después «# Título»). Como el escenario contiene a su vez bloques \`\`\`scene, rodéalo con un bloque de cuatro acentos graves (\`\`\`\`markdown … \`\`\`\`), o escribe los bloques de comandos con ~~~scene.
+- Después, fuera del bloque, unas líneas para el docente: el plan de los pasos y lo que debe revisar (referencias añadidas por ti, simplificaciones, veredictos impuestos, nociones dejadas de lado).
+- Recuérdale cómo usarlo: taller Contract Lab → 🎬 Cine → 📚 Escenarios → pegar el markdown → Iniciar. El botón 🔗 Compartir da después un enlace para los estudiantes.
+
+---
+
+`;
+write(r('docs', 'es', 'instructions-ia.md'), IA_INTRO_ES + P.FORMAT_DOC_ES.replace(/^# /, '# Anexo 1 — ') + '\n\n---\n\n' +
+  reglasEs.replace(/^# /, '# Anexo 2 — ') + '\n\n---\n\n' +
+  '# Anexo 3 — Ejemplo completo\n\nUn escenario real del taller (pactos de no competencia, plena dedicación y permanencia, derecho español), con pasos pregunta precedidos de `verificacion off`:\n\n````markdown\n' +
+  scen(LIB_ES, 'es-no-competencia').trim() + '\n````\n');
+
 /* ---- skill : moteur */
-['i18n', 'i18n-en', 'model', 'catalog-fr-en', 'catalog-uk', 'scenario'].forEach(f => copy(r('js', f + '.js'), path.join(skill, 'scripts', 'lib', f + '.js')));
+['i18n', 'i18n-en', 'i18n-es', 'model', 'catalog-fr-en', 'catalog-uk', 'catalog-es', 'scenario'].forEach(f => copy(r('js', f + '.js'), path.join(skill, 'scripts', 'lib', f + '.js')));
 console.log('\nTerminé. Pour produire le fichier installable de la skill : python tools/package_skill.py (voir docs/developpeurs.md)');

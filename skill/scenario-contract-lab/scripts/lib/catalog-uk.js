@@ -433,7 +433,7 @@
   P.registerJuris({
     id: 'uk', lang: 'en',
     names: ['uk', 'england', 'england_wales', 'ew', 'english_law', 'angleterre', 'droit_anglais', 'royaume_uni', 'gb', 'england_and_wales'],
-    label: "Droit anglais (Angleterre et pays de Galles)", labelEn: 'English law (England & Wales)', flag: '🇬🇧',
+    label: "Droit anglais (Angleterre et pays de Galles)", labelEn: 'English law (England & Wales)', labelEs: 'Derecho inglés (Inglaterra y Gales)', flag: '🇬🇧',
     catalog: CAT_UK, categories: {}, aliases: ALIASES_UK, currency: 'GBP',
     defaults: DEF,
     paramAliases: {

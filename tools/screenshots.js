@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /*
- * Régénère les captures d'écran de la documentation (docs/images/*.jpg)
- * (docs/images/en/*.jpg pour la documentation anglaise)
- * et les images de présentation à la racine (contract-lab*.png).
- * Usage (depuis le dossier du projet) : node tools/screenshots.js
+ * Régénère les captures d'écran de la documentation (docs/images/*.jpg, docs/images/en/*.jpg)
+ * et les visuels de communication (visuels/<langue>/ : aperçus de partage, posts, stories,
+ * images d'articles ; voir visuels/README.md).
+ * Usage (depuis le dossier du projet) : node tools/screenshots.js [doc|visuels|compo] (détail plus bas)
  *
  * Pilote Microsoft Edge (ou Chrome) sans fenêtre via son protocole de débogage :
  * aucune dépendance à installer. Chemin du navigateur modifiable avec BROWSER=…
@@ -57,20 +57,62 @@ const SHOTS = [
   { file: 'en/phone-question-night', url: '?lang=en&scenario=uk-misconduct&etape=5', size: PHONE, theme: 'dark',
     js: `App.reveal(); await wait(700); const c = document.querySelector('.qcard.correct') || document.querySelector('[data-card="0"]'); c.click(); await wait(200);
          document.querySelector('.qinline').scrollIntoView({ block: 'start' });` },
-  { file: 'en/phone-diagram-day', url: '?lang=en&scenario=uk-redundancy&etape=5', size: PHONE, theme: 'light' },
-  /* images de présentation (README, partage sur les réseaux) : à la racine, en PNG */
-  { file: 'contract-lab', root: true, url: '?scenario=non-concurrence&etape=6', size: WIDE, theme: 'light',
-    js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
-  { file: 'contract-lab-libre', root: true, url: '', size: WIDE, theme: 'dark',
-    js: `document.querySelector('#tool-example').click(); await wait(300); App.select({ kind: 'node', id: 'REN' }); await wait(200); App.fit(false);` },
-  /* version anglaise : droit anglais (England & Wales) */
-  { file: 'contract-lab-en', root: true, url: '?lang=en&scenario=uk-covenants&etape=5', size: WIDE, theme: 'light',
-    js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
-  { file: 'contract-lab-en-redundancy', root: true, url: '?lang=en&scenario=uk-redundancy&etape=6', size: WIDE, theme: 'dark',
-    js: `foldLegend(); App.reveal(); await wait(900);` },
-  { file: 'contract-lab-rupture', root: true, url: '?scenario=faute-grave&etape=3', size: WIDE, theme: 'light',
-    js: `foldLegend(); App.reveal(); await wait(900); App.select({ kind: 'node', id: 'IL' });` }
+  { file: 'en/phone-diagram-day', url: '?lang=en&scenario=uk-redundancy&etape=5', size: PHONE, theme: 'light' }
 ];
+
+/* ---------- visuels de communication (visuels/<langue>/) : voir visuels/README.md
+ * 1. captures de l'application, par langue (visuels/<langue>/captures/*.png) ;
+ * 2. mises en scène par tools/visuels.html (titre, accroche, capture) aux formats des réseaux. */
+const VIS = path.join(root, 'visuels');
+const SHOW = {   // scénarios « vitrines » de chaque langue
+  fr: { cinema: '?scenario=non-concurrence&etape=6', sombre: '?scenario=faute-grave&etape=3', phone: '?scenario=non-concurrence&etape=6', droit: 'fr' },
+  en: { cinema: '?lang=en&scenario=uk-covenants&etape=5', sombre: '?lang=en&scenario=uk-redundancy&etape=6', phone: '?lang=en&scenario=uk-misconduct&etape=5', droit: 'uk' },
+  es: { cinema: '?lang=es&scenario=es-no-competencia&etape=4', sombre: '?lang=es&scenario=es-improcedente-nulo&etape=5', phone: '?lang=es&scenario=es-no-competencia&etape=4', droit: 'es' }
+};
+const CAPTURES = [];
+Object.keys(SHOW).forEach(lang => {
+  const s = SHOW[lang], dir = path.join(VIS, lang, 'captures'), q = lang === 'fr' ? '' : `?lang=${lang}`;
+  CAPTURES.push(
+    { file: path.join(dir, 'cinema-question.png'), url: s.cinema, size: WIDE, theme: 'light',
+      js: `foldLegend(); key('2'); await wait(300); App.reveal(); await wait(900); key('2');` },
+    { file: path.join(dir, 'cinema-rupture-nuit.png'), url: s.sombre, size: WIDE, theme: 'dark',
+      js: `foldLegend(); App.reveal(); await wait(900);` },
+    { file: path.join(dir, 'libre-nuit.png'), url: q, size: WIDE, theme: 'dark',
+      js: `const s = document.querySelector('#opt-droit'); if (s.value !== '${s.droit}') { s.value = '${s.droit}'; s.dispatchEvent(new Event('change')); await wait(300); }
+           document.querySelector('#tool-example').click(); await wait(400);
+           const an = App.an, ids = Object.keys(App.state.entities);
+           const id = ids.slice().sort((a, b) => an.info[b].reqs.length - an.info[a].reqs.length)[0];
+           App.select({ kind: 'node', id }); await wait(200); App.fit(false); document.querySelector('#toast').classList.remove('show');` },
+    { file: path.join(dir, 'telephone-question.png'), url: s.phone, size: PHONE, theme: 'dark',
+      js: `App.reveal(); await wait(700); const c = document.querySelector('.qcard.correct') || document.querySelector('[data-card="0"]'); c.click(); await wait(200);
+           document.querySelector('.qinline').scrollIntoView({ block: 'start' });` }
+  );
+});
+/* formats : og (aperçu de lien : Facebook, LinkedIn, X, Mastodon, WhatsApp), carré, portrait, story */
+const FORMATS = {
+  og: { width: 1200, height: 630, img: 'cinema-question' },
+  carre: { width: 1080, height: 1080, img: 'cinema-question' },
+  portrait: { width: 1080, height: 1350, img: 'libre-nuit' },
+  story: { width: 1080, height: 1920, img: 'telephone-question' }
+};
+const COMPOS = [];
+Object.keys(SHOW).forEach(lang => Object.keys(FORMATS).forEach(fmt => {
+  const F = FORMATS[fmt];
+  COMPOS.push({ file: path.join(VIS, lang, fmt + '.png'), compose: true, theme: 'dark',
+    page: `tools/visuels.html?lang=${lang}&fmt=${fmt}&img=../visuels/${lang}/captures/${F.img}.png`,
+    size: { width: F.width, height: F.height, deviceScaleFactor: 1, mobile: false } });
+}));
+
+/* node tools/screenshots.js           → tout (documentation et visuels)
+ * node tools/screenshots.js doc       → seulement les captures de la documentation
+ * node tools/screenshots.js visuels   → seulement les visuels (captures et mises en scène)
+ * node tools/screenshots.js compo     → seulement les mises en scène (après retouche de tools/visuels.html)
+ * ONLY=visuels/es node tools/screenshots.js visuels → seulement les images dont le chemin commence ainsi */
+const MODE = process.argv[2] || 'tout';
+const TODO = { doc: SHOTS, visuels: CAPTURES.concat(COMPOS), compo: COMPOS }[MODE] || SHOTS.concat(CAPTURES, COMPOS);
+// fichier final : PNG au chemin absolu donné, sinon JPEG de la documentation (docs/images/<nom>.jpg)
+const outFile = s => path.isAbsolute(s.file) ? s.file : path.join(out, s.file + '.jpg');
+const rel = s => path.relative(root, outFile(s)).split(path.sep).join('/');
 
 /* ---------- petit serveur statique */
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.md': 'text/markdown', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json' };
@@ -107,26 +149,33 @@ async function main() {
     });
     await send('Page.enable'); await send('Runtime.enable');
 
-    // ONLY=en/ node tools/screenshots.js : ne refait que les captures dont le nom commence ainsi
-    for (const s of SHOTS.filter(x => !process.env.ONLY || x.file.startsWith(process.env.ONLY))) {
+    // ONLY=docs/images/en/ node tools/screenshots.js doc : ne refait que les images dont le chemin commence ainsi
+    for (const s of TODO.filter(x => !process.env.ONLY || rel(x).startsWith(process.env.ONLY))) {
       await send('Emulation.setDeviceMetricsOverride', s.size);
       await send('Emulation.setTouchEmulationEnabled', { enabled: !!s.size.mobile });
       await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: s.theme }] });
       // repartir d'un stockage vide : thème du système émulé, pas de travail en cours
       await send('Runtime.evaluate', { expression: 'try { localStorage.clear(); } catch (e) {}' });
-      await send('Page.navigate', { url: `http://127.0.0.1:${PORT}/index.html${s.url}` });
-      await sleep(1800);
-      const prelude = `const wait = ms => new Promise(r => setTimeout(r, ms));
-        const key = k => document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
-        const foldLegend = () => document.querySelector('#legend').classList.add('collapsed');`;
-      const r = await send('Runtime.evaluate', { expression: `(async () => { ${prelude} ${s.js || ''} })()`, awaitPromise: true });
-      if (r.exceptionDetails) throw new Error(s.file + ' : ' + r.exceptionDetails.exception.description);
-      await sleep(1600);   // fin des animations (apparition, recadrage)
-      const shot = await send('Page.captureScreenshot', s.root ? { format: 'png' } : { format: 'jpeg', quality: 82 });
-      const file = s.root ? path.join(root, s.file + '.png') : path.join(out, s.file + '.jpg');
+      await send('Page.navigate', { url: `http://127.0.0.1:${PORT}/` + (s.page || 'index.html' + s.url) });
+      let r;
+      if (s.compose) {   // mise en scène : attendre le chargement de la capture et des polices
+        await sleep(400);
+        r = await send('Runtime.evaluate', { expression: `(async () => { for (let i = 0; i < 50 && !document.body.dataset.ready; i++) await new Promise(r => setTimeout(r, 100)); await document.fonts.ready; })()`, awaitPromise: true });
+        await sleep(200);
+      } else {
+        await sleep(1800);
+        const prelude = `const wait = ms => new Promise(r => setTimeout(r, ms));
+          const key = k => document.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+          const foldLegend = () => document.querySelector('#legend').classList.add('collapsed');`;
+        r = await send('Runtime.evaluate', { expression: `(async () => { ${prelude} ${s.js || ''} })()`, awaitPromise: true });
+        await sleep(1600);   // fin des animations (apparition, recadrage)
+      }
+      if (r.exceptionDetails) throw new Error(rel(s) + ' : ' + r.exceptionDetails.exception.description);
+      const file = outFile(s), png = path.isAbsolute(s.file);
+      const shot = await send('Page.captureScreenshot', png ? { format: 'png' } : { format: 'jpeg', quality: 82 });
       fs.mkdirSync(path.dirname(file), { recursive: true });
       fs.writeFileSync(file, Buffer.from(shot.data, 'base64'));
-      console.log('capturé  ' + path.relative(root, file) + `  (${Math.round(fs.statSync(file).size / 1024)} ko)`);
+      console.log('capturé  ' + rel(s) + `  (${Math.round(fs.statSync(file).size / 1024)} ko)`);
     }
     ws.close();
   } finally {

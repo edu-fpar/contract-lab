@@ -4,7 +4,8 @@
  * - Première visite : la vidéo s'ouvre d'elle-même, une seule fois (clé contract-lab.introSeen).
  *   Jamais quand on arrive par un lien précis (?scenario=, ?md=, ?scenarios, #md=…), ni dans
  *   un paquet SCORM, ni avec ?intro=0, ni sous un navigateur piloté (captures, tests).
- * - La vidéo est affichée dans une iframe (intro.html?embed=app), dans la langue de l'interface,
+ * - La vidéo est affichée dans une iframe (intro.html?embed=app), dans la langue de l'interface
+ *   (fr, en, es : intro.html montre alors le droit de cette langue),
  *   en 9:16 sur un téléphone tenu droit. Elle demande sa fermeture par postMessage
  *   ({ contractLab: "intro-close" }) : bouton « Passer l'introduction », « Commencer » ou Échap.
  * Chargé après js/app.js.

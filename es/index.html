@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Page d'entrée ES : elle donne aux réseaux sociaux (qui n'exécutent pas le JavaScript)
+  un aperçu dans la bonne langue (visuels/es/og.png), puis envoie le visiteur vers ../?lang=es.
+  Lien à partager : https://edu-fpar.github.io/contract-lab/es/   (voir visuels/README.md)
+-->
+<title>Contract Lab — taller del contrato de trabajo</title>
+<meta name="description" content="Taller didáctico gratuito para visualizar el contrato de trabajo: cláusulas en iconos, las garantías que las hacen válidas, incompatibilidades, obligaciones de las partes, despidos y sus procedimientos. Derecho español. Escenarios animados paso a paso y cuestionarios para la clase.">
+<link rel="canonical" href="https://edu-fpar.github.io/contract-lab/es/">
+<link rel="alternate" hreflang="fr" href="https://edu-fpar.github.io/contract-lab/">
+<link rel="alternate" hreflang="en" href="https://edu-fpar.github.io/contract-lab/en/">
+<link rel="alternate" hreflang="es" href="https://edu-fpar.github.io/contract-lab/es/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 6h44l20 20v68H18z' fill='%230891b2'/%3E%3Cpath d='M30 46h40M30 60h40M30 74h26' stroke='%23fff' stroke-width='7'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="Contract Lab">
+<meta property="og:title" content="Contract Lab — taller del contrato de trabajo">
+<meta property="og:description" content="¿Un pacto de no competencia sin compensación? Nulo. Un taller visual y escenarios animados para enseñar el contrato de trabajo, sus cláusulas, las obligaciones y los despidos (derecho español).">
+<meta property="og:url" content="https://edu-fpar.github.io/contract-lab/es/">
+<meta property="og:image" content="https://edu-fpar.github.io/contract-lab/visuels/es/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Contract Lab en modo cine, derecho español: un pacto de no competencia y sus garantías, con la pregunta a la clase y la respuesta revelada">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contract Lab — taller del contrato de trabajo">
+<meta name="twitter:description" content="Cláusulas, garantías, obligaciones y despidos: un taller visual y escenarios animados para la clase (derecho español).">
+<meta name="twitter:image" content="https://edu-fpar.github.io/contract-lab/visuels/es/og.png">
+<script>
+  /* Vers l'application dans la langue de la page, en gardant les paramètres éventuels (?scenario=…, #md=…). */
+  (function () {
+    var q = new URLSearchParams(location.search); q.set('lang', 'es');
+    location.replace('../?' + q.toString() + location.hash);
+  })();
+</script>
+<style>body{font:16px system-ui,sans-serif;background:#0b1120;color:#e5e7eb;display:grid;place-items:center;min-height:100vh;margin:0}a{color:#818cf8}</style>
+</head>
+<body>
+<p><a href="../?lang=es">Abrir Contract Lab</a></p>
+</body>
+</html>

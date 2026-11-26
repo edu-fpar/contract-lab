@@ -399,6 +399,12 @@ details.answer .good { margin: 8px 0 4px; }
 .share-row { margin: 14px 0; }
 .share-line { display: flex; gap: 6px; margin-top: 5px; align-items: center; }
 .share-line input { flex: 1; min-width: 0; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
+.share-lang { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 10px 0 4px; font-weight: 600; }
+.share-seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.share-seg button { border: 0; border-radius: 0; background: var(--panel); color: var(--muted); padding: 5px 12px; font-weight: 600; }
+.share-seg button + button { border-left: 1px solid var(--line); }
+.share-seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .share-seg button[aria-pressed="true"] { color: #0b1120; }
 
 /* ---------------- téléphone (portrait) */
 #pl-view { display: none; }

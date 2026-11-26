@@ -14,7 +14,7 @@ Bouton **📚 Scénarios** :
 
 ## Partager un lien
 
-L'atelier est en ligne à l'adresse **https://edu-fpar.github.io/contract-lab/**. Le bouton **🔗 Partager** propose trois liens à copier : vers **l'étape affichée**, vers **le début du scénario**, ou vers **la bibliothèque**. Pendant la lecture, l'adresse du navigateur suit d'ailleurs l'étape en cours : on peut aussi la copier directement.
+L'atelier est en ligne à l'adresse **https://edu-fpar.github.io/contract-lab/**. Le bouton **🔗 Partager** propose trois liens à copier : vers **l'étape affichée**, vers **le début du scénario**, ou vers **la bibliothèque**. Le choix **Français / English** en tête du menu fixe la langue des liens (paramètre `lang=`) : l'élève ouvre l'atelier dans cette langue, quelle que soit celle de son navigateur. Pendant la lecture, l'adresse du navigateur suit d'ailleurs l'étape en cours : on peut aussi la copier directement.
 
 | Lien | Ouvre |
 |---|---|

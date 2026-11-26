@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<!--
+  Gabarit des visuels de communication (aperçus de partage, posts, stories, articles).
+  Rendu par « node tools/screenshots.js visuels », qui l'ouvre à la bonne taille avec :
+    ?lang=fr|en|es   langue des textes
+    &fmt=og|carre|portrait|story   format (voir FORMATS dans tools/screenshots.js)
+    &img=../visuels/fr/captures/cinema.png   capture de l'application à mettre en scène
+  Les textes sont ici (T) : les modifier, puis relancer la commande, régénère tout.
+-->
+<title>Contract Lab — visuel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif; color: #e2e8f0;
+    background: radial-gradient(1200px 700px at 85% 10%, #312e81 0%, transparent 60%),
+                radial-gradient(900px 600px at 0% 100%, #0e7490 0%, transparent 55%), #0b1120;
+    display: grid; padding: 5.5vmin; gap: 4.5vmin;
+  }
+  .txt { display: flex; flex-direction: column; justify-content: center; gap: 2.6vmin; min-width: 0; }
+  .brand { display: flex; flex-wrap: wrap; align-items: center; white-space: nowrap; gap: 1.6vmin; font-weight: 800; font-size: 4.6vmin; letter-spacing: -.02em; }
+  .brand .logo { font-size: 1.15em; }
+  .brand small { font-weight: 600; font-size: .55em; color: #a5b4fc; letter-spacing: 0; margin-left: .4em; }
+  h1 { font-size: 7.4vmin; line-height: 1.08; font-weight: 800; letter-spacing: -.025em; color: #fff; }
+  h1 em { font-style: normal; color: #fca5a5; }
+  .sub { font-size: 3.5vmin; line-height: 1.35; color: #cbd5e1; }
+  .chips { display: flex; flex-wrap: wrap; gap: 1.2vmin; }
+  .chips span { font-size: 2.7vmin; font-weight: 600; padding: .8vmin 1.8vmin; border-radius: 99px; background: rgba(129,140,248,.16); border: 1px solid rgba(129,140,248,.45); color: #e0e7ff; }
+  .foot { display: flex; align-items: center; gap: 2vmin; flex-wrap: wrap; font-size: 2.9vmin; color: #94a3b8; }
+  .foot b { color: #a5f3fc; font-weight: 700; }
+  .shot { min-width: 0; min-height: 0; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .shot img { object-fit: contain; }
+  .shot img { max-width: 100%; max-height: 100%; border-radius: 1.6vmin; box-shadow: 0 3vmin 8vmin rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.12); }
+
+  /* formats */
+  body.og { grid-template-columns: 40% 1fr; padding: 4.5vmin; }
+  body.og h1 { font-size: 7.2vmin; }
+  body.og .txt { gap: 2.2vmin; }
+  body.og .brand small { display: none; }
+  body.og .sub { font-size: 3.6vmin; }
+  body.og .chips span { font-size: 2.9vmin; }
+  body.carre, body.portrait { grid-template-rows: auto minmax(0, 1fr) auto; gap: 3.5vmin; }
+  body.carre .txt, body.portrait .txt { gap: 2vmin; }
+  body.carre h1 { font-size: 6.2vmin; }
+  body.carre .sub, body.carre .chips, body.portrait .chips { display: none; }
+  body.carre .foot, body.portrait .foot { justify-content: center; }
+  body.story { grid-template-rows: auto minmax(0, 1fr) auto; padding: 7vmin 6vmin; }
+  body.story h1 { font-size: 8vmin; }
+  body.story .sub { font-size: 4vmin; }
+  body.story .shot img { border-radius: 4vmin; border: 1.2vmin solid #1e293b; }
+  body.story .foot { justify-content: center; font-size: 3.6vmin; }
+</style>
+</head>
+<body>
+  <div class="txt">
+    <div class="brand"><span class="logo">📜</span><b>Contract Lab</b><small data-t="kicker"></small></div>
+    <h1 data-t="title"></h1>
+    <p class="sub" data-t="sub"></p>
+    <div class="chips" data-t="chips"></div>
+    <div class="foot" data-foot><b data-t="url"></b><span data-t="free"></span></div>
+  </div>
+  <div class="shot"><img id="img" alt=""></div>
+<script>
+const T = {
+  fr: {
+    kicker: 'atelier contrat de travail',
+    title: 'Une clause de non-concurrence sans contrepartie ? <em>Nulle.</em>',
+    sub: 'Le contrat de travail en schéma : clauses, garde-fous, obligations et ruptures. Des scénarios animés et des questions pour la classe.',
+    chips: ['✏️ Mode libre', '🎬 Mode cinéma', '❓ Quiz', '📦 SCORM', '🤖 Scénarios par IA'],
+    url: 'edu-fpar.github.io/contract-lab', free: 'Gratuit · sans inscription · FR · EN · ES'
+  },
+  en: {
+    kicker: 'employment contract workshop',
+    title: 'A non-compete that goes too far? <em>Unenforceable.</em>',
+    sub: 'The employment contract as a diagram: terms, safeguards, duties and dismissals. Animated scenarios and questions for the class.',
+    chips: ['✏️ Free mode', '🎬 Cinema mode', '❓ Quiz', '📦 SCORM', '🤖 AI scenarios'],
+    url: 'edu-fpar.github.io/contract-lab/en/', free: 'Free · no sign-up · English law & French law'
+  },
+  es: {
+    kicker: 'taller del contrato de trabajo',
+    title: '¿Un pacto de no competencia sin compensación? <em>Nulo.</em>',
+    sub: 'El contrato de trabajo en un esquema: cláusulas, garantías, obligaciones y despidos. Escenarios animados y preguntas para la clase.',
+    chips: ['✏️ Modo libre', '🎬 Modo cine', '❓ Cuestionarios', '📦 SCORM', '🤖 Escenarios con IA'],
+    url: 'edu-fpar.github.io/contract-lab/es/', free: 'Gratis · sin registro · derecho español'
+  }
+};
+const q = new URLSearchParams(location.search);
+const lang = T[q.get('lang')] ? q.get('lang') : 'fr', d = T[lang];
+document.documentElement.lang = lang;
+document.body.className = q.get('fmt') || 'og';
+document.querySelectorAll('[data-t]').forEach(el => {
+  const v = d[el.dataset.t];
+  if (Array.isArray(v)) el.innerHTML = v.map(s => '<span>' + s + '</span>').join('');
+  else el.innerHTML = v;
+});
+// formats verticaux : le pied de page (adresse) passe sous la capture
+if (document.body.className !== 'og') document.body.appendChild(document.querySelector('[data-foot]'));
+const img = document.getElementById('img');
+img.src = q.get('img') || '';
+img.onload = img.onerror = () => { document.body.dataset.ready = '1'; };
+</script>
+</body>
+</html>

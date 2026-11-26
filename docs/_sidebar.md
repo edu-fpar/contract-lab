@@ -12,3 +12,4 @@
   - [Page d'instructions pour IA](instructions-ia.md)
   - [Développeurs](developpeurs.md)
 - [🇬🇧 English version](en/README.md)
+- [🇪🇸 Versión en español](es/README.md)

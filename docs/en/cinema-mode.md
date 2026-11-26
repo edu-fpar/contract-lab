@@ -14,7 +14,7 @@ Cinema mode 🎬 plays a **scenario**: at each step the canvas comes alive (card
 
 ## Sharing a link
 
-The workshop is online at **https://edu-fpar.github.io/contract-lab/?lang=en**. The **🔗 Share** button offers three links to copy: to **the step displayed**, to **the start of the scenario**, or to **the library**. During playback the browser address follows the current step, so it can be copied directly too.
+The workshop is online at **https://edu-fpar.github.io/contract-lab/?lang=en**. The **🔗 Share** button offers three links to copy: to **the step displayed**, to **the start of the scenario**, or to **the library**. The **Français / English** choice at the top of the menu sets the language of the links (`lang=` parameter): students open the workshop in that language, whatever their browser language. During playback the browser address follows the current step, so it can be copied directly too.
 
 | Link | Opens |
 |---|---|

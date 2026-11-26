@@ -1,6 +1,6 @@
 # Contract Lab
 
-> Atelier pédagogique 100 % navigateur pour visualiser le contrat de travail et le droit du travail français (clauses et leurs garde-fous, incompatibilités, obligations des parties, ruptures et procédures, indemnités, sources du droit), avec vérification automatique des conditions de validité, et pour les présenter en classe sous forme de scénarios animés pas à pas, écrits en markdown. Deux droits (droit français ; droit anglais, England & Wales) et deux langues (français, anglais).
+> Atelier pédagogique 100 % navigateur pour visualiser le contrat de travail et le droit du travail français (clauses et leurs garde-fous, incompatibilités, obligations des parties, ruptures et procédures, indemnités, sources du droit), avec vérification automatique des conditions de validité, et pour les présenter en classe sous forme de scénarios animés pas à pas, écrits en markdown. Trois droits (droit français ; droit anglais, England & Wales ; droit espagnol) et trois langues (français, anglais, espagnol).
 
 ## Pour les IA
 
@@ -14,9 +14,17 @@
 - [Scenario format](https://edu-fpar.github.io/contract-lab/docs/en/format-scenario.md): syntax of steps, commands and questions, catalogues of English law and French law.
 - [Checking rules](https://edu-fpar.github.io/contract-lab/docs/en/checking-rules.md): what the tool checks and calculates under each law, annual figures, Employment Rights Act 2025, limits.
 
+## Para las IA (español)
+
+- [Instrucciones: crear un escenario a partir de una clase](https://edu-fpar.github.io/contract-lab/docs/es/instructions-ia.md): misión (derecho español con `droit: es`, o derecho francés), formato completo de los escenarios, reglas de verificación, ejemplo comentado.
+- [Formato de los escenarios](https://edu-fpar.github.io/contract-lab/docs/es/formato-escenario.md): sintaxis de los pasos, de los comandos y de las preguntas, catálogos del derecho español y del derecho francés.
+- [Reglas de verificación](https://edu-fpar.github.io/contract-lab/docs/es/reglas-de-verificacion.md): lo que la herramienta verifica y calcula en derecho español (prueba, pactos del art. 21 ET, temporales, SMI, indemnizaciones de 20, 33 y 12 días, nulidad, prescripción, caducidad, desempleo), cifras anuales, límites.
+
 ## Pour les humains
 
 - [Atelier en ligne](https://edu-fpar.github.io/contract-lab/)
 - [Documentation](https://edu-fpar.github.io/contract-lab/docs/)
 - [Workshop in English](https://edu-fpar.github.io/contract-lab/?lang=en)
 - [Documentation in English](https://edu-fpar.github.io/contract-lab/docs/#/en/)
+- [Taller en español (derecho español)](https://edu-fpar.github.io/contract-lab/es/)
+- [Documentación en español](https://edu-fpar.github.io/contract-lab/docs/#/es/)

@@ -6,6 +6,10 @@
 <title>Contract Lab — atelier contrat de travail</title>
 <meta name="description" content="Atelier pédagogique gratuit pour visualiser le contrat de travail : clauses en icônes, garde-fous qui les rendent valables, incompatibilités, obligations des parties, ruptures et leurs procédures. Scénarios animés pas à pas et quiz pour la classe.">
 <link rel="canonical" href="https://edu-fpar.github.io/contract-lab/">
+<link rel="alternate" hreflang="fr" href="https://edu-fpar.github.io/contract-lab/">
+<link rel="alternate" hreflang="en" href="https://edu-fpar.github.io/contract-lab/en/">
+<link rel="alternate" hreflang="es" href="https://edu-fpar.github.io/contract-lab/es/">
+<!-- Aperçus de partage : ici en français ; /en/ et /es/ ont les leurs (visuels/<langue>/og.png, voir visuels/README.md) -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 6h44l20 20v68H18z' fill='%230891b2'/%3E%3Cpath d='M30 46h40M30 60h40M30 74h26' stroke='%23fff' stroke-width='7'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fr_FR">
@@ -13,14 +17,14 @@
 <meta property="og:title" content="Contract Lab — atelier contrat de travail">
 <meta property="og:description" content="Une clause de non-concurrence sans contrepartie ? Nulle. Un atelier visuel et des scénarios animés pour enseigner le contrat de travail, ses clauses, les obligations et les ruptures.">
 <meta property="og:url" content="https://edu-fpar.github.io/contract-lab/">
-<meta property="og:image" content="https://edu-fpar.github.io/contract-lab/contract-lab.png">
-<meta property="og:image:width" content="1440">
-<meta property="og:image:height" content="860">
+<meta property="og:image" content="https://edu-fpar.github.io/contract-lab/visuels/fr/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Contract Lab en mode cinéma : une clause de non-concurrence et ses garde-fous, avec une question à la salle">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Contract Lab — atelier contrat de travail">
 <meta name="twitter:description" content="Clauses, garde-fous, obligations et ruptures du contrat de travail : un atelier visuel et des scénarios animés pour la classe.">
-<meta name="twitter:image" content="https://edu-fpar.github.io/contract-lab/contract-lab.png">
+<meta name="twitter:image" content="https://edu-fpar.github.io/contract-lab/visuels/fr/og.png">
 <script>
   /* Thème appliqué avant l'affichage pour éviter un flash : choix mémorisé, sinon réglage du système. */
   (function () {
@@ -49,6 +53,7 @@
     <button id="btn-layout" title="Réorganiser automatiquement">⇅<span class="lbl"> Disposer</span></button>
     <button id="btn-open" title="Ouvrir un schéma (.json) ou un scénario (.md)">📂<span class="lbl"> Ouvrir</span></button>
     <button id="btn-save" title="Enregistrer le schéma (.json)">💾<span class="lbl"> Enregistrer</span></button>
+    <button id="btn-share-libre" title="Copier un lien vers ce schéma (pour les élèves, un collègue)">🔗<span class="lbl"> Partager</span></button>
     <button id="btn-studio" title="Capturer des étapes et produire un scénario">📸<span class="lbl"> Studio</span></button>
   </div>
   <div class="actions" id="actions-cinema" hidden>
@@ -117,14 +122,17 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/i18n-en.js"></script>
+<script src="js/i18n-es.js"></script>
 <script src="js/model.js"></script>
 <script src="js/catalog-fr-en.js"></script>
 <script src="js/catalog-uk.js"></script>
+<script src="js/catalog-es.js"></script>
 <script src="js/scenario.js"></script>
 <script src="js/docs.js"></script>
 <script src="js/library.js"></script>
 <script src="js/library-en.js"></script>
 <script src="js/library-uk.js"></script>
+<script src="js/library-es.js"></script>
 <script src="js/scorm.js"></script>
 <script src="js/app.js"></script>
 <script src="js/intro-launcher.js"></script>

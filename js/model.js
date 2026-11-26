@@ -24,7 +24,7 @@
   };
   P.round2 = v => Math.round(v * 100) / 100;
   P.eur = v => { const cur = (P.juris && P.juris.currency) || 'EUR', n = Math.round(v).toLocaleString(P.locale ? P.locale() : 'fr-FR'); return cur === 'GBP' ? '£' + n : (cur === 'USD' ? '$' + n : n + ' €'); };
-  P.mois = v => P.round2(v).toLocaleString(P.locale ? P.locale() : 'fr-FR') + ' ' + (P.lang === 'en' ? (P.round2(v) > 1 ? 'months' : 'month') : 'mois');
+  P.mois = v => P.round2(v).toLocaleString(P.locale ? P.locale() : 'fr-FR') + ' ' + ({ en: P.round2(v) > 1 ? 'months' : 'month', es: P.round2(v) > 1 ? 'meses' : 'mes' }[P.lang] || 'mois');
 
   /* ------------------------------------------------------------ familles */
   P.FAMS = {
@@ -428,10 +428,17 @@
     _signe: ['signs', 'sign', 'party_to'], _doit: ['owes', 'owe', 'must', 'bound_by'], _viole: ['breaches', 'breach', 'violates'],
     _justifie: ['justifies', 'justify', 'grounds'], _initie: ['initiates', 'initiate', 'starts'], _met_fin: ['ends', 'end', 'terminates'],
     _puis: ['next', 'followed_by'], _ouvre: ['entitles', 'entitles_to', 'opens', 'gives'], _encadre: ['governs', 'govern', 'regulates'],
-    _prevaut: ['prevails', 'prevails_over', 'overrides'], _lien: ['related', 'relates']
+    _prevaut: ['prevails', 'prevails_over', 'overrides'], _lien: ['related', 'relates'],
+    // espagnol
+    __contient: ['contiene', 'incluye'], __limite: ['limita', 'garantiza', 'salvaguarda', 'condiciona'],
+    __requiert: ['requiere', 'necesita'], __exclut: ['excluye', 'impide', 'neutraliza'],
+    __signe: ['firma', 'suscribe'], __doit: ['debe', 'obligado_a'], __viole: ['incumple', 'vulnera', 'infringe'],
+    __justifie: ['justifica', 'motiva'], __initie: ['inicia', 'iniciativa_de'], __met_fin: ['extingue', 'pone_fin', 'termina'],
+    __puis: ['luego', 'despues', 'seguido_de'], __ouvre: ['da_derecho', 'da_derecho_a', 'genera'], __encadre: ['regula', 'rige'],
+    __prevaut: ['prevalece', 'prima_sobre'], __lien: ['vinculo', 'relaciona']
   };
   P.REL_ALIASES = {};
-  Object.keys(relAliases).forEach(r => relAliases[r].forEach(a => { P.REL_ALIASES[P.key(a)] = r.replace(/^_/, ''); }));
+  Object.keys(relAliases).forEach(r => relAliases[r].forEach(a => { P.REL_ALIASES[P.key(a)] = r.replace(/^_+/, ''); }));
   P.relOf = w => P.REL_ALIASES[P.key(w)] || null;
 
   /** Relation par défaut entre deux éléments, d'après leurs familles. Renvoie [rel, inverser]. */
@@ -504,7 +511,7 @@
     agent_maitrise: { label: t('Agent de maîtrise'), essai: 3, max: 6 }, technicien: { label: t('Technicien'), essai: 3, max: 6 },
     cadre: { label: t('Cadre'), essai: 4, max: 8 }
   };
-  P.registerJuris({ id: 'fr', lang: 'fr', names: ['france', 'francais', 'french', 'droit_francais', 'french_law'], paramAliases: { seniority: 'anciennete', salary: 'salaire', category: 'categorie', duration: 'duree', amount: 'montant', total_pay: 'remuneration_totale' }, label: 'Droit français', labelEn: 'French law', flag: '🇫🇷', catalog: CAT_FR, categories: CATEGORIES_FR, aliases: ALIASES_FR, currency: 'EUR' });
+  P.registerJuris({ id: 'fr', lang: 'fr', names: ['france', 'francais', 'french', 'droit_francais', 'french_law'], paramAliases: { seniority: 'anciennete', salary: 'salaire', category: 'categorie', duration: 'duree', amount: 'montant', total_pay: 'remuneration_totale' }, label: 'Droit français', labelEn: 'French law', labelEs: 'Derecho francés', flag: '🇫🇷', catalog: CAT_FR, categories: CATEGORIES_FR, aliases: ALIASES_FR, currency: 'EUR' });
 
   /** Active un droit : catalogue (traduit dans la langue de l'interface si une traduction existe), catégories, alias. */
   const cache = {};
@@ -529,15 +536,15 @@
     P.CATEGORIES = J.categories || {};
     const AL = P.KIND_ALIASES = {};
     Object.keys(C).forEach(k => {
-      const labs = [C[k].label, J.catalog[k].label].concat(['fr', 'en'].filter(x => J[x] && J[x][k]).map(x => J[x][k].label));
+      const labs = [C[k].label, J.catalog[k].label].concat(['fr', 'en', 'es'].filter(x => J[x] && J[x][k]).map(x => J[x][k].label));
       [k, k.replace(/_/g, '')].concat(labs.filter(Boolean).map(P.key)).forEach(a => { AL[a] = k; });
     });
     Object.keys(J.aliases || {}).forEach(k => (J.aliases[k] || []).forEach(a => { if (C[k]) AL[P.key(a)] = k; }));
   };
   /** 'fr', 'france', 'uk', 'england'… → identifiant du droit (noms déclarés dans names) */
   P.jurisOf = w => { const k = P.key(w); return Object.keys(P.JURIS).find(id => id === k || (P.JURIS[id].names || []).includes(k)) || null; };
-  P.jurisLabel = J => (P.lang === 'fr' ? J.label : (J.labelEn || J.label));
-  P.locale = () => (P.lang === 'en' ? 'en-GB' : 'fr-FR');
+  P.jurisLabel = J => (P.lang === 'fr' ? J.label : (P.lang === 'es' && J.labelEs) || J.labelEn || J.label);
+  P.locale = () => ({ en: 'en-GB', es: 'es-ES' }[P.lang] || 'fr-FR');
   let C = null;
   P.setJuris('fr');
   P.catKey = v => { const k = P.key(v); if (P.CATEGORIES[k]) return k; if (/maitrise/.test(k)) return 'agent_maitrise'; if (/cadre/.test(k)) return 'cadre'; if (/tech/.test(k)) return 'technicien'; if (/ouvr/.test(k)) return 'ouvrier'; if (/employ/.test(k)) return 'employe'; return null; };

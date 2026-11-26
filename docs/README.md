@@ -1,4 +1,4 @@
-[🇬🇧 English version](en/README.md)
+[🇬🇧 English version](en/README.md) · [🇪🇸 Versión en español (derecho español)](es/README.md)
 
 # Contract Lab — atelier contrat de travail
 
@@ -10,7 +10,7 @@ Chaque élément du droit du travail devient une carte : le contrat et ses claus
 
 L'atelier existe aussi **en anglais** (`?lang=en`) et connaît deux droits : le **droit français** et le **droit anglais** (Angleterre et pays de Galles : *restrictive covenants*, *unfair dismissal*, *redundancy*, *settlement agreements*…), choisi par la ligne `droit: uk` en tête d'un scénario. Voir la [documentation en anglais](en/README.md).
 
-![Mode libre : un CDI, ses clauses, et la vérification du renouvellement de la période d'essai](../contract-lab-libre.png)
+![Mode libre : un CDI, ses clauses, et la vérification du renouvellement de la période d'essai](../visuels/fr/captures/libre-nuit.png)
 <p class="caption">Le mode libre (nuit) : le contrat de Léa et ses clauses dans leur cadre ; à droite, les conditions de validité du renouvellement de l'essai, toutes remplies.</p>
 
 ## 🤖 Préparer son cours avec une IA

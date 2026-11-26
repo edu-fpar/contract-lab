@@ -6,36 +6,37 @@
   const P = window.P;
 
   /* ------------------------------------------------------------ mots-clés */
+  /* français, anglais, espagnol (formes sans accents : « verificación » → verificacion) */
   const KW = {
-    retirer: ['retirer', 'supprimer', 'enlever', 'remove', 'delete'],
-    renommer: ['renommer', 'rename'],
-    type: ['type'],
-    statut: ['statut', 'status', 'verdict'],
-    condition: ['condition', 'exigence'],
-    param: ['param', 'parametre', 'parametres', 'params'],
-    icone: ['icone', 'icon', 'emoji'],
-    vue: ['vue', 'perspective', 'view', 'zoom'],
-    focus: ['focus', 'surligner', 'highlight', 'montrer'],
-    note: ['note', 'bulle'],
-    effacer: ['effacer', 'vider', 'reset', 'clear'],
-    duree: ['duree', 'duration'],
-    regle: ['regle', 'option', 'rule', 'verification', 'check', 'checking'],
-    droit: ['droit', 'law', 'jurisdiction', 'juridiction'],
-    disposition: ['disposition', 'layout'],
-    deplacer: ['deplacer', 'placer', 'move'],
-    selection: ['selection', 'selectionner', 'select', 'analyse', 'analyser']
+    retirer: ['retirer', 'supprimer', 'enlever', 'remove', 'delete', 'quitar', 'eliminar', 'retirar', 'suprimir'],
+    renommer: ['renommer', 'rename', 'renombrar'],
+    type: ['type', 'tipo'],
+    statut: ['statut', 'status', 'verdict', 'estado', 'veredicto'],
+    condition: ['condition', 'exigence', 'condicion', 'requisito'],
+    param: ['param', 'parametre', 'parametres', 'params', 'parametro', 'parametros'],
+    icone: ['icone', 'icon', 'emoji', 'icono'],
+    vue: ['vue', 'perspective', 'view', 'zoom', 'vista', 'perspectiva'],
+    focus: ['focus', 'surligner', 'highlight', 'montrer', 'resaltar', 'destacar', 'enfocar'],
+    note: ['note', 'bulle', 'nota'],
+    effacer: ['effacer', 'vider', 'reset', 'clear', 'borrar', 'limpiar'],
+    duree: ['duree', 'duration', 'duracion'],
+    regle: ['regle', 'option', 'rule', 'verification', 'check', 'checking', 'regla', 'opcion', 'verificacion'],
+    droit: ['droit', 'law', 'jurisdiction', 'juridiction', 'derecho', 'ley', 'jurisdiccion'],
+    disposition: ['disposition', 'layout', 'disposicion', 'reorganizar'],
+    deplacer: ['deplacer', 'placer', 'move', 'mover', 'colocar'],
+    selection: ['selection', 'selectionner', 'select', 'analyse', 'analyser', 'seleccion', 'seleccionar', 'analizar']
   };
   const KWMAP = {};
   Object.keys(KW).forEach(k => KW[k].forEach(w => { KWMAP[w] = k; }));
-  const NONE = ['aucun', 'aucune', 'aucuns', 'aucunes', 'rien', 'none', 'off', '-', 'nothing'];
+  const NONE = ['aucun', 'aucune', 'aucuns', 'aucunes', 'rien', 'none', 'off', '-', 'nothing', 'ninguno', 'ninguna', 'nada'];
   const isNone = tok => tok && NONE.includes(P.norm(tok.v));
   const STATUTS = {
-    ok: ['ok', 'valide', 'valable', 'licite', 'reguliere', 'regulier', 'respectee', 'vert', 'valid', 'lawful', 'fair', 'green'],
-    ko: ['ko', 'nulle', 'nul', 'illicite', 'irreguliere', 'irregulier', 'abusive', 'invalide', 'rouge', 'void', 'invalid', 'unlawful', 'unfair', 'unenforceable', 'red'],
-    risk: ['risk', 'risque', 'a_risque', 'douteuse', 'orange', 'risky', 'at_risk', 'amber'],
-    violee: ['violee', 'viole', 'manquement', 'breached', 'breach'],
-    neutral: ['neutre', 'neutral', 'gris', 'sans'],
-    auto: ['auto', 'automatique', 'aucun', 'aucune', 'automatic']
+    ok: ['ok', 'valide', 'valable', 'licite', 'reguliere', 'regulier', 'respectee', 'vert', 'valid', 'lawful', 'fair', 'green', 'valido', 'valida', 'licito', 'licita', 'procedente', 'regular', 'verde'],
+    ko: ['ko', 'nulle', 'nul', 'illicite', 'irreguliere', 'irregulier', 'abusive', 'invalide', 'rouge', 'void', 'invalid', 'unlawful', 'unfair', 'unenforceable', 'red', 'nulo', 'nula', 'ilicito', 'ilicita', 'improcedente', 'irregular', 'invalido', 'invalida', 'rojo'],
+    risk: ['risk', 'risque', 'a_risque', 'douteuse', 'orange', 'risky', 'at_risk', 'amber', 'riesgo', 'en_riesgo', 'dudoso', 'dudosa', 'naranja'],
+    violee: ['violee', 'viole', 'manquement', 'breached', 'breach', 'violada', 'violado', 'incumplida', 'incumplido'],
+    neutral: ['neutre', 'neutral', 'gris', 'sans', 'neutro', 'neutra'],
+    auto: ['auto', 'automatique', 'aucun', 'aucune', 'automatic', 'automatico', 'ninguno']
   };
   const statutOf = w => Object.keys(STATUTS).find(k => STATUTS[k].includes(P.key(w))) || null;
 
@@ -75,7 +76,8 @@
     const al = (P.juris && P.juris.paramAliases) || {}; if (al[k]) k = al[k];
     if (k === 'icone' || k === 'icon') return { k: 'icone', v };
     if (k === 'categorie') return { k, v: P.catKey(v) || v };
-    const n = P.num(v);
+    // droit espagnol : 1.221,50 (point des milliers, virgule décimale)
+    const n = P.juris && P.juris.lang === 'es' && /^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(v) ? parseFloat(v.replace(/\./g, '').replace(',', '.')) : P.num(v);
     return { k: ({ anciennete_ans: 'anciennete', salaire_brut: 'salaire', mois: 'duree' })[k] || k, v: n == null ? v : n };
   }
 
@@ -138,11 +140,11 @@
         a.slice(2).forEach(tok => {
           const w = P.key(tok.v);
           if (tok.q) { effet = tok.v; return; }
-          if (['ok', 'oui', 'remplie', 'satisfaite', 'presente', 'vrai', 'yes', 'met', 'present', 'true'].includes(w)) ok = true;
-          else if (['manque', 'non', 'absente', 'manquante', 'ko', 'faux', 'missing', 'no', 'unmet', 'false'].includes(w)) ok = false;
-          else if (['risque', 'leger', 'legere', 'risk', 'minor'].includes(w)) level = 'risque';
-          else if (['grave', 'nullite', 'serious', 'major'].includes(w)) level = 'grave';
-          else if (['retirer', 'supprimer', 'remove', 'delete'].includes(w)) ok = 'del';
+          if (['ok', 'oui', 'remplie', 'satisfaite', 'presente', 'vrai', 'yes', 'met', 'present', 'true', 'si', 'cumplida', 'satisfecha', 'verdadero'].includes(w)) ok = true;
+          else if (['manque', 'non', 'absente', 'manquante', 'ko', 'faux', 'missing', 'no', 'unmet', 'false', 'falta', 'ausente', 'faltante', 'incumplida', 'falso'].includes(w)) ok = false;
+          else if (['risque', 'leger', 'legere', 'risk', 'minor', 'riesgo', 'leve'].includes(w)) level = 'risque';
+          else if (['grave', 'nullite', 'serious', 'major', 'nulidad'].includes(w)) level = 'grave';
+          else if (['retirer', 'supprimer', 'remove', 'delete', 'quitar', 'eliminar'].includes(w)) ok = 'del';
           else err('Mot non compris : « ' + tok.v + ' »');
         });
         e.conds = (e.conds || []).filter(c => P.norm(c.label) !== P.norm(label));
@@ -181,8 +183,8 @@
       case 'duree': return;
       case 'regle': {
         const w = a.map(x => P.key(x.v));
-        const on = w.some(x => ['on', 'oui', 'actif', 'active', 'activee', 'vrai', 'true'].includes(x));
-        const off = w.some(x => ['off', 'non', 'inactif', 'inactive', 'desactivee', 'faux', 'false', 'masquee', 'cachee', 'no', 'hidden', 'hide'].includes(x));
+        const on = w.some(x => ['on', 'oui', 'actif', 'active', 'activee', 'vrai', 'true', 'yes', 'si', 'activa', 'activada', 'activo'].includes(x));
+        const off = w.some(x => ['off', 'non', 'inactif', 'inactive', 'desactivee', 'faux', 'false', 'masquee', 'cachee', 'no', 'hidden', 'hide', 'desactivada', 'inactiva', 'oculta', 'apagada'].includes(x));
         if (!on && !off) return err('Syntaxe : verification on|off');
         st.options.verif = on; return;
       }
@@ -212,7 +214,7 @@
       for (let k = 1; k < a.length; k++) {
         const tok = a[k], w = P.norm(tok.v);
         if (tok.q) { if (name == null) name = tok.v; continue; }
-        if (['at', 'en', '@', 'pos', 'position'].includes(w)) {
+        if (['at', 'en', '@', 'pos', 'position', 'posicion'].includes(w)) {
           x = P.num(a[k + 1] && a[k + 1].v); y = P.num(a[k + 2] && a[k + 2].v); k += 2;
           if (x == null || y == null) err('Coordonnées invalides');
           continue;
@@ -257,17 +259,17 @@
   };
 
   /* ------------------------------------------------------------ analyse d'un scénario */
-  const SCENE_LANGS = ['scene', 'canevas', 'canvas', 'actions', 'script', 'commandes'];
+  const SCENE_LANGS = ['scene', 'canevas', 'canvas', 'actions', 'script', 'commandes', 'escena', 'lienzo', 'comandos'];
 
   /* Étapes « questions » :
    *  - titre commençant par « Question », « Quiz » ou « ❓ », ou présence de choix « - [ ] » / « - [x] »,
    *    ou d'une section « ### Réponse » ;
    *  - lignes indentées (ou citations « > ») sous un choix = explication de ce choix ;
    *  - tout ce qui suit « ### Réponse » (texte et blocs scene) n'apparaît qu'à la révélation. */
-  const ANSWER_RE = /^###\s+(?:💡\s*)?(?:réponse|reponse|correction|explication|solution|answer|explanation)s?\b/i;
+  const ANSWER_RE = /^###\s+(?:💡\s*)?(?:réponse|reponse|correction|explication|solution|answer|explanation|respuesta|solución|solucion|explicación|explicacion|correcci[oó]n)(?:s|es)?(?![\wáéíóúñ])/i;
   const CHOICE_RE = /^\s*[-*+]\s+\[( |x|X)\]\s+(.*)$/;
-  const QTITLE_RE = /^(?:❓\s*)?(?:question|quiz)\b/i;
-  const QPREFIX_RE = /^(?:❓\s*)?(?:(?:question|quiz)\s*(?:n°\s*)?\d*\s*[:.\-–—]\s*)?/i;
+  const QTITLE_RE = /^(?:❓\s*)?(?:question|quiz|pregunta|cuestionario)\b/i;
+  const QPREFIX_RE = /^(?:❓\s*)?(?:(?:question|quiz|pregunta)\s*(?:n[°º]\s*)?\d*\s*[:.\-–—]\s*)?/i;
 
   function makeStep(cur) {
     const ctx = [], choices = [];
@@ -326,7 +328,7 @@
           if (tl && !tl.startsWith('#') && !tl.startsWith('//')) {
             (cur.hasAnswer ? cur.reveal : cur.commands).push({ text: tl, line: i + 1 });
             const t = P.tokenize(tl);
-            if (t.length > 1 && ['duree', 'duration'].includes(P.norm(t[0].v))) cur.duration = P.num(t[1].v);
+            if (t.length > 1 && ['duree', 'duration', 'duracion'].includes(P.norm(t[0].v))) cur.duration = P.num(t[1].v);
           }
         } else mdOut.push(line);
         continue;
@@ -359,7 +361,7 @@
    *  celles de l'étape n seulement si revealLast est vrai. */
   P.buildState = function (sc, n, errs, revealLast) {
     const st = P.newState();
-    const j = P.jurisOf(sc.meta.droit || sc.meta.law || sc.meta.jurisdiction || 'fr') || 'fr';
+    const j = P.jurisOf(sc.meta.droit || sc.meta.law || sc.meta.jurisdiction || sc.meta.derecho || sc.meta.ley || 'fr') || 'fr';
     st.options.droit = j; P.setJuris(j);
     for (let i = 0; i <= n && i < sc.steps.length; i++) {
       st.view.focus = []; st.view.notes = {}; st.view.select = null;

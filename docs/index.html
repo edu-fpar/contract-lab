@@ -12,9 +12,9 @@
   <meta property="og:title" content="Contract Lab — documentation">
   <meta property="og:description" content="Prise en main, mode cinéma, règles de vérification et création de scénarios pour l'atelier Contract Lab.">
   <meta property="og:url" content="https://edu-fpar.github.io/contract-lab/docs/">
-  <meta property="og:image" content="https://edu-fpar.github.io/contract-lab/contract-lab.png">
+  <meta property="og:image" content="https://edu-fpar.github.io/contract-lab/visuels/fr/og.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://edu-fpar.github.io/contract-lab/contract-lab.png">
+  <meta name="twitter:image" content="https://edu-fpar.github.io/contract-lab/visuels/fr/og.png">
   <script>
     /* même réglage que l'atelier : choix mémorisé, sinon réglage du système */
     (function () {
@@ -30,6 +30,12 @@
     .markdown-section table { display: table; width: 100%; }
     .markdown-section pre > code { font-size: .85rem; }
     .app-name-link { font-weight: 700; }
+    #doc-langs { position: fixed; top: 12px; right: 62px; z-index: 30; display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #fff; }
+    #doc-langs a { padding: 4px 9px; font: 600 13px/1.6 system-ui, sans-serif; color: #64748b; text-decoration: none; }
+    #doc-langs a.on { background: var(--theme-color); color: #fff; }
+    [data-theme="dark"] #doc-langs { background: #141c2f; border-color: #2a3550; }
+    [data-theme="dark"] #doc-langs a { color: #94a3b8; }
+    [data-theme="dark"] #doc-langs a.on { color: #0b1120; }
     #theme-toggle {
       position: fixed; top: 12px; right: 16px; z-index: 30; border: 1px solid #e2e8f0; background: #fff;
       border-radius: 8px; padding: 4px 9px; font-size: 16px; cursor: pointer;
@@ -112,15 +118,18 @@
   </style>
 </head>
 <body>
+  <nav id="doc-langs" aria-label="Langue / Language / Idioma"><a href="#/" data-l="fr" title="Documentation en français">FR</a><a href="#/en/" data-l="en" title="Documentation in English">EN</a><a href="#/es/" data-l="es" title="Documentación en español">ES</a></nav>
   <button id="theme-toggle" type="button"></button>
   <script>
     (function () {
       var b = document.getElementById('theme-toggle'), root = document.documentElement;
+      var TITLES = { fr: ['Passer en mode jour', 'Passer en mode nuit'], en: ['Switch to day mode', 'Switch to night mode'], es: ['Pasar al modo claro', 'Pasar al modo oscuro'] };
       function show() {
-        var dark = root.getAttribute('data-theme') === 'dark';
+        var dark = root.getAttribute('data-theme') === 'dark', m = location.hash.match(/^#\/(en|es)(\/|$)/), T = TITLES[m ? m[1] : 'fr'];
         b.textContent = dark ? '☀️' : '🌙';
-        b.title = dark ? 'Passer en mode jour' : 'Passer en mode nuit';
+        b.title = dark ? T[0] : T[1];
       }
+      window.addEventListener('hashchange', show);
       b.onclick = function () {
         var t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-theme', t);
@@ -142,26 +151,47 @@
       subMaxLevel: 2,
       auto2top: true,
       relativePath: true,
-      search: { placeholder: 'Rechercher…', noData: 'Aucun résultat', depth: 3 },
-      plugins: [function (hook) { hook.doneEach(fillAiBox); }]
+      // une barre latérale par langue : docs/_sidebar.md, docs/en/_sidebar.md, docs/es/_sidebar.md (Docsify charge la plus proche)
+      search: {
+        placeholder: { '/en/': 'Search…', '/es/': 'Buscar…', '/': 'Rechercher…' },
+        noData: { '/en/': 'No results', '/es/': 'Sin resultados', '/': 'Aucun résultat' },
+        depth: 3
+      },
+      plugins: [function (hook) { hook.doneEach(function () { showLang(); fillAiBox(); }); }]
     };
+
+    /* Langue de la page : #/en/… (anglais), #/es/… (espagnol), sinon français */
+    function pageLang() { var m = location.hash.match(/^#\/(en|es)(\/|$)/); return m ? m[1] : 'fr'; }
+    var L10N = {
+      fr: { copied: '✅ Copié !', fail: 'Copie impossible : sélectionnez le texte manuellement.',
+        read: 'Lecture impossible : ouvrez la page des instructions (lien « voir les instructions ») et copiez son contenu.', request: 'Ma demande' },
+      en: { copied: '✅ Copied!', fail: 'Copy failed: select the text manually.',
+        read: 'Could not read the file: open the instructions page ("see the instructions" link) and copy its content.', request: 'My request' },
+      es: { copied: '✅ ¡Copiado!', fail: 'No se pudo copiar: seleccione el texto manualmente.',
+        read: 'No se pudo leer el archivo: abra la página de instrucciones (enlace «ver las instrucciones») y copie su contenido.', request: 'Mi petición' }
+    };
+    function showLang() {
+      var l = pageLang();
+      document.documentElement.lang = l;
+      document.querySelectorAll('#doc-langs a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-l') === l); });
+    }
 
     /* Encart IA : adresse de la page d'instructions (publique si la doc est consultée en local) et boutons Copier */
     var PUBLIC_DOCS = 'https://edu-fpar.github.io/contract-lab/docs/';
     function isLocal() { return location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname); }
     function docsBase() { return isLocal() ? PUBLIC_DOCS : location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, ''); }
-    /* pages anglaises (#/en/…) : messages en anglais */
-    function isEn() { return /^#\/en(\/|$)/.test(location.hash); }
     function fillAiBox() {
-      document.querySelectorAll('.js-ia-url').forEach(function (e) { e.textContent = docsBase() + (e.getAttribute('data-path') || 'instructions-ia.md'); });
+      var l = pageLang(), def = (l === 'fr' ? '' : l + '/') + 'instructions-ia.md';
+      document.querySelectorAll('.js-ia-url').forEach(function (e) { e.textContent = docsBase() + (e.getAttribute('data-path') || def); });
       document.querySelectorAll('.js-ia-local').forEach(function (e) { e.hidden = !isLocal(); });
     }
     function copyText(text, btn) {
-      var done = function () { var old = btn.innerHTML; btn.innerHTML = isEn() ? '✅ Copied!' : '✅ Copié !'; setTimeout(function () { btn.innerHTML = old; }, 1600); };
+      var T = L10N[pageLang()];
+      var done = function () { var old = btn.innerHTML; btn.innerHTML = T.copied; setTimeout(function () { btn.innerHTML = old; }, 1600); };
       var fallback = function () {
         var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
         document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); done(); } catch (e) { alert(isEn() ? 'Copy failed: select the text manually.' : 'Copie impossible : sélectionnez le texte manuellement.'); }
+        try { document.execCommand('copy'); done(); } catch (e) { alert(T.fail); }
         ta.remove();
       };
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
@@ -175,13 +205,14 @@
       // Version complète, pour une IA qui n'ouvre pas les liens : instructions + consigne (sans le lien)
       var f = b.getAttribute('data-copy-full');
       var suite = consigne.trim().replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare')
-        .replace(/^Read the instructions at \S+ and prepare/, 'Following the instructions above, prepare');
-      var en = isEn();
+        .replace(/^Read the instructions at \S+ and prepare/, 'Following the instructions above, prepare')
+        .replace(/^Lee las instrucciones en \S+ y prepara/, 'Siguiendo las instrucciones anteriores, prepara');
+      var T = L10N[pageLang()];
       // fichier local d'abord ; sinon (ouverture en file://) la version publiée
       fetch(f).then(function (r) { if (!r.ok) throw 0; return r.text(); })
         .catch(function () { return fetch(PUBLIC_DOCS + f).then(function (r) { if (!r.ok) throw 0; return r.text(); }); })
-        .then(function (t) { copyText(t.trim() + '\n\n---\n\n# ' + (en ? 'My request' : 'Ma demande') + '\n\n' + suite + '\n\n', b); })
-        .catch(function () { alert(en ? 'Could not read the file: open the instructions page ("see the instructions" link) and copy its content.' : 'Lecture impossible : ouvrez la page des instructions (lien « voir les instructions ») et copiez son contenu.'); });
+        .then(function (t) { copyText(t.trim() + '\n\n---\n\n# ' + T.request + '\n\n' + suite + '\n\n', b); })
+        .catch(function () { alert(T.read); });
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/docsify@4.13.1/lib/docsify.min.js"></script>

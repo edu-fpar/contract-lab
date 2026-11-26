@@ -1,4 +1,4 @@
-[🇫🇷 Version française](../README.md)
+[🇫🇷 Version française](../README.md) · [🇪🇸 Versión en español (Spanish law)](../es/README.md)
 
 # Contract Lab — employment contract workshop
 
@@ -8,10 +8,10 @@ Each element of employment law becomes a card: the contract and its clauses, the
 
 [▶ Open the workshop](../index.html?lang=en ':ignore') — online: **https://edu-fpar.github.io/contract-lab/?lang=en**, also usable on a phone.
 
-![Restrictive covenants under English law: the non-compete is enforceable once its four safeguards are in place](../../contract-lab-en.png)
+![Restrictive covenants under English law: the non-compete is enforceable once its four safeguards are in place](../../visuels/en/captures/cinema-question.png)
 <p class="caption">Cinema mode, English law: the non-compete turns green when its last safeguard (a reasonable duration) is added; the classroom question has just been revealed.</p>
 
-![Redundancy under English law, with statutory redundancy pay calculated by the tool](../../contract-lab-en-redundancy.png)
+![Redundancy under English law, with statutory redundancy pay calculated by the tool](../../visuels/en/captures/cinema-rupture-nuit.png)
 <p class="caption">Redundancy (night theme): the procedure chain and statutory redundancy pay, 12 weeks × £751 = £9,012.</p>
 
 ## 🤖 Prepare your course with an AI

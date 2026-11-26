@@ -94,6 +94,7 @@ At the top right. Unticked, it **hides the verdicts and badges**: the cards stay
 ## Saving, opening, tidying
 
 - **💾 Save** downloads the construction as `.json`; **📂 Open** reloads it (or opens a `.md` scenario). A file can also be dropped onto the window.
+- **🔗 Share** gives a link that contains the construction (encoded after the `#`, no server receives it), in English or French, with or without the verdicts: send it to students or a colleague. The link opens the diagram in free mode; **Ctrl+Z** brings back the canvas you had before.
 - Work in progress is kept automatically in the browser.
 - **⇅ Arrange** arranges the cards automatically: parties at the top, contracts, then clauses and their safeguards; procedure chains ("then") on one row, from left to right.
 - **🗋 New** empties the canvas.

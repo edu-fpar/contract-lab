@@ -177,6 +177,8 @@
  .opt .tick { position: absolute; right: -.45em; top: -.55em; width: 1.5em; height: 1.5em; border-radius: 50%; display: grid; place-items: center; background: #16a34a; color: #fff; font-weight: 900; font-style: normal; }
 
  /* ================= 1. accroche ================= */
+ /* en espagnol, le pacte de non-concurrence n'a que deux garanties (art. 21.2 ET) : les trois autres disparaissent */
+ html[lang="es"] .no-es { display: none !important; }
  .s-hook { font-size: 1.3em; }
  .s-hook .big { font-size: 1.5em; }
  .s-hook .big .cn { min-width: 11em; }
@@ -233,7 +235,7 @@
  <div class="wrap">
   <a class="pg-brand" href="index.html" data-app><span class="pg-logo"></span><span><b>Contract Lab</b><small data-p="tagline">Visite guidée en vidéo</small></span></a>
   <div class="pg-langs" role="group" aria-label="Langue / Language">
-   <button type="button" data-plang="fr" aria-pressed="false">FR</button><button type="button" data-plang="en" aria-pressed="false">EN</button>
+   <button type="button" data-plang="fr" aria-pressed="false">FR</button><button type="button" data-plang="en" aria-pressed="false">EN</button><button type="button" data-plang="es" aria-pressed="false">ES</button>
   </div>
   <a class="pg-btn primary" href="index.html" data-app><span data-p="openApp">Ouvrir l'application</span></a>
  </div>
@@ -248,7 +250,7 @@
  <div class="wrap">
   <div class="pg-embedbar">
    <span class="pg-brand"><span class="pg-logo"></span><span><b>Contract Lab</b><small data-p="tagline">Visite guidée en vidéo</small></span></span>
-   <span class="pg-embed-r"><span class="pg-langs" role="group" aria-label="Langue / Language"><button type="button" data-plang="fr" aria-pressed="false">FR</button><button type="button" data-plang="en" aria-pressed="false">EN</button></span>
+   <span class="pg-embed-r"><span class="pg-langs" role="group" aria-label="Langue / Language"><button type="button" data-plang="fr" aria-pressed="false">FR</button><button type="button" data-plang="en" aria-pressed="false">EN</button><button type="button" data-plang="es" aria-pressed="false">ES</button></span>
    <button class="pg-skip" id="pg-skip" type="button"><span data-p="skip">Passer l'introduction</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 6 6 6-6 6M13 6l6 6-6 6"/></svg></button></span>
   </div>
 
@@ -262,7 +264,7 @@
    <div class="node">
     <div class="cn"><i>🚫</i><span><b data-t="ncName"></b><small data-t="tClause"></small></span><i class="ring ko" data-in="fade 2.6 0.4"></i></div>
     <div class="under">
-     <span class="pz" data-stagger="0.9 0.12"><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span></span>
+     <span class="pz" data-stagger="0.9 0.12"><span data-in="pop"><i class="off"></i></span><span class="no-es" data-in="pop"><i class="off"></i></span><span class="no-es" data-in="pop"><i class="off"></i></span><span class="no-es" data-in="pop"><i class="off"></i></span><span data-in="pop"><i class="off"></i></span></span>
     </div>
    </div>
   </div>
@@ -291,21 +293,21 @@
     <span class="app-modes"><span>✏️ <span data-t="mLibre"></span></span><span class="on">🎬 <span data-t="mCine"></span></span></span><span class="app-sp"></span>
     <span class="app-b hide-9x16 hide-1x1">📚 <span data-t="bScen"></span></span></div>
    <div class="canvas">
-    <div class="cn" data-in="pop 0.4 0.4"><i>📃</i><span><b data-t="ctK"></b><small>CDI</small></span></div>
+    <div class="cn" data-in="pop 0.4 0.4"><i>📃</i><span><b data-t="ctK"></b><small data-t="ctT"></small></span></div>
     <div class="vl" data-in="fade 0.6 0.3"></div>
     <div class="node" data-in="pop 0.6 0.4">
      <div class="cn"><i>🚫</i><span><b data-t="ncName"></b><small data-t="tClause"></small></span><i class="ring ko" data-out="fade 6.8 0.3"></i><i class="ring ok" data-in="fade 6.8 0.4"></i></div>
      <div class="under">
       <span class="stack"><em class="vd ko" data-out="fade 6.8 0.2" data-t="vNulle"></em><em class="vd ok" data-in="pop 6.9 0.4" data-t="vValide"></em></span>
-      <span class="pz"><span><i class="off"></i><i class="on" data-in="pop 1.25 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 1.65 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 2.05 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 2.45 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 6.5 0.3">✓</i></span></span>
+      <span class="pz"><span><i class="off"></i><i class="on" data-in="pop 1.25 0.3">✓</i></span><span class="no-es"><i class="off"></i><i class="on" data-in="pop 1.65 0.3">✓</i></span><span class="no-es"><i class="off"></i><i class="on" data-in="pop 2.05 0.3">✓</i></span><span class="no-es"><i class="off"></i><i class="on" data-in="pop 2.45 0.3">✓</i></span><span><i class="off"></i><i class="on" data-in="pop 6.5 0.3">✓</i></span></span>
      </div>
     </div>
     <div class="bracket" data-in="fade 1.0 0.3"></div>
     <div class="row">
      <div class="cn lim" data-in="pop 1.1 0.35"><i>🏰</i><span><b data-t="g1"></b></span></div>
-     <div class="cn lim" data-in="pop 1.5 0.35"><i>⌛</i><span><b data-t="g2"></b></span></div>
-     <div class="cn lim" data-in="pop 1.9 0.35"><i>🗺️</i><span><b data-t="g3"></b></span></div>
-     <div class="cn lim" data-in="pop 2.3 0.35"><i>🧩</i><span><b data-t="g4"></b></span></div>
+     <div class="cn lim no-es" data-in="pop 1.5 0.35"><i>⌛</i><span><b data-t="g2"></b></span></div>
+     <div class="cn lim no-es" data-in="pop 1.9 0.35"><i>🗺️</i><span><b data-t="g3"></b></span></div>
+     <div class="cn lim no-es" data-in="pop 2.3 0.35"><i>🧩</i><span><b data-t="g4"></b></span></div>
      <div class="g5"><div class="cn lim" data-in="pop 6.3 0.4"><i>💰</i><span><b data-t="g5"></b></span><i class="ring sel" data-in="fade 6.5 0.3"></i></div></div>
     </div>
    </div>
@@ -404,7 +406,7 @@
      <div class="fam">🎁 <span data-t="f8"></span></div>
     </div>
     <div class="canvas">
-     <div class="cn" data-in="pop 0.4 0.4"><i>📃</i><span><b data-t="ctK"></b><small>CDI</small></span></div>
+     <div class="cn" data-in="pop 0.4 0.4"><i>📃</i><span><b data-t="ctK"></b><small data-t="ctT"></small></span></div>
      <div class="vl" data-in="wipe-up 2.4 0.3"></div>
      <div class="node" data-in="pop 2.2 0.4">
       <div class="cn"><i>🧳</i><span><b data-t="mob"></b><small data-t="tClause"></small></span>
@@ -438,7 +440,7 @@
   <div class="k-pointer" data-in="fade 1.2 0.3" data-out="fade 8.3 0.3" data-moves="#l-hit 1.9, #l-add 3.6, #l-chk 5.5" data-clicks="2.0 3.7 5.6"></div>
  </section>
 
- <!-- ============ 6. Deux droits : français et anglais ============ -->
+ <!-- ============ 6. Deux droits : le français et celui de la langue (anglais, espagnol) ============ -->
  <section class="scene g-demo wide" data-dur="8" data-chapter="ch6" data-say="say6" data-key="7.2">
   <div class="app" data-in="fade-up 0.1 0.6">
    <div class="app-top"><span class="app-brand">📜 Contract Lab<small data-t="appSub"></small></span>
@@ -453,16 +455,16 @@
      </div>
      <div class="twolaw">
       <div class="row" data-stagger="1.8 0.12">
-       <div class="cn" data-in="pop"><i>🏭</i><span><b>Corvid Print Ltd</b><small>Employer</small></span></div>
-       <div class="cn" data-in="pop"><i>👤</i><span><b>Alan Hughes</b><small>45 · 10 years · £820/wk</small></span></div>
+       <div class="cn" data-in="pop"><i>🏭</i><span><b data-t="wCo"></b><small data-t="wCoT"></small></span></div>
+       <div class="cn" data-in="pop"><i>👤</i><span><b data-t="wEmp"></b><small data-t="wEmpT"></small></span></div>
       </div>
-      <div class="cn" data-in="pop 2.2 0.4"><i>✂️</i><span><b>Redundancy</b><small>Dismissal</small></span></div>
+      <div class="cn" data-in="pop 2.2 0.4"><i>✂️</i><span><b data-t="wRup"></b><small data-t="wRupT"></small></span></div>
       <div class="calc" data-in="fade-up 2.6 0.5">
-       <header>💷 Statutory redundancy pay</header>
-       <div class="ln" data-in="fade 3.0 0.3"><span>4 years aged 41–44 × 1.5</span><span>6 weeks</span></div>
-       <div class="ln" data-in="fade 3.3 0.3"><span>6 years aged 35–40 × 1</span><span>6 weeks</span></div>
-       <div class="ln" data-in="fade 3.6 0.3"><span>Week's pay (capped)</span><span>£751</span></div>
-       <div class="tot" data-in="fade 3.9 0.3"><span>12 weeks × £751</span><b data-in="pop 4.0 0.5">£9,012</b></div>
+       <header data-t="wCalc"></header>
+       <div class="ln" data-in="fade 3.0 0.3"><span data-t="wL1"></span><span data-t="wL1v"></span></div>
+       <div class="ln" data-in="fade 3.3 0.3"><span data-t="wL2"></span><span data-t="wL2v"></span></div>
+       <div class="ln" data-in="fade 3.6 0.3"><span data-t="wL3"></span><span data-t="wL3v"></span></div>
+       <div class="tot" data-in="fade 3.9 0.3"><span data-t="wTot"></span><b data-in="pop 4.0 0.5" data-t="wTotV"></b></div>
       </div>
      </div>
     </div>
@@ -484,8 +486,8 @@
  <section class="scene g-stats" data-dur="5" data-chapter="ch7" data-say="say7">
   <p class="k-kicker" data-in="fade 0.1" data-t="statsK"></p>
   <div class="k-stats" data-stagger="0.3 0.2">
-   <div class="k-stat" data-in="fade-up"><b data-count="0.4 1.2">22</b><span data-t="stat1"></span></div>
-   <div class="k-stat" data-in="fade-up"><b data-count="0.6 0.8">2</b><span data-t="stat2"></span></div>
+   <div class="k-stat" data-in="fade-up"><b data-count="0.4 1.2" data-t="nScen">22</b><span data-t="stat1"></span></div>
+   <div class="k-stat" data-in="fade-up"><b data-count="0.6 0.8" data-t="nLaws">2</b><span data-t="stat2"></span></div>
    <div class="k-stat" data-in="fade-up"><b>0</b><span data-t="stat3"></span></div>
   </div>
   <div class="k-row k-center" data-stagger="2.2 0.15">
@@ -515,20 +517,21 @@
    <h2 data-p="toolsT">Par où commencer ?</h2>
    <p data-p="toolsP"></p>
    <div class="pg-grid">
-    <article class="pg-card"><h3><span>🎬</span><b data-p="c1T"></b></h3><p data-p="c1P"></p><a class="pg-btn" href="index.html?scenario=non-concurrence" data-app data-p="c1B"></a></article>
-    <article class="pg-card"><h3><span>❓</span><b data-p="c2T"></b></h3><p data-p="c2P"></p><a class="pg-btn" href="index.html?scenario=faute-grave&amp;etape=3" data-app data-en="index.html?scenario=uk-gross-misconduct&amp;etape=6" data-p="c2B"></a></article>
-    <article class="pg-card"><h3><span>⚖️</span><b data-p="c3T"></b></h3><p data-p="c3P"></p><a class="pg-btn" href="index.html?scenario=uk-redundancy" data-app data-lang="en" data-p="c3B"></a></article>
+    <article class="pg-card"><h3><span>🎬</span><b data-p="c1T"></b></h3><p data-p="c1P"></p><a class="pg-btn" href="index.html?scenario=non-concurrence" data-app data-es="index.html?scenario=es-no-competencia" data-p="c1B"></a></article>
+    <article class="pg-card"><h3><span>❓</span><b data-p="c2T"></b></h3><p data-p="c2P"></p><a class="pg-btn" href="index.html?scenario=faute-grave&amp;etape=3" data-app data-en="index.html?scenario=uk-gross-misconduct&amp;etape=6" data-es="index.html?scenario=es-improcedente-nulo&amp;etape=4" data-p="c2B"></a></article>
+    <article class="pg-card"><h3><span>⚖️</span><b data-p="c3T"></b></h3><p data-p="c3P"></p><a class="pg-btn" href="index.html?scenario=uk-redundancy" data-app data-lang="en" data-es="index.html?scenario=es-despido-objetivo" data-p="c3B"></a></article>
     <article class="pg-card"><h3><span>📚</span><b data-p="c4T"></b></h3><p data-p="c4P"></p><a class="pg-btn" href="index.html?scenarios" data-app data-p="c4B"></a></article>
-    <article class="pg-card"><h3><span>🤖</span><b data-p="c5T"></b></h3><p data-p="c5P"></p><a class="pg-btn" href="docs/index.html#/ia-et-skill" data-en="docs/index.html#/en/ai-and-skill" data-p="c5B"></a></article>
-    <article class="pg-card"><h3><span>📦</span><b data-p="c6T"></b></h3><p data-p="c6P"></p><a class="pg-btn" href="docs/index.html#/mode-cinema" data-en="docs/index.html#/en/cinema-mode" data-p="c6B"></a></article>
+    <article class="pg-card"><h3><span>🤖</span><b data-p="c5T"></b></h3><p data-p="c5P"></p><a class="pg-btn" href="docs/index.html#/ia-et-skill" data-en="docs/index.html#/en/ai-and-skill" data-es="docs/index.html#/es/ia-y-skill" data-p="c5B"></a></article>
+    <article class="pg-card"><h3><span>📦</span><b data-p="c6T"></b></h3><p data-p="c6P"></p><a class="pg-btn" href="docs/index.html#/mode-cinema" data-en="docs/index.html#/en/cinema-mode" data-es="docs/index.html#/es/modo-cine" data-p="c6B"></a></article>
    </div>
   </div>
  </section>
 </main>
 
-<footer class="pg-foot"><div class="wrap"><span>© 2026 François Parlant · <a href="LICENSE">CC BY-NC-SA 4.0</a> · <a href="https://doi.org/10.5281/zenodo.24508195">DOI 10.5281/zenodo.24508195</a></span><span><a href="docs/index.html" data-en="docs/index.html#/en/" data-p="docs">Documentation</a><a href="https://github.com/edu-fpar/contract-lab">GitHub</a></span></div></footer>
+<footer class="pg-foot"><div class="wrap"><span>© 2026 François Parlant · <a href="LICENSE">CC BY-NC-SA 4.0</a> · <a href="https://doi.org/10.5281/zenodo.24508195">DOI 10.5281/zenodo.24508195</a></span><span><a href="docs/index.html" data-en="docs/index.html#/en/" data-es="docs/index.html#/es/" data-p="docs">Documentation</a><a href="https://github.com/edu-fpar/contract-lab">GitHub</a></span></div></footer>
 
-<!-- Tous les textes de l'animation, par langue (seulement celles du projet : FR, EN). La voix lit les clés data-say. -->
+<!-- Tous les textes de l'animation, par langue (celles du projet : FR, EN, ES). La voix lit les clés data-say.
+     Chaque langue montre son droit : droit anglais en anglais, droit espagnol en espagnol (scènes 1, 3, 4 et 6 en ES). -->
 <script type="application/json" id="anim-texts">
 {
  "fr": {
@@ -579,7 +582,12 @@
   "stat1": "scénarios intégrés", "stat2": "droits : français et anglais", "stat3": "installation : tout dans le navigateur",
   "x1": "Prompt pour une IA", "x2": "Export SCORM", "x3": "Sur téléphone",
   "cta": "Essayez-le en classe",
-  "b1": "Gratuit", "b2": "Hors ligne", "b3": "Sur téléphone"
+  "b1": "Gratuit", "b2": "Hors ligne", "b3": "Sur téléphone",
+  "ctT": "CDI",
+  "wCo": "Corvid Print Ltd", "wCoT": "Employer", "wEmp": "Alan Hughes", "wEmpT": "45 · 10 years · £820/wk", "wRup": "Redundancy", "wRupT": "Dismissal",
+  "wCalc": "💷 Statutory redundancy pay", "wL1": "4 years aged 41–44 × 1.5", "wL1v": "6 weeks", "wL2": "6 years aged 35–40 × 1", "wL2v": "6 weeks",
+  "wL3": "Week's pay (capped)", "wL3v": "£751", "wTot": "12 weeks × £751", "wTotV": "£9,012",
+  "nScen": "22", "nLaws": "2"
  },
  "en": {
   "title": "Contract Lab – Guided tour",
@@ -629,7 +637,66 @@
   "stat1": "built-in scenarios", "stat2": "laws: French and English", "stat3": "installs: it all runs in the browser",
   "x1": "AI prompt", "x2": "SCORM export", "x3": "On a phone",
   "cta": "Try it in class",
-  "b1": "Free", "b2": "Works offline", "b3": "On a phone"
+  "b1": "Free", "b2": "Works offline", "b3": "On a phone",
+  "ctT": "CDI",
+  "wCo": "Corvid Print Ltd", "wCoT": "Employer", "wEmp": "Alan Hughes", "wEmpT": "45 · 10 years · £820/wk", "wRup": "Redundancy", "wRupT": "Dismissal",
+  "wCalc": "💷 Statutory redundancy pay", "wL1": "4 years aged 41–44 × 1.5", "wL1v": "6 weeks", "wL2": "6 years aged 35–40 × 1", "wL2v": "6 weeks",
+  "wL3": "Week's pay (capped)", "wL3v": "£751", "wTot": "12 weeks × £751", "wTotV": "£9,012",
+  "nScen": "22", "nLaws": "2"
+ },
+ "es": {
+  "title": "Contract Lab – Visita guiada",
+  "ch1": "¿Válida o nula?", "ch2": "Contract Lab", "ch3": "Modo cine", "ch4": "Verificación", "ch5": "Modo libre", "ch6": "Tres derechos", "ch7": "En cifras", "ch8": "Probar",
+  "say1": "Un pacto de no competencia: ¿válido o nulo? Se ve a simple vista.",
+  "say2": "Contract Lab: el contrato de trabajo y sus reglas, en iconos.",
+  "say3": "En modo cine, un escenario avanza paso a paso, con preguntas para la clase.",
+  "say4": "La herramienta verifica y calcula: el despido disciplinario no da derecho a indemnización.",
+  "say5": "En modo libre, usted construye el contrato; oculte la verificación y deje que la clase juzgue.",
+  "say6": "Derecho español, francés e inglés, cada uno con sus propios cálculos.",
+  "say7": "Escenarios listos, una instrucción para la IA y una exportación SCORM para Moodle.",
+  "say8": "Gratis y sin instalación: pruébelo en clase.",
+  "hookK": "Derecho del trabajo",
+  "ncName": "No competencia", "tClause": "Pacto",
+  "hookQ": "¿Válido o nulo?",
+  "hookA": "⛔ Nulo: faltan 2 garantías",
+  "kicker": "Taller del contrato de trabajo",
+  "sub": "El contrato de trabajo y sus reglas, en iconos",
+  "chip1": "Cláusulas", "chip2": "Garantías", "chip3": "Despidos", "chip4": "Indemnizaciones",
+  "appSub": "taller del contrato de trabajo", "mLibre": "Libre", "mCine": "Cine", "bScen": "Escenarios",
+  "ctK": "Contrato de Carlos", "ctT": "Indefinido",
+  "vNulle": "⛔ nulo", "vValide": "✅ válido", "vRisque": "⚠️ en riesgo",
+  "g1": "Interés industrial o comercial efectivo", "g2": "", "g3": "", "g4": "", "g5": "Compensación: 30 % del salario",
+  "qTag": "Pregunta", "qT": "¿Qué garantía falta?",
+  "qA": "El consentimiento escrito de Carlos", "qB": "Una compensación económica adecuada", "qC": "Una autorización de la Inspección", "qD": "Un preaviso de 15 días",
+  "cinK": "🎬 Modo cine", "cinT": "Un escenario, paso a paso",
+  "cin1": "Paso a paso o reproducción continua", "cin2": "Preguntas para la clase", "cin3": "Una vista para el móvil",
+  "fgLaw": "⚖️ Derecho español",
+  "fgEmp": "Lucía Moreno", "tSal": "Trabajadora", "fgCo": "Moda Sol S.L.", "tEmployeur": "Empresa",
+  "fgLic": "Despido de Lucía", "tRupture": "Extinción",
+  "fgF1": "Descuadres de caja", "fgF1t": "Incumplimiento leve", "fgF2": "Hurtos en la caja", "fgF2t": "Falta muy grave",
+  "st1": "Carta de despido", "st1d": "hechos y fecha", "st2": "Fecha de efectos", "st2d": "20 días hábiles", "st3": "Papeleta de conciliación",
+  "r1": "Preaviso (15 días)", "r2": "Indemnización por despido", "r3": "Vacaciones no disfrutadas",
+  "due": "✅ se debe", "r1ko": "⊘ no: despido disciplinario", "r2ko": "⊘ no: despido disciplinario", "r3ok": "✅ en el finiquito",
+  "verK": "⚖️ Verificación automática", "verT": "La herramienta verifica y calcula",
+  "ver1": "Validez de cláusulas y pactos", "ver2": "Forma y plazos del despido", "ver3": "Preaviso e indemnizaciones",
+  "chk": "Verificación", "srch": "movi", "mob": "Movilidad",
+  "f1": "Partes", "f2": "Contratos", "f3": "Cláusulas", "f4": "Garantías", "f5": "Obligaciones", "f6": "Faltas", "f7": "Extinciones", "f8": "Indemnizaciones",
+  "inspT": "Garantía que falta:", "zone": "Zona geográfica precisa", "zoneV": "Comunidad Valenciana",
+  "judge": "Veredictos ocultos: la clase juzga",
+  "libK": "✏️ Modo libre", "libT": "Usted construye, la herramienta verifica",
+  "lib1": "Una paleta por familias", "lib2": "Las garantías en pastillas", "lib3": "Verificación que se puede ocultar",
+  "lawFr": "Derecho francés", "lawUk": "Derecho español", "frLaw": "Derecho francés", "frRc": "Ruptura convencional", "frInd": "Indemnización específica", "tDroit": "Indemnización",
+  "wCo": "Gráficas Turia S.L.", "wCoT": "Empresa", "wEmp": "Javier Ruiz", "wEmpT": "10 años · 36.500 €/año", "wRup": "Despido objetivo", "wRupT": "Causas económicas",
+  "wCalc": "💶 Indemnización (art. 53 ET)", "wL1": "10 años × 20 días", "wL1v": "200 días", "wL2": "Salario diario (36.500 € / 365)", "wL2v": "100 €",
+  "wL3": "Tope: 12 mensualidades", "wL3v": "36.500 €", "wTot": "200 días × 100 €", "wTotV": "20.000 €",
+  "lawK": "🌍 Tres derechos", "lawT": "Derecho español, francés e inglés",
+  "law1": "Despido objetivo, improcedente y nulo, periodo de prueba", "law2": "CDI, CDD, faute grave, rupture conventionnelle", "law3": "Interfaz en español, francés e inglés",
+  "statsK": "Listo para el aula",
+  "nScen": "11", "nLaws": "3",
+  "stat1": "escenarios en español", "stat2": "derechos: español, francés e inglés", "stat3": "instalaciones: todo funciona en el navegador",
+  "x1": "Instrucción para una IA", "x2": "Exportación SCORM", "x3": "En el móvil",
+  "cta": "Pruébelo en clase",
+  "b1": "Gratis", "b2": "Sin conexión", "b3": "En el móvil"
  }
 }
 </script>
@@ -697,6 +764,36 @@
   "c6P": "Export a scenario as a SCORM package: completion, resume and score are reported to the platform.",
   "c6B": "Learn more",
   "docs": "Documentation"
+ },
+ "es": {
+  "tagline": "Visita guiada en vídeo",
+  "openApp": "Abrir la aplicación",
+  "skip": "Saltar la introducción",
+  "start": "Empezar",
+  "scenario": "Ver un escenario",
+  "h1": "Contract Lab en un minuto",
+  "lead": "El contrato de trabajo y el derecho del trabajo en iconos: las cláusulas y sus garantías, las obligaciones, los despidos y sus indemnizaciones, verificados automáticamente. En derecho español, francés e inglés, con escenarios animados para el aula.",
+  "toolsT": "¿Por dónde empezar?",
+  "toolsP": "Cada enlace abre la aplicación directamente en el lugar adecuado. Nada que instalar, ninguna cuenta: todo funciona en el navegador, incluso sin conexión.",
+  "c1T": "El pacto de no competencia",
+  "c1P": "El escenario del vídeo (derecho español): las garantías del artículo 21.2 del Estatuto de los Trabajadores y la pregunta de la que falta.",
+  "c1B": "Iniciar el escenario",
+  "c2T": "Una pregunta para la clase",
+  "c2P": "¿Despido improcedente o nulo? El alumnado vota y después se revela la respuesta, con sus consecuencias.",
+  "c2B": "Abrir la pregunta",
+  "c3T": "El derecho español",
+  "c3P": "Despido objetivo, disciplinario, improcedente o nulo, periodo de prueba, contratos temporales: once escenarios en español, con sus cálculos.",
+  "c3B": "Ver el despido objetivo",
+  "c4T": "Todos los escenarios",
+  "c4P": "Los escenarios de derecho español, y los de derecho francés e inglés en sus idiomas.",
+  "c4B": "Elegir un escenario",
+  "c5T": "Su clase se convierte en un escenario",
+  "c5P": "Una instrucción lista para copiar en su IA y una skill de Claude que verifica el escenario con el motor real.",
+  "c5B": "Prepararlo con una IA",
+  "c6T": "En Moodle",
+  "c6P": "Exporte un escenario como paquete SCORM: la finalización, la reanudación y la nota llegan a la plataforma.",
+  "c6B": "Más información",
+  "docs": "Documentación"
  }
 }
 </script>
@@ -718,16 +815,18 @@
 
   const lang = () => (T[document.documentElement.lang] ? document.documentElement.lang : "fr");
 
-  /* Liens : data-en = cible en anglais (scénario de droit anglais, page de documentation anglaise) ;
-     data-app = lien vers l'application, qui reçoit ?lang= (data-lang pour imposer une langue). */
+  /* Liens : data-en / data-es = cible dans cette langue (scénario du droit de la langue : anglais, espagnol ;
+     page de documentation traduite) ; data-app = lien vers l'application, qui reçoit ?lang=
+     (data-lang impose une langue quand la langue de la page n'a pas sa propre cible). */
   function links() {
     const l = lang();
-    document.querySelectorAll("a[data-app], a[data-en]").forEach((a) => {
+    document.querySelectorAll("a[data-app], a[data-en], a[data-es]").forEach((a) => {
       if (!a.dataset.base) a.dataset.base = a.getAttribute("href");
-      const href = l === "en" && a.dataset.en ? a.dataset.en : a.dataset.base;
+      const own = l !== "fr" && a.dataset[l];
+      const href = own || a.dataset.base;
       if (!a.hasAttribute("data-app")) { a.setAttribute("href", href); return; }
       const u = new URL(href, location.href);
-      u.searchParams.set("lang", a.dataset.lang || l);
+      u.searchParams.set("lang", own ? l : a.dataset.lang || l);
       a.setAttribute("href", u.pathname.split("/").pop() + u.search.replace("scenarios=", "scenarios"));
     });
   }
@@ -754,7 +853,7 @@
         const b = mk('<button class="pg-btn primary" type="button" data-p="start"></button>');
         b.addEventListener("click", closeEmbed); end.prepend(b);
       } else {
-        end.prepend(mk('<a class="pg-btn" href="index.html?scenario=non-concurrence" data-app data-p="scenario"></a>'));
+        end.prepend(mk('<a class="pg-btn" href="index.html?scenario=non-concurrence" data-app data-es="index.html?scenario=es-no-competencia" data-p="scenario"></a>'));
         end.prepend(mk('<a class="pg-btn primary" href="index.html" data-app data-p="openApp"></a>'));
       }
     }

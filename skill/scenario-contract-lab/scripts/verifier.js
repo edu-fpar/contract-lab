@@ -3,9 +3,10 @@
  * Vérifie un scénario « Contract Lab » avec le moteur de l'outil.
  * Checks a Contract Lab scenario with the tool's engine.
  *
- * Usage : node verifier.js scenario.md [--lang fr|en]
+ * Usage : node verifier.js scenario.md [--lang fr|en|es]
  * Langue des messages : --lang, sinon anglais si le scénario est détecté comme anglais
- * (front matter droit: uk, titres « ### Answer », texte en anglais), sinon français.
+ * (front matter droit: uk, titres « ### Answer », texte en anglais), espagnol s'il est
+ * détecté comme espagnol (droit: es, « ### Respuesta »), sinon français.
  * Affiche, étape par étape, les éléments, leurs relations et le verdict
  * calculé par l'outil (valide, à risque, nulle, violée), avec les garde-fous
  * manquants et les calculs. Code de sortie 1 s'il reste des erreurs bloquantes.
@@ -19,13 +20,15 @@ let lang = null;
 const li = args.findIndex(a => a === '--lang' || a.startsWith('--lang='));
 if (li >= 0) { lang = args[li].includes('=') ? args[li].split('=')[1] : args[li + 1]; args.splice(li, args[li].includes('=') ? 1 : 2); }
 const file = args[0];
-if (!file) { console.error('Usage : node verifier.js scenario.md [--lang fr|en]'); process.exit(2); }
+if (!file) { console.error('Usage : node verifier.js scenario.md [--lang fr|en|es]'); process.exit(2); }
 const md = fs.readFileSync(file, 'utf8');
 
 /* détection de la langue du scénario */
 function detectLang(src) {
   const fm = src.replace(/\r/g, '').match(/^\s*---\n([\s\S]*?)\n---/);
   if (fm && /^\s*(droit|law|jurisdiction)\s*:\s*(uk|england|england_wales|english_law|gb|ew)\b/im.test(fm[1])) return 'en';
+  if (fm && /^\s*(droit|law|jurisdiction|derecho|ley)\s*:\s*(es|espana|españa|spain|derecho_espanol|spanish_law)\s*$/im.test(fm[1])) return 'es';
+  if (/^###\s+(💡\s*)?(respuesta|solución|solucion|explicación|explicacion)\b/im.test(src)) return 'es';
   if (/^###\s+(💡\s*)?(answer|explanation)s?\b/im.test(src)) return 'en';
   if (/^###\s+(💡\s*)?(réponse|reponse)\b/im.test(src)) return 'fr';
   const words = src.toLowerCase().match(/[a-zàâçéèêëîïôûùüÿœ']+/g) || [];
@@ -34,17 +37,33 @@ function detectLang(src) {
   let en = 0, fr = 0; words.forEach(w => { if (EN.has(w)) en++; if (FR.has(w)) fr++; });
   return en > fr ? 'en' : 'fr';
 }
-if (lang !== 'fr' && lang !== 'en') lang = detectLang(md);
-const EN = lang === 'en';
+if (lang !== 'fr' && lang !== 'en' && lang !== 'es') lang = detectLang(md);
+const EN = lang === 'en', ES = lang === 'es';
 
 global.window = global;
 const lib = f => require(path.join(__dirname, 'lib', f + '.js'));
-lib('i18n'); lib('i18n-en');
+/* modules facultatifs (copies plus anciennes de lib/ : sans espagnol) */
+const optLib = f => { if (fs.existsSync(path.join(__dirname, 'lib', f + '.js'))) lib(f); };
+lib('i18n'); lib('i18n-en'); optLib('i18n-es');
 const P = global.P;
 P.lang = lang;   // avant model.js : familles et relations sont traduites au chargement
-['model', 'catalog-fr-en', 'catalog-uk', 'scenario'].forEach(lib);
+['model', 'catalog-fr-en', 'catalog-uk'].forEach(lib);
+optLib('catalog-es');
+lib('scenario');
 
-const M = EN ? {
+const M = ES ? {
+  scenario: 'Escenario', steps: n => `${n} paso(s)`, noStep: 'ERROR: ningún paso (¿faltan los títulos «##»?)',
+  err: (s, l, t, m) => `ERROR paso ${s}, línea ${l}: «${t}» — ${m}`, intro: ' (texto anterior al primer «##»)',
+  masked: '   (veredictos ocultos en pantalla: verification off)', question: '   ❓ pregunta: ', noExpl: '   (sin explicación)',
+  open: '     (pregunta abierta)', reveal: '     comandos al revelar: ', after: '     (estado siguiente: tras revelar)',
+  wNoRight: s => `paso ${s}: pregunta con opciones sin respuesta correcta [x]`, wOne: s => `paso ${s}: pregunta con una sola opción`,
+  wNoExpl: s => `paso ${s}: pregunta sin explicación (ni «### Respuesta» ni explicación de las opciones)`,
+  wShown: (s, ids) => `paso ${s}: pregunta sin «verification off» mientras ${ids} muestra un veredicto — el lienzo puede delatar la respuesta`,
+  wNoText: s => `paso ${s}: sin comentario`, wLong: (s, n) => `paso ${s}: comentario largo (${n} caracteres), ¿dividirlo?`,
+  wNote: (s, id, n) => `paso ${s}: la nota sobre ${id} es larga (${n} caracteres)`,
+  or: ' o ', via: ' (vía ', otherwise: ' — si no: ', rels: '   relaciones: ', zoom: '   zoom en: ', law: 'Derecho: ',
+  warns: 'Avisos:', nErr: n => `${n} error(es) por corregir.`, ok: 'Sin errores. Compare los veredictos con los comentarios.'
+} : EN ? {
   scenario: 'Scenario', steps: n => `${n} step(s)`, noStep: 'ERROR: no step (missing "##" headings?)',
   err: (s, l, t, m) => `ERROR step ${s}, line ${l}: "${t}" — ${m}`, intro: ' (text placed before the first "##")',
   masked: '   (verdicts hidden on screen: verification off)', question: '   ❓ question: ', noExpl: '   (no explanation)',
@@ -74,14 +93,14 @@ const sc = P.parseScenario(md);
 
 let blocking = 0;
 const warn = [];
-console.log(`${M.scenario} : ${sc.title}`.replace(' :', EN ? ':' : ' :'));
+console.log(`${M.scenario} : ${sc.title}`.replace(' :', EN || ES ? ':' : ' :'));
 console.log(`${M.steps(sc.steps.length)}\n`);
 if (!sc.steps.length) { console.log(M.noStep); process.exit(1); }
 
 const errs = [];
 P.buildState(sc, sc.steps.length - 1, errs);
 const J = P.JURIS[P.jurisId] || {};
-console.log(M.law + (EN ? (J.labelEn || J.label) : J.label) + '\n');
+console.log(M.law + (ES ? (J.labelEs || J.labelEn || J.label) : EN ? (J.labelEn || J.label) : J.label) + '\n');
 errs.forEach(e => { blocking++; console.log(M.err(e.step + 1, e.line, e.text, P.t(e.msg))); });
 if (errs.length) console.log('');
 

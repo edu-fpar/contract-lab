@@ -5,53 +5,79 @@
  * ============================================================ */
 window.P = window.P || {};
 
+/** Texte dans la langue de l'interface : { fr, en, es } → la version de P.lang, sinon le français. */
+P.byLang = o => (o[P.lang] != null ? o[P.lang] : o.fr);
+
 /* Aide rapide (fenêtre ❔ Aide) : l'essentiel, le détail est dans la documentation (docs/). */
-P.HELP_LIBRE = P.lang === 'en'
-  ? `- Click or drag an **item** from the palette (clauses, safeguards, obligations, terminations…); drag the **+** handle of a card onto another to link them.
+P.HELP_LIBRE = P.byLang({
+  en: `- Click or drag an **item** from the palette (clauses, safeguards, obligations, terminations…); drag the **+** handle of a card onto another to link them.
 - With a card selected, clicking in the palette adds the item **and links it**.
 - Verdicts: ✅ valid, ⚠️ at risk, ⛔ void; the **badges** under a card are its safeguards (dotted: missing, ＋ to add them).
-- **🔍 Checks** unticked: verdicts hidden, the class decides. **📸 Studio**: turn a diagram into a scenario.`
-  : `- Cliquez ou glissez un **élément** de la palette (clauses, garde-fous, obligations, ruptures…) ; tirez la poignée **+** d'une carte vers une autre pour les relier.
+- **🔍 Checks** unticked: verdicts hidden, the class decides. **📸 Studio**: turn a diagram into a scenario.`,
+  es: `- Haga clic en un **elemento** de la paleta o arrástrelo (cláusulas, garantías, obligaciones, extinciones…); arrastre el asa **+** de una tarjeta hasta otra para unirlas.
+- Con una tarjeta seleccionada, un clic en la paleta añade el elemento **y lo une a ella**.
+- Veredictos: ✅ válida, ⚠️ en riesgo, ⛔ nula; las **pastillas** bajo una tarjeta son sus salvaguardas (punteadas: faltan; ＋ para añadirlas).
+- **🔍 Verificación** desmarcada: veredictos ocultos, la clase juzga. **📸 Estudio**: convertir un esquema en escenario.`,
+  fr: `- Cliquez ou glissez un **élément** de la palette (clauses, garde-fous, obligations, ruptures…) ; tirez la poignée **+** d'une carte vers une autre pour les relier.
 - Avec une carte sélectionnée, un clic dans la palette ajoute l'élément **et le relie**.
 - Verdicts : ✅ valide, ⚠️ à risque, ⛔ nulle ; les **pastilles** sous une carte sont ses garde-fous (pointillées : manquants, ＋ pour les ajouter).
-- **🔍 Vérification** décochée : verdicts masqués, la classe juge. **📸 Studio** : transformer une construction en scénario.`;
+- **🔍 Vérification** décochée : verdicts masqués, la classe juge. **📸 Studio** : transformer une construction en scénario.`
+});
 
-P.HELP_CINEMA = P.lang === 'en'
-  ? `- **📚 Scenarios**: choose, paste or drop a markdown scenario.
+P.HELP_CINEMA = P.byLang({
+  en: `- **📚 Scenarios**: choose, paste or drop a markdown scenario.
 - **→ / Space**: next step (first reveals the answer to a question); **←**: previous.
 - **🔗 Share**: link to a step or a scenario. Also works on a phone.
-- **📦 SCORM**: .zip package for Moodle or another LMS (completion, resume, quiz score).`
-  : `- **📚 Scénarios** : choisir, coller ou déposer un scénario markdown.
+- **📦 SCORM**: .zip package for Moodle or another LMS (completion, resume, quiz score).`,
+  es: `- **📚 Escenarios**: elegir, pegar o soltar un escenario en markdown.
+- **→ / Espacio**: paso siguiente (primero revela la respuesta de una pregunta); **←**: anterior.
+- **🔗 Compartir**: enlace a un paso o a un escenario, en el idioma que elija. También funciona en el móvil.
+- **📦 SCORM**: paquete .zip para Moodle u otro LMS (finalización, reanudación, nota de las preguntas).`,
+  fr: `- **📚 Scénarios** : choisir, coller ou déposer un scénario markdown.
 - **→ / Espace** : étape suivante (révèle d'abord la réponse d'une question) ; **←** : précédente.
 - **🔗 Partager** : lien vers une étape ou un scénario. Fonctionne aussi sur téléphone.
-- **📦 SCORM** : paquet .zip pour Moodle ou un autre LMS (achèvement, reprise, note des quiz).`;
+- **📦 SCORM** : paquet .zip pour Moodle ou un autre LMS (achèvement, reprise, note des quiz).`
+});
 
-P.HELP_THANKS = P.lang === 'en'
-  ? `Contract Lab reuses the scenario engine of **Capital Lab**, which grew out of the tool devised by **Tao** for his financial law class and passed on by **Yannick**.`
-  : `Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil imaginé par **Tao** pour sa classe de droit financier et transmis par **Yannick**.`;
+P.HELP_THANKS = P.byLang({
+  en: `Contract Lab reuses the scenario engine of **Capital Lab**, which grew out of the tool devised by **Tao** for his financial law class and passed on by **Yannick**.`,
+  es: `Contract Lab reutiliza el motor de escenarios de **Capital Lab**, nacido de la herramienta ideada por **Tao** para su clase de derecho financiero y transmitida por **Yannick**.`,
+  fr: `Contract Lab reprend le moteur de scénarios de **Capital Lab**, né de l'outil imaginé par **Tao** pour sa classe de droit financier et transmis par **Yannick**.`
+});
 
 P.IA_INSTRUCTIONS_URL = 'https://edu-fpar.github.io/contract-lab/docs/instructions-ia.md';
-P.IA_CONSIGNE = P.lang === 'en'
-  ? 'Read the instructions at https://edu-fpar.github.io/contract-lab/docs/en/instructions-ia.md and prepare a Contract Lab scenario from the course below (or the attached file). Audience: HR / employment law students (undergraduate), 6 to 8 steps, with two questions for the class.'
-  : `Lis les instructions sur ${P.IA_INSTRUCTIONS_URL} et prépare un scénario Contract Lab à partir du cours ci-dessous (ou du fichier joint). Public : BTS / licence RH, 6 à 8 étapes, avec deux questions pour la salle.`;
+P.IA_CONSIGNE = P.byLang({
+  en: 'Read the instructions at https://edu-fpar.github.io/contract-lab/docs/en/instructions-ia.md and prepare a Contract Lab scenario from the course below (or the attached file). Audience: HR / employment law students (undergraduate), 6 to 8 steps, with two questions for the class.',
+  es: 'Lee las instrucciones en https://edu-fpar.github.io/contract-lab/docs/es/instructions-ia.md y prepara un escenario de Contract Lab a partir de la clase siguiente (o del archivo adjunto). Público: estudiantes de Relaciones Laborales o de Derecho (grado), de 6 a 8 pasos, con dos preguntas para la clase.',
+  fr: `Lis les instructions sur ${P.IA_INSTRUCTIONS_URL} et prépare un scénario Contract Lab à partir du cours ci-dessous (ou du fichier joint). Public : BTS / licence RH, 6 à 8 étapes, avec deux questions pour la salle.`
+});
 /** Version pour une IA qui n'ouvre pas les liens : la consigne sans le lien, à placer après les instructions. */
 P.iaConsigneSansLien = c => c.trim()
   .replace(/^Lis les instructions sur \S+ et prépare/, 'En suivant les instructions ci-dessus, prépare')
-  .replace(/^Read the instructions at \S+ and prepare/, 'Following the instructions above, prepare');
+  .replace(/^Read the instructions at \S+ and prepare/, 'Following the instructions above, prepare')
+  .replace(/^Lee las instrucciones en \S+ y prepara/, 'Siguiendo las instrucciones anteriores, prepara');
 
 /** Libellés des familles dans chaque langue (indépendants de la langue de chargement de model.js). */
 P.FAM_LABELS_DOC = {
   fr: { partie: 'Parties & acteurs', contrat: 'Contrats', clause: 'Clauses', limite: 'Garde-fous & conditions', obligation: 'Obligations', manquement: 'Fautes & manquements', rupture: 'Ruptures du contrat', etape: 'Procédure', droit: 'Indemnités & droits', norme: 'Normes' },
-  en: { partie: 'Parties & actors', contrat: 'Contracts', clause: 'Clauses', limite: 'Safeguards & conditions', obligation: 'Obligations', manquement: 'Misconduct & breaches', rupture: 'Termination of the contract', etape: 'Procedure', droit: 'Payments & entitlements', norme: 'Legal sources' }
+  en: { partie: 'Parties & actors', contrat: 'Contracts', clause: 'Clauses', limite: 'Safeguards & conditions', obligation: 'Obligations', manquement: 'Misconduct & breaches', rupture: 'Termination of the contract', etape: 'Procedure', droit: 'Payments & entitlements', norme: 'Legal sources' },
+  es: { partie: 'Partes y actores', contrat: 'Contratos', clause: 'Cláusulas', limite: 'Salvaguardas y condiciones', obligation: 'Obligaciones', manquement: 'Faltas e incumplimientos', rupture: 'Extinción del contrato', etape: 'Procedimiento', droit: 'Indemnizaciones y derechos', norme: 'Fuentes del derecho' }
 };
 
 /** Catalogue des types, en tableaux markdown, pour un droit et une langue donnés.
  *  P.catalogDoc() : droit français, en français (comportement historique, utilisé par P.FORMAT_DOC).
- *  P.catalogDoc('uk', 'en') : droit anglais, en anglais ; P.catalogDoc('fr', 'en') : droit français, textes anglais.
+ *  P.catalogDoc('uk', 'en') : droit anglais, en anglais ; P.catalogDoc('fr', 'en') : droit français, textes anglais ;
+ *  P.catalogDoc('es', 'es') : droit espagnol, en espagnol (vide si js/catalog-es.js n'est pas chargé).
  *  level : niveau des titres de familles (3 par défaut). */
+P.CAT_DOC_WORDS = {
+  en: { head: '| Type | Icon | Label | Data (`key=value`) | Conditions checked (safeguards) | Also accepted |', or: ' or ', risk: ' (risk)', illicit: 'unlawful by nature' },
+  es: { head: '| Tipo | Icono | Etiqueta | Datos (`clave=valor`) | Condiciones verificadas (salvaguardas) | También se acepta |', or: ' o ', risk: ' (riesgo)', illicit: 'ilícita por naturaleza' },
+  fr: { head: '| Type | Icône | Libellé | Conditions vérifiées (garde-fous) |', or: ' ou ', risk: ' (risque)', illicit: 'illicite par nature' }
+};
 P.catalogDoc = function (jurisId, lang, level) {
   jurisId = jurisId || 'fr'; lang = lang || 'fr';
-  const h = '#'.repeat(level || 3), en = lang === 'en';
+  if (!P.JURIS || !P.JURIS[jurisId]) return '';
+  const h = '#'.repeat(level || 3), wide = lang !== 'fr', W = P.CAT_DOC_WORDS[lang] || P.CAT_DOC_WORDS.fr;
   const prevLang = P.lang, prevJuris = P.jurisId || 'fr';
   let md = '';
   P.lang = lang; P.setJuris(jurisId);
@@ -60,15 +86,13 @@ P.catalogDoc = function (jurisId, lang, level) {
     P.FAM_ORDER.forEach(f => {
       const F = P.FAMS[f], ks = Object.keys(C).filter(k => C[k].fam === f);
       if (!ks.length) return;
-      md += en
-        ? `\n${h} ${F.icon} ${labs[f]}\n\n| Type | Icon | Label | Data (\`key=value\`) | Conditions checked (safeguards) | Also accepted |\n|---|---|---|---|---|---|\n`
-        : `\n${h} ${F.icon} ${labs[f]}\n\n| Type | Icône | Libellé | Conditions vérifiées (garde-fous) |\n|---|---|---|---|\n`;
+      md += `\n${h} ${F.icon} ${labs[f]}\n\n${W.head}\n|${'---|'.repeat(wide ? 6 : 4)}\n`;
       ks.forEach(k => {
         const d = C[k];
-        const req = (d.req || []).map(r => r.any.map(x => '`' + x + '`').join(en ? ' or ' : ' ou ') + (r.level === 'risque' ? (en ? ' (risk)' : ' (risque)') : '')).join(', ');
+        const req = (d.req || []).map(r => r.any.map(x => '`' + x + '`').join(W.or) + (r.level === 'risque' ? W.risk : '')).join(', ');
         const ex = (d.excl || []).map(x => '⊘ ' + x.any.map(y => '`' + y + '`').join('/')).join(', ');
-        const cond = [req, ex, d.illicite ? (en ? 'unlawful by nature' : 'illicite par nature') : ''].filter(Boolean).join(' ; ') || '—';
-        if (en) {
+        const cond = [req, ex, d.illicite ? W.illicit : ''].filter(Boolean).join(' ; ') || '—';
+        if (wide) {
           const params = (d.params || []).map(p => '`' + p + '`').join(', ') || '—';
           const al = ((J.aliases || {})[k] || []).filter((a, i, arr) => a !== k && arr.indexOf(a) === i).map(a => '`' + a + '`').join(', ') || '—';
           md += `| \`${k}\` | ${d.icon} | ${d.label} | ${params} | ${cond} | ${al} |\n`;
@@ -419,4 +443,196 @@ The checks (validity of clauses, incompatibilities, calculations) are done by th
 ----- REQUESTED TOPIC -----
 
 [Describe here the notion to explain, the law (English or French), the audience (e.g. undergraduate HR or law students) and the number of steps wanted.]
+`;
+
+/* ------------------------------------------------------------ versiones en español
+ * P.FORMAT_DOC_ES y P.AI_PROMPT_ES: los usa la aplicación cuando P.lang === 'es'.
+ * El catálogo del derecho español se genera a partir de js/catalog-es.js: si ese archivo
+ * no está cargado, la sección queda vacía (con un aviso) y el resto sigue funcionando. */
+P.FORMAT_DOC_ES = `# Formato de los escenarios (modo «cine»)
+
+Un escenario es un archivo **markdown** corriente. La herramienta lo divide en **pasos** (uno por cada título de nivel 2) y ejecuta, en cada paso, los **comandos** de los bloques \`scene\`, que construyen un esquema: un contrato y sus cláusulas, sus salvaguardas, las partes y sus obligaciones, una extinción y su procedimiento, las indemnizaciones a las que da derecho. Después la herramienta **verifica** cada elemento (✅ válida, ⚠️ en riesgo, ⛔ nula o improcedente, ⚡ obligación incumplida).
+
+Hay tres derechos disponibles: **derecho español**, **derecho francés** y **derecho inglés (Inglaterra y Gales)**. Un escenario usa uno de ellos (véase «Elegir el derecho»); los comandos son los mismos, el catálogo de tipos cambia.
+
+## Estructura
+
+~~~
+---
+droit: es
+---
+# Título del escenario
+> Una frase de descripción (opcional).
+
+Texto de introducción (opcional: se convierte en el primer paso).
+
+## 1. Título del primer paso
+Comentario en markdown: **negrita**, *cursiva*, listas, tablas, citas…
+Se puede citar un elemento por su identificador: [[NC]].
+
+\`\`\`scene
+empresa EMP "Ópticas del Turia S.L."
+trabajador CAR "Carlos Gil" antiguedad=4 salario=2500 categoria=tecnico
+contrato_indefinido CT "Contrato de Carlos"
+EMP CAR -> CT
+pacto_no_competencia NC "No competencia" duracion=24
+CT -> NC
+focus NC
+\`\`\`
+
+## 2. Título del paso siguiente
+…
+~~~
+
+Reglas:
+- los pasos son **acumulativos**: cada paso parte del estado del anterior;
+- \`focus\`, \`nota\` y \`seleccion\` solo valen para el paso en que se escriben; \`vista\` sigue activa hasta \`vista ninguna\`;
+- los bloques pueden escribirse \`\`\`scene o ~~~scene (alias: canvas, actions, script);
+- dentro de un bloque, una línea que empieza por # o // es un comentario;
+- identificadores sin espacios (CT, NC, CAR…); nombres entre comillas dobles;
+- \`[[ID]]\` en el comentario muestra el nombre del elemento, resaltado en el lienzo al pasar el ratón (\`[[ID|otro texto]]\` para elegir el texto).
+
+## Elegir el derecho
+
+| Derecho | Cómo elegirlo | Claves de tipos |
+|---|---|---|
+| Derecho español | encabezado \`droit: es\` al principio del archivo (también \`derecho: es\`), o el comando \`derecho es\` en el primer bloque | en español, sin tildes: \`trabajador\`, \`contrato_indefinido\`, \`pacto_no_competencia\`, \`despido_disciplinario\`, \`indemnizacion_despido\`… |
+| Derecho francés | el derecho por defecto: no hay que escribir nada (o \`droit: fr\`) | claves francesas (\`salarie\`, \`cdi\`, \`non_concurrence\`, \`licenciement_personnel\`…) |
+| Derecho inglés (Inglaterra y Gales) | encabezado \`droit: uk\` | claves inglesas (\`employee\`, \`permanent\`, \`non_compete\`, \`conduct_dismissal\`…) |
+
+- Nombres aceptados: \`es\`, \`espana\`, \`spain\`, \`derecho_espanol\`… para el derecho español; \`fr\`, \`france\` para el francés; \`uk\`, \`england\`, \`english_law\` para el inglés.
+- Un escenario, un derecho. El encabezado es la forma recomendada: la biblioteca y los enlaces compartidos muestran entonces la bandera correcta. Debe empezar en la primera línea del archivo.
+- El idioma del texto y el derecho son independientes: un escenario de derecho francés puede escribirse en español (derecho comparado). Las etiquetas del catálogo siguen el idioma de la interfaz cuando existe una traducción.
+- Derecho español: importes en €, \`antiguedad\` en años (con decimales), \`salario\` bruto **mensual con prorrata de pagas extra**, \`categoria\` (\`tecnico_titulado\`, \`tecnico\` u otro). Derecho francés: \`anciennete\`, \`salaire\`, \`categorie\` (también se aceptan \`antiguedad\`, \`salario\`, \`categoria\` en el derecho español, y las claves francesas o inglesas equivalentes).
+
+## Pasos pregunta (quiz)
+
+Un paso puede interrogar al público. Sube entonces una ventana en la parte inferior del lienzo con la pregunta y las opciones en grandes tarjetas. El docente puede hacer clic en la opción elegida por la clase y después revela la respuesta: botón, **→** o mando de presentación. Las tarjetas cambian de color; al hacer clic en una tarjeta se le da la vuelta para leer su explicación. La explicación general aparece en el panel de la derecha. En reproducción continua, el avance espera a la revelación. En un paquete SCORM, las preguntas dan una nota.
+
+~~~
+## Pregunta: ¿es válido este pacto de no competencia?
+Contexto opcional, que se muestra en el panel de la derecha.
+
+\`\`\`scene
+verificacion off
+interes_efectivo IE "Clientela de la óptica"
+IE -> NC
+focus NC
+\`\`\`
+
+- [ ] Sí, Carlos firmó su contrato
+  La firma no basta: el pacto restringe la libertad de trabajo (art. 21.2 ET).
+- [x] No, le falta una compensación económica adecuada
+  Las condiciones son acumulativas: sin compensación, el pacto es nulo.
+- [ ] Sí, si la empresa lo decide
+  El juez controla los requisitos de validez.
+
+### Respuesta
+Explicación general, que se muestra tras la revelación.
+
+\`\`\`scene
+verificacion on
+compensacion_economica CE "30 % del salario"
+CE -> NC
+nota NC "Válido: interés efectivo y compensación"
+\`\`\`
+~~~
+
+Reglas:
+- un paso es una pregunta si su título empieza por «Pregunta» (o «Question», «Quiz», «❓»), si contiene opciones \`- [ ]\` / \`- [x]\`, o una sección \`### Respuesta\` (también: Solución, Explicación, Corrección; en francés: Réponse; en inglés: Answer);
+- \`[x]\` marca una respuesta correcta; puede haber varias, o ninguna casilla para una **pregunta abierta**;
+- el texto de la pregunta es el título, sin el prefijo «Pregunta:»;
+- el contexto va **antes** de las opciones; las líneas sangradas (o «> ») justo debajo de una opción son su explicación;
+- los comandos situados **después** de \`### Respuesta\` solo se ejecutan al revelar, lo que permite mostrar la respuesta en el lienzo; siguen aplicados en los pasos siguientes (salvo \`focus\`, \`nota\` y \`seleccion\`, propios del paso);
+- \`verificacion off\` antes de la pregunta oculta veredictos y pastillas (si no, el lienzo da la respuesta), \`verificacion on\` en la respuesta los restablece;
+- evite que el texto de los pasos anteriores ya dé la respuesta.
+
+## Comandos
+
+Cada comando tiene un nombre en español, en francés y en inglés (\`quitar\` / \`retirer\` / \`remove\`…); se pueden mezclar.
+
+| Comando | Efecto |
+|---|---|
+| \`TIPO ID "Nombre"\` | crea o modifica un elemento del tipo indicado (véase el catálogo más abajo), p. ej. \`pacto_permanencia PP "Permanencia 2 años"\` |
+| \`TIPO ID "Nombre" clave=valor …\` | con datos: \`trabajador CAR "Carlos" antiguedad=4 salario=2500 categoria=tecnico\`, \`periodo_prueba PR duracion=6\`, \`contrato_temporal CT duracion=8\` |
+| \`clause ID "Nombre" icono=🧸\` | elemento libre, con el icono que se quiera (también \`condition\`, \`obligation\`, \`rupture\`, \`etape\`, \`droit\`, \`norme\`, \`partie\`, \`contrat\`) |
+| \`TIPO ID "Nombre" en 200 150\` | posición fija (también \`at\`); sin ella, disposición automática |
+| \`A -> B\` | une A con B; la relación se elige según los tipos (véase más abajo) |
+| \`A B C -> D\` | une A, B y C con D (p. ej. tres salvaguardas con una cláusula) |
+| \`A -> B C D\` | une A con B, C y D (p. ej. un contrato con sus cláusulas) |
+| \`A -> B relación\` | relación impuesta: \`contiene\`, \`limita\`, \`requiere\`, \`excluye\`, \`firma\`, \`debe\`, \`incumple\`, \`justifica\`, \`inicia\`, \`extingue\`, \`luego\`, \`da_derecho\`, \`regula\`, \`prevalece\`, \`vinculo\` (en francés: \`contient\`, \`limite\`, \`requiert\`, \`exclut\`, \`signe\`, \`doit\`, \`viole\`, \`justifie\`, \`initie\`, \`met_fin\`, \`puis\`, \`ouvre\`, \`encadre\`, \`prevaut\`, \`lien\`) |
+| \`A -> B luego "20 días hábiles"\` | relación con una etiqueta mostrada en el vínculo (plazo, importe…) |
+| \`limita CE NC\` | otra forma: primero la relación, después el origen y el destino o destinos |
+| \`quitar ID\` / \`quitar A -> B\` | elimina un elemento / un vínculo (\`retirer\`, \`eliminar\`) |
+| \`renombrar ID "Nuevo nombre"\` · \`tipo ID contrato_temporal\` | renombra / cambia el tipo |
+| \`parametro ID clave=valor\` · \`icono ID 🧸\` | añade o modifica datos / el icono (\`param\`, \`icone\`) |
+| \`condicion ID "Etiqueta" cumplida\` / \`falta\` | condición libre mostrada como pastilla (\`falta riesgo\`: naranja; \`"efecto"\` al final de la línea); \`condicion ID ninguna\` las quita (también \`ok\` / \`manque\`) |
+| \`estado ID nula "texto"\` | impone un veredicto: \`valida\`, \`riesgo\`, \`nula\`, \`incumplida\`, \`neutral\` (también \`improcedente\`, \`procedente\`; \`veredicto\`, \`statut\`); \`estado ID auto\` vuelve al cálculo |
+| \`verificacion off\` / \`on\` | oculta / muestra los veredictos y las pastillas (para las preguntas) |
+| \`vista ID\` / \`vista ninguna\` | zoom en el expediente de un elemento (el resto queda atenuado) |
+| \`focus ID ID…\` | resalta elementos (también \`resaltar\`) |
+| \`nota ID "texto"\` | bocadillo encima de un elemento |
+| \`seleccion ID\` | muestra las condiciones de validez de ID bajo el comentario |
+| \`duracion 12\` | duración del paso en reproducción continua, en segundos |
+| \`mover ID X Y\` · \`disposicion\` · \`borrar\` | mover, volver a la disposición automática, vaciar el lienzo |
+| \`derecho es\` · \`derecho fr\` | elige el derecho; mejor el encabezado \`droit: es\` |
+
+Un elemento citado en un vínculo sin haberse declarado se crea automáticamente (como cláusula libre, o del tipo cuyo nombre lleva) y se muestra una advertencia: declare siempre sus elementos.
+
+### Relaciones elegidas automáticamente
+
+| De → a | Relación |
+|---|---|
+| salvaguarda → cualquier elemento | \`limita\` (vínculo verde 🔒) |
+| parte → contrato | \`firma\` |
+| contrato → cláusula | \`contiene\` (la cláusula entra en el marco del contrato) |
+| parte → obligación | \`debe\` |
+| falta / incumplimiento → obligación | \`incumple\` (la obligación pasa a ⚡ incumplida) |
+| falta → extinción | \`justifica\` (la falta cuenta como causa de la extinción) |
+| parte → extinción | \`inicia\` |
+| extinción → contrato | \`extingue\` |
+| extinción → trámite, trámite → trámite | \`luego\` (cadena de procedimiento, mostrada en fila) |
+| extinción o trámite → indemnización / derecho | \`da_derecho\` |
+| norma → norma / otro | \`prevalece\` / \`regula\` |
+
+### Qué verifica la herramienta
+
+- **Salvaguardas**: cada tipo tiene sus condiciones (columna «Condiciones verificadas» del catálogo). Una condición se cumple si un elemento del tipo esperado está **unido directamente** al elemento, pertenece a la misma **cadena de procedimiento** (\`luego\`) o está unido al **contrato** que contiene la cláusula (p. ej. una \`forma_escrita\` unida al contrato vale para su periodo de prueba). Las condiciones que faltan aparecen como pastillas punteadas bajo la tarjeta.
+- **Incompatibilidades** (⊘): se verifican en el mismo **expediente**, es decir, los elementos unidos entre sí, sin pasar por las partes ni por las normas. P. ej. \`funciones_previas\` (el trabajador ya había desempeñado esas funciones) neutraliza el \`periodo_prueba\`; en derecho francés, una \`faute_grave\` neutraliza el \`preavis\` y la \`indemnite_licenciement\`.
+- **Datos**: una cifra se busca en el propio elemento, después en su expediente y después en las partes unidas a él: ponga \`antiguedad\`, \`salario\` y \`categoria\` en el trabajador, y \`plantilla\` en la empresa.
+- **Cálculos, derecho español** (⚠️ simplificaciones descritas en el catálogo): indemnización por despido con prorrata por meses (20 días por año con tope de 12 mensualidades en el despido objetivo o colectivo; 33 días con tope de 24 si es improcedente; 12 días al fin de un contrato temporal), salario diario = \`salario\` × 12 / 365 (o \`salario_diario\`), duración máxima del periodo de prueba (art. 14 ET), del pacto de no competencia (2 años técnicos, 6 meses los demás) y del pacto de permanencia, contrato por circunstancias de la producción (\`duracion\`, \`meses_acumulados\`: 18 meses en 24), SMI, jornada, horas extraordinarias y vacaciones, preaviso de 15 días, umbrales del despido colectivo (\`plantilla\`, \`afectados\`), plazos de caducidad (\`dias_habiles\`: 20 días hábiles), prestación por desempleo (\`dias_cotizados\`). Las cifras anuales (SMI…) son parámetros que se pueden sustituir en cualquier elemento.
+- **Cálculos, derecho francés**: periodo de prueba (\`duree\` en meses, \`categorie\` del trabajador), CDD (\`duree\` > 18 meses), preaviso legal e indemnización legal por despido (\`anciennete\` en años, \`salaire\` mensual bruto), indemnización de ruptura convencional (\`montant\` frente al mínimo legal), indemnización de precariedad (\`remuneration_totale\`).
+
+## Catálogo de tipos
+
+### Derecho español
+
+Encabezado \`droit: es\`. Las claves de tipos están en español, sin tildes; la columna «También se acepta» da los alias.
+` + (P.catalogDoc('es', 'es', 4) || '\n> ⚠️ El catálogo del derecho español (js/catalog-es.js) no está cargado.\n') + `
+### Derecho francés (etiquetas en francés)
+
+El derecho por defecto. Las claves de tipos están en francés; la columna «También se acepta» da los alias, incluidos los ingleses. Para el derecho inglés, véase la versión inglesa de este documento.
+` + P.catalogDoc('fr', 'es', 4) + `
+## Consejos de redacción
+
+- De 5 a 9 pasos; cada paso añade una sola idea (una cláusula y sus salvaguardas, un trámite del procedimiento, una falta…).
+- Muestre primero la cláusula **sola** (⛔, pastillas punteadas) y añada después sus salvaguardas una a una: la tarjeta se pone verde ante la clase.
+- Para una extinción, ponga la extinción, después su cadena de procedimiento (\`luego\` con los plazos como etiqueta) y después los derechos a los que da lugar (\`da_derecho\`).
+- Ponga las cifras en el trabajador (\`antiguedad\`, \`salario\`, \`categoria\`): los cálculos las encuentran. Dé el cálculo en el texto («200 días × 100 € = 20.000 €»): la herramienta muestra las mismas cifras.
+- Use \`focus\` y \`nota\` para guiar la mirada; un bocadillo debe ser breve (unos 60 caracteres).
+- Cuando la herramienta no sabe representar una regla (apreciación de los hechos por el juez, mejoras del convenio, fechas reales…), use \`condicion\` o \`estado\` con un texto y explíquelo en el comentario.
+- Derecho español: cite los artículos (ET, LRJS, LGSS) e indique el año de las cifras que cambian (SMI…).
+`;
+
+P.AI_PROMPT_ES = `Vas a redactar un escenario didáctico para Contract Lab, una herramienta que visualiza el contrato de trabajo y el derecho del trabajo (cláusulas, salvaguardas, obligaciones, extinciones), en derecho español o en derecho francés.
+El escenario debe respetar EXACTAMENTE el formato descrito a continuación: un documento markdown, un título de nivel 1 y después un paso por cada título de nivel 2, cada paso con un comentario didáctico en español y un bloque de comandos \`\`\`scene. Para el derecho español, empieza el archivo con el encabezado --- / droit: es / ---.
+Las verificaciones (validez de las cláusulas, incompatibilidades, cálculos) las hace la herramienta: tus comentarios deben anunciar los mismos veredictos. Responde únicamente con el markdown del escenario.
+
+----- ESPECIFICACIÓN DEL FORMATO -----
+
+` + P.FORMAT_DOC_ES + `
+
+----- TEMA SOLICITADO -----
+
+[Describe aquí la noción que hay que explicar, el derecho (español o francés), el público (p. ej. grado en Relaciones Laborales o en Derecho) y el número de pasos deseado.]
 `;
